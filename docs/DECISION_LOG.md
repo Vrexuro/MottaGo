@@ -1,47 +1,30 @@
-# Decision Log
+# MottaGo Decision Log
 
-## DL-001 — Pembuatan Repository
+## DL-01
+Store menggunakan max_capacity yang dikonfigurasi manajer.
 
-Tanggal: 17 Juni 2026
+## DL-02
+Unit ditentukan otomatis berdasarkan waste_type.
+Qty diinput manual oleh Utility.
 
-Keputusan:
-Repository GitHub MottaGo dibuat sebagai source of truth proyek.
+## DL-03
+Satu pickup aktif per store.
 
-Alasan:
-Agar seluruh dokumentasi, desain, dan kode tersentralisasi.
+## DL-04
+Menggunakan tabel NOTIFICATION dan polling 30 detik.
 
----
+## DL-05
+Vendor nonaktif tidak dapat login.
+Pickup aktif tetap dapat diselesaikan.
 
-## DL-002 — Metodologi Pengembangan
+## DL-06
+Store memiliki default_vendor_id.
 
-Tanggal: 17 Juni 2026
+## DL-07
+Utility dapat memulai klasifikasi tanpa menunggu konfirmasi Pelayan.
 
-Keputusan:
-Menggunakan GSD-style workflow dengan Claude Cowork.
+## Referensi Keputusan Bisnis
 
-Alasan:
-Agar proses pengembangan terdokumentasi dan terstruktur.
+Decision Log lengkap hasil Phase 1:
 
----
-
-## DL-003 — Frontend First Approach
-
-Tanggal: 17 Juni 2026
-
-Keputusan:
-Frontend dikembangkan terlebih dahulu sebelum backend dan database.
-
-Alasan:
-Mengikuti arahan dosen dan mempermudah validasi kebutuhan pengguna.
-
----
-
-## DL-004 — Repository Visibility
-
-Tanggal: 17 Juni 2026
-
-Keputusan:
-Repository MottaGo diset sebagai Private.
-
-Alasan:
-Melindungi dokumen proyek dan kode selama masa pengembangan.
+- docs/phase1/DecisionLog_MottaGo_v1.2.docx
