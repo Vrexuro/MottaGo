@@ -19,15 +19,20 @@ Visual Validation digunakan untuk mengevaluasi kualitas desain sebelum implement
 ---
 
 Status:
-✓ SCR-M-01 Approved
+✓ Approved
 
 Visual Baseline:
+SCR-M-01 Manager Dashboard
+
+Theme:
 Bumi Tenang + Daun Segar
-Dark Forest Green Sidebar
-Professional Sustainability Enterprise Dashboard
+
+Approved Date:
+18 Juni 2026
 
 Source of Truth:
 Phase3C_VisualDesign_MottaGo_v1.1
+SCR-M-01_VisualSpec_MottaGo_v1.1
 
 ## Input Documents
 
