@@ -18,21 +18,30 @@ Visual Validation digunakan untuk mengevaluasi kualitas desain sebelum implement
 
 ---
 
-Status:
-✓ Approved
+## Status
 
-Visual Baseline:
-SCR-M-01 Manager Dashboard
+**Visual Validation Status:** In Progress
 
-Theme:
-Bumi Tenang + Daun Segar
+**Approved Visual Screens:**
 
-Approved Date:
+* SCR-M-01 — Manager Dashboard
+* SCR-M-02 — Monitoring Kapasitas
+
+**Theme:**
+
+* Bumi Tenang (Primary Theme)
+* Daun Segar (Accent System)
+
+**Approved Date:**
 18 Juni 2026
 
-Source of Truth:
-Phase3C_VisualDesign_MottaGo_v1.1
-SCR-M-01_VisualSpec_MottaGo_v1.1
+**Source of Truth:**
+
+* Phase3C_VisualDesign_MottaGo_v1.1
+* SCR-M-01_VisualSpec_MottaGo_v1.1
+* SCR-M-02_VisualSpec_MottaGo_v1.1
+
+---
 
 ## Input Documents
 
@@ -42,7 +51,7 @@ Visual Validation menggunakan dokumen berikut sebagai sumber kebenaran:
 * DecisionLog_MottaGo_v1.2
 * Phase3A_UX_Architecture_MottaGo_v1.1
 * Phase3B_DesignSystem_MottaGo_v1.0
-* Phase3C_VisualDesign_MottaGo_v1.0
+* Phase3C_VisualDesign_MottaGo_v1.1
 
 ---
 
@@ -50,7 +59,7 @@ Visual Validation menggunakan dokumen berikut sebagai sumber kebenaran:
 
 ### Primary Theme
 
-Bumi Tenang
+**Bumi Tenang**
 
 Karakteristik:
 
@@ -63,7 +72,7 @@ Karakteristik:
 
 ### Accent Theme
 
-Daun Segar
+**Daun Segar**
 
 Digunakan hanya untuk:
 
@@ -81,11 +90,11 @@ Daun Segar bukan tema utama dan tidak boleh mendominasi antarmuka.
 
 ### SCR-M-01 — Manager Dashboard
 
-Dokumen:
+**Dokumen:**
 
-* SCR-M-01_VisualSpec_MottaGo_v1.0.docx
+* SCR-M-01_VisualSpec_MottaGo_v1.1.docx
 
-Mencakup:
+**Mencakup:**
 
 * Screen Purpose
 * Layout Structure
@@ -102,7 +111,37 @@ Mencakup:
 * Accessibility Considerations
 * Design Rationale
 
-Status:
+**Status:**
+
+* Approved
+
+---
+
+### SCR-M-02 — Monitoring Kapasitas
+
+**Dokumen:**
+
+* SCR-M-02_VisualSpec_MottaGo_v1.1.docx
+
+**Mencakup:**
+
+* Screen Purpose & Navigation Context
+* Layout Structure
+* Component Placement
+* Information Hierarchy
+* Capacity Overview
+* Capacity Trend Analysis
+* Waste Category Breakdown
+* Threshold Monitoring
+* Capacity Alerts & Notifications
+* Desktop Layout
+* Tablet Layout
+* Mobile Layout
+* Accessibility Considerations
+* Design Rationale
+* Verification Report
+
+**Status:**
 
 * Approved
 
@@ -133,13 +172,13 @@ Tidak diperbolehkan:
 
 Setiap desain yang dihasilkan harus dievaluasi berdasarkan:
 
-1. Konsistensi terhadap Design Freeze.
-2. Keterbacaan informasi.
-3. Kejelasan KPI dan status operasional.
-4. Aksesibilitas.
-5. Responsivitas.
-6. Kesesuaian dengan karakter Bumi Tenang + Daun Segar.
-7. Kesiapan untuk implementasi frontend.
+* Konsistensi terhadap Design Freeze.
+* Keterbacaan informasi.
+* Kejelasan KPI dan status operasional.
+* Aksesibilitas.
+* Responsivitas.
+* Kesesuaian dengan karakter Bumi Tenang + Daun Segar.
+* Kesiapan untuk implementasi frontend.
 
 ---
 
@@ -151,7 +190,10 @@ Setiap desain yang dihasilkan harus dievaluasi berdasarkan:
 | Phase 3B                      | Approved    |
 | Phase 3C                      | Frozen      |
 | SCR-M-01 Visual Specification | Approved    |
+| SCR-M-02 Visual Specification | Approved    |
+| SCR-M-04 Visual Specification | In Progress |
 | High-Fidelity Mockup          | Pending     |
+| Prototype Generation (Figma)  | Pending     |
 | Phase 4 Build                 | Not Started |
 
 ---
@@ -160,4 +202,11 @@ Setiap desain yang dihasilkan harus dievaluasi berdasarkan:
 
 Visual Validation berfungsi sebagai jembatan antara Design Freeze dan Implementation Phase.
 
-Phase 4 tidak boleh dimulai sebelum desain visual utama telah divalidasi dan disetujui.
+Visual Specification yang telah disetujui menjadi sumber referensi untuk:
+
+* Claude Design
+* Claude Code + Figma MCP
+* Prototype Generation
+* Frontend Implementation
+
+Phase 4 tidak boleh dimulai sebelum visual utama telah divalidasi dan disetujui.
