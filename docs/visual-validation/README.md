@@ -183,18 +183,17 @@ Setiap desain yang dihasilkan harus dievaluasi berdasarkan:
 ---
 
 ## Current Status
-
-| Item                          | Status      |
-| ----------------------------- | ----------- |
-| Phase 3A                      | Approved    |
-| Phase 3B                      | Approved    |
-| Phase 3C                      | Frozen      |
-| SCR-M-01 Visual Specification | Approved    |
-| SCR-M-02 Visual Specification | Approved    |
-| SCR-M-04 Visual Specification | In Progress |
-| High-Fidelity Mockup          | Pending     |
-| Prototype Generation (Figma)  | Pending     |
-| Phase 4 Build                 | Not Started |
+| Item | Status |
+|--------|--------|
+| Phase 3A | Approved |
+| Phase 3B | Approved |
+| Phase 3C | Frozen |
+| SCR-M-01 Visual Specification | Approved |
+| SCR-M-02 Visual Specification | Approved |
+| SCR-M-04 Visual Specification | Approved |
+| Prototype Generation (Figma) | In Progress |
+| High-Fidelity Mockup | Pending |
+| Phase 4 Build | Not Started |
 
 ---
 
