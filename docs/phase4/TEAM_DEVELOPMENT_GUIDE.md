@@ -672,11 +672,40 @@ Sebuah task atau fitur dinyatakan **selesai** hanya jika memenuhi semua kriteria
 | `npm run build` sukses tanpa error | Wajib sebelum buat PR |
 | `npm run lint` bersih (0 errors, 0 warnings) | Wajib sebelum buat PR |
 | Tampilan sesuai Visual Spec yang disetujui | SCR-M-01/M-02/M-04 VisualSpec v1.1 |
-| Responsif di mobile, tablet, desktop | Uji di DevTools (640px / 1024px / 1280px+) |
+| Responsif di mobile, tablet, desktop | Uji di DevTools (< 768px / 768–1023px / ≥ 1024px) [DL-09] |
 | Tidak mengubah file di luar area ownership tanpa izin | Cek `git diff` sebelum commit |
 | Pull Request sudah dibuat dan menunggu review | PR terbuka di GitHub |
 | Approved oleh Rifqi | Ditandai Approve di GitHub |
 | Merged ke main oleh Rifqi | Merge dilakukan oleh Rifqi |
+
+### Responsive Implementation Convention — DL-09
+
+Konvensi ini wajib diikuti seluruh tim untuk Sprint 1 dan Sprint 2.
+
+**Breakpoint resmi:**
+
+| Breakpoint | Viewport | Tailwind Prefix |
+|---|---|---|
+| Mobile  | < 768px    | (default, tanpa prefix)       |
+| Tablet  | 768–1023px | `md:`                         |
+| Desktop | ≥ 1024px   | `lg:`                         |
+| Wide    | ≥ 1280px   | `xl:` (max-width konten saja) |
+
+**Aturan penulisan CSS:**
+- Mobile-First: default = mobile; `md:` = tablet; `lg:` = desktop
+- Tidak boleh menggunakan breakpoint hardcoded — gunakan Tailwind prefix
+- `tailwind.config.ts` tidak perlu konfigurasi breakpoint kustom
+
+**Navigasi per breakpoint (DL-09):**
+- Mobile: SideNav tersembunyi (drawer); hamburger di AppHeader kiri; tidak ada BottomNav
+- Tablet: SideNav collapsed 64px icon-only; tap → expand 240px + backdrop rgba(0,0,0,0.3)
+- Desktop: SideNav expanded 240px; selalu terlihat; tidak collapsed
+
+**Token navigasi (tersedia di `tokens.css`):**
+- `--nav-header-height-mobile: 56px` — tinggi AppHeader mobile
+- `--nav-header-height: 64px` — tinggi AppHeader tablet & desktop
+- `--nav-side-collapsed: 64px` — lebar SideNav collapsed (tablet)
+- `--nav-side-expanded: 240px` — lebar SideNav expanded (desktop)
 
 ---
 
@@ -725,11 +754,12 @@ komponen belum tersedia.
 |---|---|---|
 | S1-15 | AppHeader (COMP-19) | `src/components/organisms/AppHeader/index.tsx` |
 | S1-16 | SideNav Dark (COMP-21) | `src/components/organisms/SideNav/index.tsx` |
-| S1-17 | BottomNav (COMP-20) | `src/components/organisms/BottomNav/index.tsx` |
+| ~~S1-17~~ | ~~BottomNav (COMP-20)~~ | ~~`src/components/organisms/BottomNav/index.tsx`~~ — **DEFERRED per DL-10** |
 | S1-18 | AuthLayout | `src/layouts/AuthLayout.tsx` |
 | S1-19 | DashboardLayout | `src/layouts/DashboardLayout.tsx` |
 | S1-20 | SimpleLayout | `src/layouts/SimpleLayout.tsx` |
-| S1-21 | Skeleton LT-04 s/d LT-08 | `src/layouts/` |
+| S1-21a | FormLayout (LT-04 — FULL) | `src/layouts/FormLayout.tsx` — digunakan SCR-M-04 Sprint 2 [DL-10] |
+| S1-21 | Skeleton LT-05 s/d LT-08 | `src/layouts/` [LT-04 sudah FULL di S1-21a — DL-10] |
 
 **Tahap 1D — Types, Hooks, Guard:**
 
@@ -746,6 +776,9 @@ komponen belum tersedia.
 - Pelajari Visual Spec screen masing-masing:
   - Azizah: `docs/visual-validation/SCR-M-02_VisualSpec_MottaGo_v1.1.docx`
   - Dhia: `docs/visual-validation/SCR-M-04_VisualSpec_MottaGo_v1.0.docx`
+- Layout yang digunakan di Sprint 2 (per DL-10):
+  - Azizah: SCR-M-02 → **DashboardLayout** (`src/layouts/DashboardLayout.tsx`) — LT-03, dibangun Sprint 1
+  - Dhia: SCR-M-04 → **FormLayout** (`src/layouts/FormLayout.tsx`) — LT-04, dibangun Rifqi di S1-21a
 - Komunikasikan ke Rifqi jika ada komponen yang akan dibutuhkan tapi belum ada
   di daftar Sprint 1
 
