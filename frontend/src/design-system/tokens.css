@@ -1,0 +1,136 @@
+:root {
+  /* =========================================
+     BUMI TENANG — Primary Brand Colors
+     Source: Phase 3B v1.0 §5 · Phase 3C v1.1 §10
+     ========================================= */
+  --color-brand-primary: #1f4e79;
+  --color-brand-primary-hover: #1e3a5f;
+  --color-brand-secondary: #375623;
+
+  /* =========================================
+     DARK NAVIGATION — SideNav Dark Variant
+     Source: Phase 3C v1.1 §2.2 — WAJIB
+     Kontras: #A3C98A on #243F1A = 4.6:1 (AA ✓)
+               #E5F3DC on #243F1A = 10.2:1 (AAA ✓)
+     ========================================= */
+  --color-nav-dark-bg: #243f1a;
+  --color-nav-dark-active-bg: #375623;
+  --color-nav-dark-hover-bg: #2d5020;
+  --color-nav-dark-item-text: #e5f3dc;
+  --color-nav-dark-muted: #a3c98a;
+  --color-nav-dark-active-border: #22c55e;
+
+  /* =========================================
+     ROLE IDENTITY — AppHeader Background per Role
+     Source: Phase 3B v1.0 §5 · SCR-M-01 VisualSpec
+     ========================================= */
+  --color-role-manajer-bg: #fff2cc;
+  --color-role-manajer-text: #78350f;
+  --color-role-pelayan-bg: #d6e4f0;
+  --color-role-utility-bg: #e2efda;
+  --color-role-vendor-bg: #fce9d9;
+
+  /* =========================================
+     CAPACITY STATUS — DL-04 Behavior
+     Normal < 60% · Warning 60–89% · Critical ≥ 90%
+     ========================================= */
+  --color-capacity-normal: #4caf50;
+  --color-capacity-warning: #ff9800;
+  --color-capacity-critical: #f44336;
+
+  /* =========================================
+     DAUN SEGAR — Accent System
+     Source: Phase 3C v1.1: success, sustainability, positive KPI
+     ========================================= */
+  --color-accent-primary: #22c55e;
+  --color-accent-success-bg: #dcfce7;
+  --color-accent-success-border: #16a34a;
+  --color-accent-success-text: #15803d;
+
+  /* =========================================
+     SEMANTIC COLORS
+     ========================================= */
+  --color-error-bg: #fee2e2;
+  --color-error-border: #f44336;
+  --color-error-text: #991b1b;
+  --color-warning-bg: #fffbeb;
+  --color-info-bg: #dbeafe;
+  --color-info-text: #1e40af;
+
+  /* =========================================
+     SURFACE & BORDER
+     ========================================= */
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f7f8fa;
+  --color-border: #d9d9d9;
+  --color-border-focus: #22c55e;
+
+  /* =========================================
+     TEXT
+     ========================================= */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-disabled: #aaaaaa;
+  --color-text-on-dark: #e5f3dc;
+
+  /* =========================================
+     SHOULD HAVE — Feature Indicator
+     ========================================= */
+  --color-sh-indicator: #7030a0;
+
+  /* =========================================
+     TYPOGRAPHY
+     Source: Phase 3B v1.0 §5.2
+     ========================================= */
+  --font-family-base: 'Inter', 'Arial', sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 32px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  /* =========================================
+     SPACING
+     ========================================= */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* =========================================
+     BORDER RADIUS
+     ========================================= */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* =========================================
+     SHADOWS
+     ========================================= */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.18);
+
+  /* =========================================
+     BREAKPOINTS (reference only — used via Tailwind config)
+     ========================================= */
+  --bp-mobile: 640px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1280px;
+}

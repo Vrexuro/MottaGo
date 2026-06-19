@@ -1,0 +1,52 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        'brand-primary': 'var(--color-brand-primary)',
+        'brand-primary-hover': 'var(--color-brand-primary-hover)',
+        'brand-secondary': 'var(--color-brand-secondary)',
+        'nav-dark-bg': 'var(--color-nav-dark-bg)',
+        'nav-dark-active-bg': 'var(--color-nav-dark-active-bg)',
+        'nav-dark-hover-bg': 'var(--color-nav-dark-hover-bg)',
+        'nav-dark-item-text': 'var(--color-nav-dark-item-text)',
+        'nav-dark-muted': 'var(--color-nav-dark-muted)',
+        'role-manajer-bg': 'var(--color-role-manajer-bg)',
+        'role-manajer-text': 'var(--color-role-manajer-text)',
+        'role-pelayan-bg': 'var(--color-role-pelayan-bg)',
+        'role-utility-bg': 'var(--color-role-utility-bg)',
+        'role-vendor-bg': 'var(--color-role-vendor-bg)',
+        'capacity-normal': 'var(--color-capacity-normal)',
+        'capacity-warning': 'var(--color-capacity-warning)',
+        'capacity-critical': 'var(--color-capacity-critical)',
+        'accent-primary': 'var(--color-accent-primary)',
+        'accent-success-bg': 'var(--color-accent-success-bg)',
+        'accent-success-border': 'var(--color-accent-success-border)',
+        'accent-success-text': 'var(--color-accent-success-text)',
+        'error-bg': 'var(--color-error-bg)',
+        'error-border': 'var(--color-error-border)',
+        'error-text': 'var(--color-error-text)',
+        'warning-bg': 'var(--color-warning-bg)',
+        'info-bg': 'var(--color-info-bg)',
+        'info-text': 'var(--color-info-text)',
+        'mottago-surface': 'var(--color-surface)',
+        'mottago-surface-subtle': 'var(--color-surface-subtle)',
+        'mottago-border': 'var(--color-border)',
+        'border-focus': 'var(--color-border-focus)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-disabled': 'var(--color-text-disabled)',
+        'text-on-dark': 'var(--color-text-on-dark)',
+        'sh-indicator': 'var(--color-sh-indicator)',
+      },
+      fontFamily: {
+        base: ['Inter', 'Arial', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;

@@ -23,6 +23,16 @@ Store memiliki default_vendor_id.
 ## DL-07
 Utility dapat memulai klasifikasi tanpa menunggu konfirmasi Pelayan.
 
+## DL-08
+Phase 3B v1.0 ditetapkan sebagai source of truth untuk screen inventory,
+screen numbering, route definitions, layout type assignments, dan module
+structure pada Phase 4 Build, menggantikan aspek-aspek tersebut dari
+Phase 3A v1.1.
+Phase 3A v1.1 tetap berlaku untuk information architecture, user flows,
+navigation patterns, dan role mapping.
+SCR-M-02 = Monitoring Kapasitas Store (bukan Daftar Pickup).
+Disetujui: 19 Juni 2026.
+
 ## Referensi Keputusan Bisnis
 
 Decision Log lengkap hasil Phase 1:

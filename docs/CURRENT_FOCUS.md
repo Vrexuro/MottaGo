@@ -6,7 +6,7 @@ MottaGo adalah sistem manajemen pengurangan sampah sisa makanan untuk bisnis res
 
 ## Current Phase
 
-Phase 4 – Frontend Development
+Phase 4 – Frontend Development (Sprint 1)
 
 ## Completed
 
@@ -42,6 +42,16 @@ Available Screens:
 * SCR-M-02 Monitoring Kapasitas
 * SCR-M-04 Request Pickup
 
+### Phase 4 – Sprint 0 (Selesai)
+
+* React 18 + TypeScript 5 + Vite 6
+* React Router v6
+* TailwindCSS v3
+* ESLint v8 + Prettier v3
+* Folder Structure sesuai Build Plan v1.1
+* Design System Foundation (tokens.css, globals.css, typography.css)
+* 4 Route Placeholder: /, /manajer, /manajer/kapasitas, /manajer/pickup/request
+
 ## Repository
 
 Frontend:
@@ -51,29 +61,21 @@ Purpose:
 React + TypeScript frontend implementation for MottaGo.
 
 Current Status:
-Repository initialized.
-Frontend foundation setup not started.
+Sprint 0 selesai. Frontend foundation tersedia di frontend/.
+Sprint 1 – Shared Layout & Components belum dimulai.
 
 ## Next Objective
 
-Setup frontend foundation:
+Sprint 1 – Shared Layout & Components:
 
-* React
-* TypeScript
-* Vite
-* React Router
-* TailwindCSS
-* ESLint
-* Prettier
-
-Setelah setup selesai:
-
-* Build Main Layout
-* Build Sidebar
-* Build Routing
-* Implement SCR-M-01 Dashboard
-* Implement SCR-M-02 Monitoring Kapasitas
-* Implement SCR-M-04 Request Pickup
+* AppHeader (COMP-19)
+* SideNav Dark Variant (COMP-21)
+* BottomNav (COMP-20)
+* Layout wrappers: DashboardLayout, SimpleLayout, AuthLayout, skeleton LT-04 s/d LT-08
+* Atom components: COMP-01 s/d COMP-09
+* Molecule components prioritas: COMP-10, COMP-13, COMP-14, COMP-15, COMP-17
+* Hooks: useCapacity (skeleton), usePagination
+* RoleGuard (skeleton)
 
 ## Team Structure
 
