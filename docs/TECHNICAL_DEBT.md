@@ -106,9 +106,58 @@ nilai token yang berbeda.
 
 ---
 
+## TD-03 — Badge Warning Text Token Gap
+
+**Komponen:** `frontend/src/components/atoms/Badge/index.tsx`
+**Sprint:** S1-05
+**Tanggal:** 20 Juni 2026
+
+### Deskripsi
+
+`warning` variant menggunakan warna teks `#92400E` (Amber 900) sebagai arbitrary
+Tailwind value: `text-[#92400E]`. Nilai ini tidak memiliki token di `tokens.css`
+maupun mapping di `tailwind.config.ts`.
+
+`#92400E` dipilih karena `--color-capacity-warning: #ff9800` (token yang ada)
+tidak aman sebagai warna teks — rasio kontras pada latar `#FFFBEB` hanya 2.9:1,
+di bawah WCAG AA minimum 4.5:1. Phase 3B §3.1 mengonfirmasi bahwa `#FF9800`
+tidak boleh digunakan sebagai teks kecil.
+
+Nilai `#92400E` menghasilkan kontras 8.1:1 (AAA ✓) pada `#FFFBEB`.
+
+### Dampak
+
+- **Severity:** Low — fungsional dan WCAG compliant
+- **Scope:** Badge `warning` variant; akan berdampak ke StatusBadge `pending` state (S1-13)
+- **DX Impact:** Tidak ada token autocomplete untuk warna teks warning
+
+### Perbaikan yang Direkomendasikan
+
+Tambahkan `--color-warning-text: #92400E` ke `tokens.css`:
+
+```css
+--color-warning-text: #92400E;
+```
+
+Tambahkan mapping ke `tailwind.config.ts`:
+
+```typescript
+'warning-text': 'var(--color-warning-text)',
+```
+
+Kemudian ganti `text-[#92400E]` di Badge dengan `text-warning-text`.
+
+### Target Resolusi
+
+Sprint 2 — sebelum StatusBadge (S1-13) diimplementasi, agar token tersedia
+untuk seluruh komponen yang merender warning state sebagai teks.
+
+---
+
 ## Index
 
 | ID | Komponen | Sprint | Status | Target |
 |---|---|---|---|---|
 | TD-01 | TextInput leftIcon/rightIcon type safety | S1-02 | Open | Sprint 2 |
 | TD-02 | TextInput readonly token visual verification | S1-02 | Open | Visual Validation Phase |
+| TD-03 | Badge warning text token gap (#92400E) | S1-05 | Open | Sprint 2 |
