@@ -1,7 +1,7 @@
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-type IconSize = 16 | 20 | 24 | 32 | 48;
+export type IconSize = 16 | 20 | 24 | 32 | 48;
 
 interface IconProps {
   name: string;
