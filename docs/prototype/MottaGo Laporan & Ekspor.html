@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MottaGo – Laporan &amp; Ekspor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #F7F8FA; color: #111827; }
+.mg-navdark { transition: background 120ms ease, color 120ms ease; }
+.mg-navdark:hover:not(.mg-navdark-active) { background: rgba(255,255,255,.06) !important; }
+.mg-ghost { transition: background 120ms ease; }
+.mg-ghost:hover { background: rgba(0,0,0,.06); }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 20px; border: none; border-radius: 8px;
+  background: #22C55E; color: #fff; font-family: inherit;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 120ms ease;
+}
+.btn-primary:hover { background: #16A34A; }
+.btn-primary:active { background: #15803D; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 18px; border: 1px solid #D1D5DB; border-radius: 8px;
+  background: #fff; color: #374151; font-family: inherit;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background 120ms ease;
+}
+.btn-secondary:hover { background: #F9FAFB; }
+.mg-input {
+  height: 40px; padding: 0 12px; border: 1px solid #D1D5DB; border-radius: 6px;
+  font-family: inherit; font-size: 14px; color: #111827; background: #fff;
+  transition: border-color 120ms ease, box-shadow 120ms ease; outline: none;
+}
+.mg-input:focus { border-color: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+input[type="date"].mg-input { cursor: pointer; }
+.mg-card {
+  background: #fff; border: 1px solid #E5E7EB; border-radius: 8px;
+  padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.mg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mg-table th {
+  padding: 12px 16px; background: #F9FAFB; font-size: 12px; font-weight: 600;
+  color: #6B7280; text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 1px solid #E5E7EB; text-align: left; white-space: nowrap;
+}
+.mg-table td { padding: 14px 16px; border-bottom: 1px solid #F3F4F6; color: #374151; vertical-align: middle; }
+.mg-table tr:last-child td { border-bottom: none; }
+.mg-table tbody tr:hover td { background: #F9FAFB; }
+.badge { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 99px; }
+.alert-banner { display: flex; align-items: flex-start; gap: 12px; border-radius: 8px; padding: 14px 18px; border: 1px solid; border-left-width: 4px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 3px; }
+@keyframes shimmer { 0%,100% { opacity:.5 } 50% { opacity:1 } }
+.skeleton { background: #E5E7EB; border-radius: 4px; animation: shimmer 1.4s ease infinite; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+.fade-in { animation: fadeIn 180ms ease; }
+</style>
+</head>
+<body>
+
+<!-- APP HEADER -->
+<header role="banner" aria-label="MottaGo Application Header" data-screen-label="AppHeader"
+  style="position:fixed;top:0;left:0;right:0;height:64px;z-index:100;
+         background:#FFF2CC;border-bottom:1px solid #D1D5DB;
+         display:flex;align-items:center;justify-content:space-between;padding:0 32px;">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <div style="width:26px;height:26px;border-radius:7px;background:#1F4E79;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF2CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </div>
+      <span style="font-size:16px;font-weight:700;color:#1F4E79;letter-spacing:-.01em;">MottaGo</span>
+    </div>
+    <div style="width:1px;height:24px;background:#D8C68A;"></div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#78350F;">
+      <span style="color:#A0824A;font-weight:500;">Dashboard</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4A968" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      Laporan &amp; Ekspor
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:18px;">
+    <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;background:rgba(255,255,255,.55);border:1px solid #E6D9A8;border-radius:8px;width:240px;color:#92702A;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <span style="font-size:13px;color:#A0824A;">Cari laporan, tanggal…</span>
+    </div>
+    <div class="mg-ghost" style="position:relative;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:9px;cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+      </svg>
+      <span style="position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 4px;background:#DC2626;color:#fff;border-radius:9px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid #FFF2CC;">2</span>
+    </div>
+    <div style="width:1px;height:24px;background:#E6D9A8;"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:right;line-height:1.25;">
+        <div style="font-size:14px;font-weight:500;color:#78350F;">Azizah</div>
+        <div style="font-size:11px;font-weight:600;color:#92702A;display:inline-block;background:rgba(255,255,255,.6);border:1px solid #E6D9A8;border-radius:5px;padding:1px 7px;margin-top:1px;">Manajer</div>
+      </div>
+      <div style="width:38px;height:38px;border-radius:50%;background:#1F4E79;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;">AZ</div>
+    </div>
+  </div>
+</header>
+
+<!-- SIDE NAV -->
+<nav role="navigation" aria-label="Menu Utama Manajer" data-screen-label="SideNav"
+  style="position:fixed;left:0;top:64px;bottom:0;width:240px;z-index:90;background:#243F1A;overflow-y:auto;display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:10px;padding:18px;border-bottom:1px solid rgba(255,255,255,.08);">
+    <div style="width:30px;height:30px;border-radius:8px;background:#22C55E;display:flex;align-items:center;justify-content:center;flex:none;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15301A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6"/>
+      </svg>
+    </div>
+    <span style="font-size:18px;font-weight:700;color:#E5F3DC;letter-spacing:-.01em;">MottaGo</span>
+  </div>
+  <div style="padding:14px 12px 4px 18px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6E9456;">Menu Utama</div>
+  <div style="display:flex;flex-direction:column;gap:2px;padding:4px 12px;">
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+      Monitoring Kapasitas
+    </a>
+    <!-- ACTIVE: Laporan & Ekspor -->
+    <a href="#" aria-current="page" class="mg-navdark mg-navdark-active"
+      style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 14px;border-radius:8px;background:#375623;border-left:3px solid #22C55E;color:#E5F3DC;font-size:14px;font-weight:600;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+      </svg>
+      Laporan &amp; Ekspor
+    </a>
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2"/>
+        <path d="M15 18H9"/>
+        <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 18.52 8H14"/>
+        <circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>
+      </svg>
+      Request Pickup
+    </a>
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+      </svg>
+      Riwayat Pickup
+    </a>
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      Pengaturan Store
+    </a>
+    <a href="#" class="mg-navdark" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 17px;border-radius:8px;background:transparent;color:#A3C98A;font-size:14px;font-weight:500;text-decoration:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
+        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+        <path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/>
+      </svg>
+      <span style="display:flex;align-items:center;gap:6px;">Manajemen Vendor <span style="font-size:9px;font-weight:700;color:#CDEBBA;background:rgba(34,197,94,.18);border-radius:4px;padding:1px 5px;">SH</span></span>
+    </a>
+  </div>
+  <div style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:16px 18px;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="width:36px;height:36px;border-radius:50%;background:#375623;color:#E5F3DC;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none;">AZ</div>
+    <div style="line-height:1.3;min-width:0;">
+      <div style="font-size:13px;font-weight:600;color:#E5F3DC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Azizah</div>
+      <div style="font-size:12px;color:#6E9456;">Manajer</div>
+    </div>
+    <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:#6E9456;padding:4px;border-radius:5px;display:flex;align-items:center;" title="Keluar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT (LT-07 Report View) -->
+<main role="main" aria-label="Laporan dan Ekspor" style="margin-left:240px;margin-top:64px;padding:32px;min-height:calc(100vh - 64px);">
+  <div style="max-width:1048px;margin:0 auto;">
+
+    <div style="margin-bottom:28px;">
+      <h1 style="margin:0 0 5px;font-size:24px;font-weight:700;color:#111827;letter-spacing:-.01em;">Laporan &amp; Ekspor</h1>
+      <p style="margin:0;font-size:14px;color:#6B7280;">Lihat ringkasan harian dan ekspor data waste ke CSV untuk analisis lebih lanjut.</p>
+    </div>
+
+    <!-- SECTION 1: LAPORAN HARIAN [SH · FR-S-06] -->
+    <div class="mg-card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E5E7EB;padding-bottom:16px;margin-bottom:20px;">
+        <div>
+          <h2 style="font-size:16px;font-weight:600;color:#111827;margin:0 0 3px;">Laporan Harian</h2>
+          <p style="font-size:13px;color:#6B7280;margin:0;">Ringkasan aktivitas waste untuk satu hari</p>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#A16207;background:#FEF9C3;border-radius:5px;padding:2px 8px;border:1px solid #FDE68A;">SH</span>
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+        <div>
+          <label for="filter-tanggal" style="display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px;">Tanggal</label>
+          <input id="filter-tanggal" type="date" class="mg-input" style="width:180px;" aria-label="Pilih tanggal laporan">
+        </div>
+        <button class="btn-primary" id="btn-lihat" onclick="lihatLaporan()" style="height:40px;margin-bottom:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Lihat
+        </button>
+        <button class="btn-secondary" onclick="resetLaporan()" style="height:40px;display:none;" id="btn-reset">Reset</button>
+      </div>
+
+      <!-- Skeleton loading -->
+      <div id="loading-laporan" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+          <div class="skeleton" style="height:96px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:96px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:96px;border-radius:8px;"></div>
+        </div>
+        <div class="skeleton" style="height:200px;border-radius:8px;"></div>
+      </div>
+
+      <!-- Summary cards -->
+      <div id="summary-cards" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+          <!-- Total Waste In -->
+          <div style="background:#fff;border:1px solid #BFDBFE;border-top:3px solid #1F4E79;border-radius:8px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Total Waste In</span>
+              <div style="width:32px;height:32px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F4E79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </div>
+            </div>
+            <div style="font-size:28px;font-weight:700;color:#1F4E79;line-height:1;" id="val-waste-in">—</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:5px;" id="sub-waste-in">Belum dimuat</div>
+          </div>
+          <!-- Status Pickup -->
+          <div style="background:#fff;border:1px solid #FDE68A;border-top:3px solid #F59E0B;border-radius:8px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Status Pickup</span>
+              <div style="width:32px;height:32px;border-radius:8px;background:#FFFBEB;display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h2"/>
+                  <path d="M15 18H9"/>
+                  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 18.52 8H14"/>
+                  <circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>
+                </svg>
+              </div>
+            </div>
+            <div style="font-size:28px;font-weight:700;color:#92400E;line-height:1;" id="val-pickup">—</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:5px;" id="sub-pickup">Belum dimuat</div>
+          </div>
+          <!-- Waste Keluar -->
+          <div style="background:#fff;border:1px solid #BBF7D0;border-top:3px solid #22C55E;border-radius:8px;padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Waste Keluar</span>
+              <div style="width:32px;height:32px;border-radius:8px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22V8"/><path d="m5 15 7 7 7-7"/><path d="M5 9h14"/><path d="M5 5h14"/>
+                </svg>
+              </div>
+            </div>
+            <div style="font-size:28px;font-weight:700;color:#15803D;line-height:1;" id="val-waste-out">—</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:5px;" id="sub-waste-out">Belum dimuat</div>
+          </div>
+        </div>
+
+        <!-- DataTable -->
+        <div style="border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;">
+            <span style="font-size:13px;font-weight:600;color:#374151;" id="table-title">Detail Aktivitas</span>
+            <span style="font-size:12px;color:#9CA3AF;" id="table-count"></span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="mg-table" id="laporan-table">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Jenis Sampah</th>
+                  <th>Qty</th>
+                  <th>Unit</th>
+                  <th>Dicatat Oleh</th>
+                </tr>
+              </thead>
+              <tbody id="laporan-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-laporan" style="display:none;flex-direction:column;align-items:center;padding:48px 24px;text-align:center;">
+        <div style="width:56px;height:56px;border-radius:12px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+          </svg>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:#374151;margin-bottom:6px;">Tidak ada data untuk tanggal ini</div>
+        <div style="font-size:14px;color:#9CA3AF;">Pilih tanggal lain atau periksa apakah data sudah dicatat.</div>
+      </div>
+
+      <!-- Hint (initial state) -->
+      <div id="hint-laporan" style="display:flex;flex-direction:column;align-items:center;padding:40px 24px;text-align:center;">
+        <div style="width:56px;height:56px;border-radius:12px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:#374151;margin-bottom:6px;">Pilih tanggal lalu klik <strong>Lihat</strong></div>
+        <div style="font-size:14px;color:#9CA3AF;">Default: kemarin (T&#8722;1). Data harian ditampilkan sebagai ringkasan dan tabel detail.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: EKSPOR CSV [MH · FR-S-09] -->
+    <div class="mg-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E5E7EB;padding-bottom:16px;margin-bottom:20px;">
+        <div>
+          <h2 style="font-size:16px;font-weight:600;color:#111827;margin:0 0 3px;">Ekspor CSV</h2>
+          <p style="font-size:13px;color:#6B7280;margin:0;">Unduh data waste dalam format CSV untuk satu rentang tanggal.</p>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#065F46;background:#D1FAE5;border-radius:5px;padding:2px 8px;border:1px solid #A7F3D0;">MH</span>
+      </div>
+
+      <!-- Success banner -->
+      <div id="export-success" style="display:none;margin-bottom:20px;" class="fade-in">
+        <div class="alert-banner" style="background:#F0FDF4;border-color:#BBF7D0;border-left-color:#22C55E;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;">
+            <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#15803D;">File CSV berhasil diunduh</div>
+            <div style="font-size:13px;color:#166534;margin-top:3px;" id="export-filename"></div>
+          </div>
+          <button onclick="document.getElementById('export-success').style.display='none'" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#6B7280;padding:2px;display:flex;align-items:center;flex:none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Date range picker -->
+      <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+        <div>
+          <label for="export-dari" style="display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px;">Dari</label>
+          <input id="export-dari" type="date" class="mg-input" style="width:180px;">
+        </div>
+        <div style="padding-bottom:10px;color:#9CA3AF;font-size:13px;font-weight:500;">s/d</div>
+        <div>
+          <label for="export-sampai" style="display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px;">Sampai</label>
+          <input id="export-sampai" type="date" class="mg-input" style="width:180px;">
+        </div>
+        <button class="btn-primary" id="btn-ekspor" onclick="eksporCSV()" style="height:40px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Ekspor CSV
+        </button>
+      </div>
+
+      <!-- Validation error -->
+      <div id="export-error" style="display:none;margin-bottom:16px;">
+        <div class="alert-banner" style="background:#FEF2F2;border-color:#FECACA;border-left-color:#EF4444;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span style="font-size:14px;color:#B91C1C;" id="export-error-msg"></span>
+        </div>
+      </div>
+
+      <!-- Info note -->
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 18px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <div style="font-size:13px;color:#166534;line-height:1.6;">
+            <strong>Format file:</strong>
+            <code style="background:rgba(0,0,0,.06);border-radius:4px;padding:1px 6px;font-size:12px;">mottago_export_YYYYMMDD_YYYYMMDD.csv</code><br>
+            File CSV berisi 3 bagian:
+            <code style="background:rgba(0,0,0,.06);border-radius:4px;padding:1px 6px;font-size:12px;">## WASTE_IN</code>,
+            <code style="background:rgba(0,0,0,.06);border-radius:4px;padding:1px 6px;font-size:12px;">## PICKUP</code>,
+            <code style="background:rgba(0,0,0,.06);border-radius:4px;padding:1px 6px;font-size:12px;">## WASTE_OUT</code>.
+            Maksimal rentang: <strong>90 hari</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// Init default dates (T-1)
+(function() {
+  var today = new Date();
+  var yest = new Date(today); yest.setDate(today.getDate() - 1);
+  var week = new Date(today); week.setDate(today.getDate() - 7);
+  var fmt = function(d) { return d.toISOString().split('T')[0]; };
+  document.getElementById('filter-tanggal').value = fmt(yest);
+  document.getElementById('filter-tanggal').max = fmt(today);
+  document.getElementById('export-dari').value = fmt(week);
+  document.getElementById('export-sampai').value = fmt(yest);
+  document.getElementById('export-sampai').max = fmt(today);
+})();
+
+var ROWS = [
+  { waktu:'07:12', jenis:'Sisa Makanan',   qty:'18', unit:'kg',  oleh:'Budi' },
+  { waktu:'08:30', jenis:'Sayuran / Buah', qty:'12', unit:'kg',  oleh:'Siti' },
+  { waktu:'09:45', jenis:'Minyak / Lemak', qty:'5',  unit:'ltr', oleh:'Budi' },
+  { waktu:'11:00', jenis:'Kemasan Kotor',  qty:'30', unit:'pcs', oleh:'Rudi' },
+  { waktu:'12:15', jenis:'Sisa Makanan',   qty:'22', unit:'kg',  oleh:'Siti' },
+  { waktu:'13:40', jenis:'Campuran',       qty:'9',  unit:'kg',  oleh:'Budi' },
+  { waktu:'15:00', jenis:'Sayuran / Buah', qty:'7',  unit:'kg',  oleh:'Rudi' },
+  { waktu:'16:30', jenis:'Kemasan Kotor',  qty:'14', unit:'pcs', oleh:'Siti' },
+];
+
+var COLORS = {
+  'Sisa Makanan':   { bg:'#FEF3C7', tx:'#92400E' },
+  'Sayuran / Buah': { bg:'#DCFCE7', tx:'#15803D' },
+  'Minyak / Lemak': { bg:'#FEE2E2', tx:'#991B1B' },
+  'Kemasan Kotor':  { bg:'#F3F4F6', tx:'#374151' },
+  'Campuran':       { bg:'#EDE9FE', tx:'#6D28D9' },
+};
+
+function fmtDisplay(iso) {
+  if (!iso) return '';
+  var p = iso.split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function jenisTag(label) {
+  var c = COLORS[label] || { bg:'#F3F4F6', tx:'#374151' };
+  return '<span class="badge" style="background:' + c.bg + ';color:' + c.tx + ';">' + label + '</span>';
+}
+
+function lihatLaporan() {
+  var tgl = document.getElementById('filter-tanggal').value;
+  document.getElementById('hint-laporan').style.display = 'none';
+  document.getElementById('summary-cards').style.display = 'none';
+  document.getElementById('empty-laporan').style.display = 'none';
+  document.getElementById('loading-laporan').style.display = 'block';
+  document.getElementById('btn-reset').style.display = 'inline-flex';
+
+  setTimeout(function() {
+    document.getElementById('loading-laporan').style.display = 'none';
+    var chosen = new Date(tgl); chosen.setHours(0,0,0,0);
+    var cutoff = new Date('2026-01-01');
+    var today  = new Date(); today.setHours(0,0,0,0);
+
+    if (!tgl || chosen < cutoff || chosen >= today) {
+      document.getElementById('empty-laporan').style.display = 'flex';
+      return;
+    }
+
+    document.getElementById('val-waste-in').textContent  = '87 kg';
+    document.getElementById('sub-waste-in').textContent  = '8 catatan · ' + fmtDisplay(tgl);
+    document.getElementById('val-pickup').textContent    = '2 / 3';
+    document.getElementById('sub-pickup').textContent    = '2 selesai · 1 dalam proses';
+    document.getElementById('val-waste-out').textContent = '74 kg';
+    document.getElementById('sub-waste-out').textContent = '±85% dari total masuk';
+
+    var tbody = document.getElementById('laporan-tbody');
+    tbody.innerHTML = '';
+    ROWS.forEach(function(r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-size:13px;color:#6B7280;white-space:nowrap;font-variant-numeric:tabular-nums;">' + r.waktu + '</td>' +
+        '<td>' + jenisTag(r.jenis) + '</td>' +
+        '<td style="font-weight:600;color:#111827;font-variant-numeric:tabular-nums;">' + r.qty + '</td>' +
+        '<td style="color:#6B7280;">' + r.unit + '</td>' +
+        '<td style="color:#374151;">' + r.oleh + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('table-title').textContent = 'Detail Aktivitas · ' + fmtDisplay(tgl);
+    document.getElementById('table-count').textContent = ROWS.length + ' catatan';
+
+    var sc = document.getElementById('summary-cards');
+    sc.style.display = 'block';
+    sc.classList.remove('fade-in');
+    void sc.offsetWidth;
+    sc.classList.add('fade-in');
+  }, 700);
+}
+
+function resetLaporan() {
+  document.getElementById('summary-cards').style.display = 'none';
+  document.getElementById('empty-laporan').style.display = 'none';
+  document.getElementById('hint-laporan').style.display = 'flex';
+  document.getElementById('btn-reset').style.display = 'none';
+  var yest = new Date(); yest.setDate(yest.getDate() - 1);
+  document.getElementById('filter-tanggal').value = yest.toISOString().split('T')[0];
+}
+
+function eksporCSV() {
+  var dari   = document.getElementById('export-dari').value;
+  var sampai = document.getElementById('export-sampai').value;
+  var errEl  = document.getElementById('export-error');
+  var errMsg = document.getElementById('export-error-msg');
+  errEl.style.display = 'none';
+  document.getElementById('export-success').style.display = 'none';
+
+  if (!dari || !sampai) {
+    errMsg.textContent = 'Pilih rentang tanggal terlebih dahulu.';
+    errEl.style.display = 'block'; return;
+  }
+  if (dari > sampai) {
+    errMsg.textContent = 'Tanggal "Dari" tidak boleh lebih besar dari "Sampai".';
+    errEl.style.display = 'block'; return;
+  }
+  var diff = (new Date(sampai) - new Date(dari)) / 86400000;
+  if (diff > 90) {
+    errMsg.textContent = 'Rentang maksimal 90 hari. Sesuaikan rentang tanggal Anda.';
+    errEl.style.display = 'block'; return;
+  }
+
+  var fn = function(iso) { return iso.replace(/-/g,''); };
+  var filename = 'mottago_export_' + fn(dari) + '_' + fn(sampai) + '.csv';
+
+  var lines = [
+    '## WASTE_IN',
+    'tanggal,waktu,jenis_sampah,qty,unit,dicatat_oleh',
+  ];
+  ROWS.forEach(function(r) { lines.push(dari+','+r.waktu+','+r.jenis+','+r.qty+','+r.unit+','+r.oleh); });
+  lines.push('');
+  lines.push('## PICKUP');
+  lines.push('tanggal,vendor,status,qty_kg,pickup_time');
+  lines.push(dari+',Bank Sampah Hijau,Selesai,52,09:30');
+  lines.push(dari+',CV Daur Ulang Mandiri,Selesai,22,14:15');
+  lines.push(sampai+',EcoCollect Nusantara,Dalam Proses,13,—');
+  lines.push('');
+  lines.push('## WASTE_OUT');
+  lines.push('tanggal,vendor,jenis,qty_kg,status');
+  lines.push(dari+',Bank Sampah Hijau,Organik,52,Terkirim');
+  lines.push(dari+',CV Daur Ulang Mandiri,Campuran,22,Terkirim');
+
+  var blob = new Blob([lines.join('\n')], { type:'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = filename; a.style.display = 'none';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+
+  document.getElementById('export-filename').textContent = filename;
+  var succ = document.getElementById('export-success');
+  succ.style.display = 'block';
+  succ.classList.remove('fade-in'); void succ.offsetWidth; succ.classList.add('fade-in');
+}
+
+document.getElementById('filter-tanggal').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') lihatLaporan();
+});
+</script>
+</body>
+</html>
