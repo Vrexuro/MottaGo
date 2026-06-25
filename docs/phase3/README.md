@@ -75,15 +75,12 @@ Status:
 
 Status:
 
-* Not Started
+* Frozen — v1.1 (18 Juni 2026)
+* Current Visual Source of Truth (per DL-08)
 
-Planned Deliverables:
+Dokumen:
 
-* Wireframes
-* UI Layout Specifications
-* Design Mockups
-* Visual Design Guidelines
-* Claude Design Outputs
+* Phase3C_VisualDesign_MottaGo_v1.1.docx
 
 ## Dependencies
 
@@ -109,4 +106,4 @@ Output To:
 
 * Phase 3A: Approved
 * Phase 3B: Approved
-* Phase 3C: Pending
+* Phase 3C: Frozen — v1.1 (18 Juni 2026)

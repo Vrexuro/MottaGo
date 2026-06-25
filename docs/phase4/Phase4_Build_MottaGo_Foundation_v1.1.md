@@ -5,7 +5,7 @@
 **Tanggal:** 19 Juni 2026
 **Status:** APPROVED
 **Berlaku untuk:** Sprint 0 & Sprint 1
-**Dasar:** Phase 3B v1.0 · Phase 3C v1.1 FROZEN · Visual Validation Approved · DL-01 s/d DL-08
+**Dasar:** Phase 3B v1.0 · Phase 3C v1.1 FROZEN · Visual Validation Approved · DL-01 s/d DL-10
 **Supersedes:** Phase4_Build_MottaGo_Foundation_v1.0 (draft)
 
 ---
@@ -45,6 +45,8 @@ Sprint 2 (implementasi screen individual SCR-M-01, SCR-M-02, SCR-M-04) tidak dic
 | NFR-03 | PRD v1.0 | Performance: initial load yang wajar untuk operasional restoran |
 | DL-04 | DECISION_LOG.md | Polling 30 detik untuk notifikasi dan kapasitas real-time |
 | DL-08 | DECISION_LOG.md | Phase 3B v1.0 sebagai source of truth screen inventory dan arsitektur frontend |
+| DL-09 | DECISION_LOG.md | Responsive strategy resmi: breakpoint Mobile <768px, Tablet 768–1023px, Desktop ≥1024px; navigasi per breakpoint; Mobile-First CSS |
+| DL-10 | DECISION_LOG.md | Layout type assignment final (SCR-M-02 → DashboardLayout, SCR-M-04 → FormLayout); COMP-20 BottomNav di-defer dari Sprint 1 |
 
 ---
 
@@ -56,7 +58,7 @@ Yang secara langsung diaddress oleh Sprint 0–1:
 
 | Requirement | Bagaimana Diaddress |
 |---|---|
-| NFR-01 (Responsif) | Konfigurasi TailwindCSS breakpoints sesuai Phase 3B §4.1; layout wrapper mendukung tiga breakpoint |
+| NFR-01 (Responsif) | Konfigurasi TailwindCSS breakpoints sesuai DL-09 (Mobile <768px, Tablet 768–1023px, Desktop ≥1024px); layout wrapper mendukung tiga breakpoint; Mobile-First CSS |
 | NFR-02 (WCAG 2.1 AA) | Design token kontras warna sesuai Phase 3C; ARIA attributes pada atom components; skip-link di layout |
 | DL-04 (Polling) | `useCapacity` hook skeleton disiapkan di Sprint 1; interval dikonfigurasi via env variable |
 | DL-08 (Screen inventory) | Routing structure mengikuti Phase 3B §9.3 sejak Sprint 0 — tidak menggunakan numbering Phase 3A |
@@ -71,7 +73,7 @@ Yang secara langsung diaddress oleh Sprint 0–1:
 | A-01 | Backend API belum tersedia saat Sprint 0–1. Data screen akan menggunakan mock JSON statis saat Sprint 2. | CLAUDE_INSTRUCTIONS.md: Frontend-First Development Rule |
 | A-02 | Semua anggota tim menggunakan Node.js versi LTS terbaru dan npm yang kompatibel dengan Vite | Standar industri untuk React + Vite project |
 | A-03 | Font Inter dimuat via Google Fonts CDN di `index.html`. Fallback: `system-ui, sans-serif` | Phase 3B §5.2: `--font-family-base: 'Inter', 'Arial', sans-serif` |
-| A-04 | Sprint 0–1 hanya membangun komponen yang dibutuhkan untuk role Manajer. BottomNav untuk role lain diimplementasikan saat sprint role tersebut mulai. | CURRENT_FOCUS.md: Sprint 2 fokus ke SCR-M-01, SCR-M-02, SCR-M-04 |
+| A-04 | Sprint 0–1 hanya membangun komponen yang dibutuhkan untuk role Manajer. Mobile navigation Manajer menggunakan hamburger + SideNav drawer (bukan BottomNav) sesuai DL-09. COMP-20 BottomNav di-defer sepenuhnya — diimplementasikan pada sprint yang memerlukan role Pelayan, Vendor, atau Utility (DL-10). | DL-09, DL-10 |
 | A-05 | Icon menggunakan Lucide React sebagai library. | Phase 3C §7: "Lucide Outline 1.5px stroke" sebagai iconography system |
 | A-06 | Charting library untuk Waste Trend (SCR-M-01) dan Capacity Trend (SCR-M-02) belum dipilih di Sprint 0–1. Keputusan library dilakukan sebelum Sprint 2 dimulai. | Phase 3C §8: area chart preferred, namun library belum ditetapkan di Phase 3B |
 | A-07 | AuthContext, useAuth, dan AuthPage diimplementasikan pada fase berikutnya setelah Sprint 1 selesai. Sprint 0–1 tidak mencakup login flow. | Revisi Build Plan v1.1 |
@@ -88,7 +90,7 @@ Berdasarkan **Phase 3B v1.0 §9 — Frontend Architecture** (source of truth per
 |---|---|---|
 | React | UI library | 18.x (latest stable) |
 | TypeScript | Type safety | 5.x |
-| Vite | Build tool & dev server | 5.x |
+| Vite | Build tool & dev server | 6.x (installed: 6.4.3) |
 | React Router | Client-side routing + RBAC guard | v6.x |
 | TailwindCSS | Utility-first styling + design tokens | v3.x |
 | ESLint | Linting | v8.x dengan config React + TypeScript |
@@ -117,9 +119,9 @@ Dari 8 layout type yang didefinisikan Phase 3B §10.1:
 |---|---|---|---|
 | LT-01 | Authentication | Sprint 1 | Shell layout; AuthPage diimplementasikan fase berikutnya |
 | LT-02 | Simple | Sprint 1 | AppHeader + BottomNav/SideNav + Content area |
-| LT-03 | Dashboard Hub | Sprint 1 | AppHeader + SideNav expanded + multi-column content area |
-| LT-04 | List View | Sprint 1 (skeleton) | Placeholder; diisi Sprint 2+ |
-| LT-05 | Form View | Sprint 1 (skeleton) | Placeholder; diisi Sprint 2+ |
+| LT-03 | Dashboard Hub | Sprint 1 (FULL) | AppHeader + SideNav expanded + multi-column content area; digunakan SCR-M-01 dan SCR-M-02 [DL-10] |
+| LT-04 | Form Layout | Sprint 1 (FULL) | AppHeader + SideNav + Form Content Area; digunakan SCR-M-04 Sprint 2 [DL-10] — BUKAN skeleton |
+| LT-05 | List View (TBD) | Sprint 1 (skeleton) | Placeholder; assignment ke screen masa depan TBD [DL-10] |
 | LT-06 | Detail View | Sprint 1 (skeleton) | Placeholder; diisi Sprint 2+ |
 | LT-07 | Report View | Sprint 1 (skeleton) | Placeholder; diisi Sprint 2+ |
 | LT-08 | Overlay / Drawer | Sprint 1 (skeleton) | Placeholder; diisi Sprint 3+ |
@@ -152,14 +154,14 @@ mottago-frontend/
 │   │   │   ├── LoadingSpinner/
 │   │   │   └── Divider/
 │   │   ├── molecules/          ← Sprint 1 (prioritas); Sprint 2+ (sisanya)
-│   │   └── organisms/          ← Sprint 1: AppHeader, SideNav, BottomNav
+│   │   └── organisms/          ← Sprint 1: AppHeader, SideNav (BottomNav: DEFERRED — DL-10)
 │   │
 │   ├── layouts/
 │   │   ├── AuthLayout.tsx      ← Sprint 1 (shell; konten fase berikutnya)
 │   │   ├── SimpleLayout.tsx    ← Sprint 1
 │   │   ├── DashboardLayout.tsx ← Sprint 1 (AppHeader + SideNav + Content)
 │   │   ├── ListLayout.tsx      ← Sprint 1 (skeleton)
-│   │   ├── FormLayout.tsx      ← Sprint 1 (skeleton)
+│   │   ├── FormLayout.tsx      ← Sprint 1 (FULL) — digunakan SCR-M-04 [DL-10]
 │   │   ├── DetailLayout.tsx    ← Sprint 1 (skeleton)
 │   │   ├── ReportLayout.tsx    ← Sprint 1 (skeleton)
 │   │   └── OverlayLayout.tsx   ← Sprint 1 (skeleton)
@@ -301,9 +303,9 @@ Aturan atom:
 
 | COMP ID | Nama | Catatan Implementasi |
 |---|---|---|
-| COMP-19 | AppHeader | Background `#FFF2CC` untuk Manajer; nama user + role badge; tombol logout |
-| COMP-21 | SideNav | Dark variant `#243F1A`; active item `#375623` + border-left `3px solid #22C55E`; collapsed 64px / expanded 240px |
-| COMP-20 | BottomNav | Untuk Pelayan (2 tab), Utility (3 tab), Vendor (2 tab) — role-aware |
+| COMP-19 | AppHeader | Background `#FFF2CC` untuk Manajer; nama user + role badge; tombol logout; tinggi 56px mobile / 64px tablet+desktop; hamburger icon kiri untuk mobile (trigger SideNav drawer) [DL-09] |
+| COMP-21 | SideNav | Dark variant `#243F1A`; active item `#375623` + border-left `3px solid #22C55E`; collapsed 64px tablet / expanded 240px desktop; drawer mode mobile [DL-09] |
+| COMP-20 | BottomNav | **DEFERRED — tidak termasuk Sprint 1** [DL-10]; diimplementasikan pada sprint yang memerlukan role Pelayan, Utility, atau Vendor |
 
 ### 8.4 Komponen yang Ditunda ke Sprint 2+
 
@@ -432,12 +434,19 @@ Seluruh token diimplementasikan sebagai CSS custom properties di `src/design-sys
 --shadow-lg: 0 10px 24px rgba(0,0,0,0.18)
 ```
 
-### 9.5 Breakpoint Tokens
+### 9.5 Breakpoint & Navigation Tokens — DL-09 (19 Juni 2026)
 
 ```
---bp-mobile: 640px
---bp-tablet: 1024px
---bp-desktop: 1280px
+/* Breakpoints */
+--bp-tablet: 768px          /* Tailwind md: — batas bawah tablet */
+--bp-desktop: 1024px        /* Tailwind lg: — batas bawah desktop */
+--bp-wide: 1280px           /* Tailwind xl: — max-width konten saja */
+
+/* Navigation Sizing — wajib per DL-09 */
+--nav-header-height-mobile: 56px   /* AppHeader tinggi mobile <768px */
+--nav-header-height: 64px          /* AppHeader tinggi tablet dan desktop */
+--nav-side-collapsed: 64px         /* SideNav collapsed tablet */
+--nav-side-expanded: 240px         /* SideNav expanded desktop */
 ```
 
 ### 9.6 Dark SideNav Token Group — Kritis
@@ -529,11 +538,12 @@ Token ini wajib benar sebelum Sprint 2 dimulai karena digunakan di setiap screen
 |---|---|---|---|
 | S1-15 | Build AppHeader | COMP-19 | Background per role; role badge; logout button |
 | S1-16 | Build SideNav Dark | COMP-21 | `#243F1A` bg; collapsed/expanded; active state per Phase 3C v1.1 §2.2 |
-| S1-17 | Build BottomNav | COMP-20 | Role-aware; Pelayan (2 tab), Utility (3 tab), Vendor (2 tab) |
+| ~~S1-17~~ | ~~Build BottomNav~~ | ~~COMP-20~~ | **DEFERRED per DL-10** — scope ditentukan pada sprint yang memerlukan role Pelayan/Vendor/Utility; total Sprint 1 = 29 deliverables |
 | S1-18 | Build AuthLayout | LT-01 | Shell layout; konten login diisi fase berikutnya |
 | S1-19 | Build DashboardLayout | LT-03 | AppHeader + SideNav + Content area |
-| S1-20 | Build SimpleLayout | LT-02 | AppHeader + BottomNav + Content |
-| S1-21 | Skeleton LT-04 s/d LT-08 | LT-04–08 | Placeholder routing page; berfungsi untuk navigasi |
+| S1-20 | Build SimpleLayout | LT-02 | AppHeader + Content area (slot BottomNav kosong Sprint 1 — DEFERRED DL-10; diisi saat sprint role non-Manajer) |
+| S1-21a | Build FormLayout | LT-04 | AppHeader + SideNav + Form Content Area; FULL implementation — digunakan SCR-M-04 Sprint 2 [DL-10] |
+| S1-21 | Skeleton LT-05 s/d LT-08 | LT-05–08 | Placeholder routing page; berfungsi untuk navigasi [LT-04 sudah FULL di S1-21a — DL-10] |
 
 #### Tahap 1D — Types, Hooks & Guard
 
@@ -590,11 +600,12 @@ Untuk setiap atom dan organism yang selesai:
 - Verifikasi ukuran touch target minimum 44×44px (Phase 3B §3.2)
 - Verifikasi keyboard navigation: Tab, Enter/Space, Escape berfungsi
 
-### 12.3 Responsive Layout Check (setelah S1-19)
+### 12.3 Responsive Layout Check (setelah S1-19) — DL-09
 
-- Viewport `< 640px`: SideNav tersembunyi; BottomNav tampil
-- Viewport `640–1024px`: SideNav collapsed (64px icon only)
-- Viewport `> 1024px`: SideNav expanded (240px)
+- Viewport `< 768px` (mobile): SideNav tersembunyi (drawer mode); hamburger tampil di AppHeader kiri; BottomNav **tidak** tampil; AppHeader tinggi 56px [DL-09]
+- Viewport `768–1023px` (tablet): SideNav collapsed 64px icon-only; AppHeader tinggi 64px; tap icon → SideNav expand 240px + backdrop rgba(0,0,0,0.3) [DL-09]
+- Viewport `≥ 1024px` (desktop): SideNav expanded 240px; selalu terlihat; tidak collapsed; AppHeader tinggi 64px [DL-09]
+- Viewport `≥ 1280px` (wide): Lebar konten dibatasi sesuai max-width; layout tidak berubah [DL-09]
 
 ### 12.4 Accessibility Baseline Check (sebelum Sprint 1 dinyatakan selesai)
 

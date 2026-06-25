@@ -70,8 +70,7 @@ Sprint 1 – Shared Layout & Components:
 
 * AppHeader (COMP-19)
 * SideNav Dark Variant (COMP-21)
-* BottomNav (COMP-20)
-* Layout wrappers: DashboardLayout, SimpleLayout, AuthLayout, skeleton LT-04 s/d LT-08
+* Layout wrappers: AuthLayout (LT-01), SimpleLayout (LT-02), DashboardLayout (LT-03), FormLayout (LT-04) — full; skeleton LT-05 s/d LT-08 [DL-10]
 * Atom components: COMP-01 s/d COMP-09
 * Molecule components prioritas: COMP-10, COMP-13, COMP-14, COMP-15, COMP-17
 * Hooks: useCapacity (skeleton), usePagination
