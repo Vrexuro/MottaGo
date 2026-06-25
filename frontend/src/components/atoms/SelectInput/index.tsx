@@ -1,5 +1,5 @@
 import type { SelectHTMLAttributes } from 'react';
-import type { SelectOption } from '../../types/common.types';
+import type { SelectOption } from '../../../types/common.types';
 import { Icon } from '../Icon';
 
 interface SelectInputProps
