@@ -1,0 +1,1 @@
+export { manajerNavItems } from './manager';

@@ -52,9 +52,7 @@ export function DashboardLayout({
   const handleMenuToggle = () => setSideNavState('expanded');
   const handleSideNavClose = () => setSideNavState(getBreakpointState());
 
-  const rootClassName = ['min-h-screen flex flex-col', className]
-    .filter(Boolean)
-    .join(' ');
+  const rootClassName = ['h-screen flex flex-col', className].filter(Boolean).join(' ');
 
   return (
     <div className={rootClassName}>
@@ -74,7 +72,7 @@ export function DashboardLayout({
         {...notificationSlot}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         <SideNav
           items={navItems}
           userRole={userRole}
@@ -82,10 +80,7 @@ export function DashboardLayout({
           onClose={handleSideNavClose}
         />
 
-        <main
-          id="main-content"
-          className="flex-1 overflow-y-auto min-w-0"
-        >
+        <main id="main-content" className="flex-1 overflow-y-auto min-w-0 md:ml-16 lg:ml-0">
           {children}
         </main>
       </div>
