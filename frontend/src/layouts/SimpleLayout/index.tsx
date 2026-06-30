@@ -4,29 +4,15 @@ import { AppHeader } from '../../components/organisms/AppHeader';
 
 import type { UserRole } from '../../types/user.types';
 
-type NotificationSlot =
-  | { notificationCount?: never; onNotificationClick?: never }
-  | { notificationCount: number; onNotificationClick: () => void };
-
 type SimpleLayoutProps = {
   children: ReactNode;
   userRole: UserRole;
-  userName: string;
-  onLogout: () => void;
+  pageTitle?: string;
   className?: string;
-} & NotificationSlot;
+};
 
-export function SimpleLayout({
-  children,
-  userRole,
-  userName,
-  onLogout,
-  className,
-  ...notificationSlot
-}: SimpleLayoutProps) {
-  const rootClassName = ['min-h-screen flex flex-col', className]
-    .filter(Boolean)
-    .join(' ');
+export function SimpleLayout({ children, userRole, pageTitle, className }: SimpleLayoutProps) {
+  const rootClassName = ['min-h-screen flex flex-col', className].filter(Boolean).join(' ');
 
   return (
     <div className={rootClassName}>
@@ -39,17 +25,12 @@ export function SimpleLayout({
 
       <AppHeader
         userRole={userRole}
-        userName={userName}
         sideNavOpen={false}
         onMenuToggle={() => undefined}
-        onLogout={onLogout}
-        {...notificationSlot}
+        pageTitle={pageTitle}
       />
 
-      <main
-        id="main-content"
-        className="flex-1 overflow-y-auto min-w-0"
-      >
+      <main id="main-content" className="flex-1 overflow-y-auto min-w-0">
         {children}
       </main>
     </div>

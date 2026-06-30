@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { AppHeader } from '../../components/organisms/AppHeader';
 import { SideNav } from '../../components/organisms/SideNav';
 
 import type { NavItem, SideNavState } from '../../types/nav.types';
 import type { UserRole } from '../../types/user.types';
-
-type NotificationSlot =
-  | { notificationCount?: never; onNotificationClick?: never }
-  | { notificationCount: number; onNotificationClick: () => void };
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -18,7 +15,7 @@ type DashboardLayoutProps = {
   navItems: NavItem[];
   onLogout: () => void;
   className?: string;
-} & NotificationSlot;
+};
 
 const getBreakpointState = (): SideNavState => {
   if (window.innerWidth >= 1024) return 'expanded';
@@ -33,9 +30,9 @@ export function DashboardLayout({
   navItems,
   onLogout,
   className,
-  ...notificationSlot
 }: DashboardLayoutProps) {
   const [sideNavState, setSideNavState] = useState<SideNavState>(getBreakpointState);
+  const location = useLocation();
 
   useEffect(() => {
     const lgMq = window.matchMedia('(min-width: 1024px)');
@@ -52,6 +49,9 @@ export function DashboardLayout({
   const handleMenuToggle = () => setSideNavState('expanded');
   const handleSideNavClose = () => setSideNavState(getBreakpointState());
 
+  // Derive the active page title from navItems for the AppHeader breadcrumb
+  const pageTitle = navItems.find((item) => location.pathname === item.path)?.label ?? '';
+
   const rootClassName = ['h-screen flex flex-col', className].filter(Boolean).join(' ');
 
   return (
@@ -65,17 +65,17 @@ export function DashboardLayout({
 
       <AppHeader
         userRole={userRole}
-        userName={userName}
         sideNavOpen={sideNavState === 'expanded'}
         onMenuToggle={handleMenuToggle}
-        onLogout={onLogout}
-        {...notificationSlot}
+        pageTitle={pageTitle}
       />
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <SideNav
           items={navItems}
           userRole={userRole}
+          userName={userName}
+          onLogout={onLogout}
           state={sideNavState}
           onClose={handleSideNavClose}
         />

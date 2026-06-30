@@ -18,9 +18,7 @@ export function NotificationBadge({
   const showBubble = safeCount > 0;
   const displayCount = safeCount > max ? `${max}+` : String(safeCount);
 
-  const containerClassName = ['relative inline-flex', className]
-    .filter(Boolean)
-    .join(' ');
+  const containerClassName = ['relative inline-flex', className].filter(Boolean).join(' ');
 
   return (
     <span className={containerClassName}>

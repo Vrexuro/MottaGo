@@ -18,9 +18,7 @@ export function Icon({
   className,
   'aria-label': ariaLabel,
 }: IconProps) {
-  const IconComponent = LucideIcons[name as keyof typeof LucideIcons] as
-    | LucideIcon
-    | undefined;
+  const IconComponent = LucideIcons[name as keyof typeof LucideIcons] as LucideIcon | undefined;
 
   if (!IconComponent) {
     if (import.meta.env.DEV) {

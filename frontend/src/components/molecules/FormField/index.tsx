@@ -19,9 +19,7 @@ export function FormField({
   errorMessage,
   className,
 }: FormFieldProps) {
-  const containerClassName = ['flex flex-col gap-1.5', className]
-    .filter(Boolean)
-    .join(' ');
+  const containerClassName = ['flex flex-col gap-1.5', className].filter(Boolean).join(' ');
 
   return (
     <div className={containerClassName}>

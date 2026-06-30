@@ -32,9 +32,7 @@ export function ProgressBar({
   const clampedValue = Math.min(100, Math.max(0, safe));
 
   const fillColor =
-    variant === 'capacity'
-      ? getCapacityFillColor(clampedValue)
-      : 'bg-brand-primary';
+    variant === 'capacity' ? getCapacityFillColor(clampedValue) : 'bg-brand-primary';
 
   const trackClassName = [
     'w-full rounded-full overflow-hidden bg-mottago-border',

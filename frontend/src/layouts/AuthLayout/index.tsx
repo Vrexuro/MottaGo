@@ -15,10 +15,7 @@ export function AuthLayout({ children, className }: AuthLayoutProps) {
 
   return (
     <div className={rootClassName}>
-      <main
-        id="main-content"
-        className="w-full flex flex-col items-center px-4"
-      >
+      <main id="main-content" className="w-full flex flex-col items-center px-4">
         {children}
       </main>
     </div>

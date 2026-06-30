@@ -2,8 +2,7 @@ import type { SelectHTMLAttributes } from 'react';
 import type { SelectOption } from '../../../types/common.types';
 import { Icon } from '../Icon';
 
-interface SelectInputProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
+interface SelectInputProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
   options: SelectOption[];
   error?: boolean;
   placeholder?: string;

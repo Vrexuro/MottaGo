@@ -18,12 +18,7 @@ export function LoadingSpinner({
   'aria-label': ariaLabel = 'Memuat...',
 }: LoadingSpinnerProps) {
   return (
-    <div
-      role="status"
-      aria-label={ariaLabel}
-      className={className}
-      style={{ color }}
-    >
+    <div role="status" aria-label={ariaLabel} className={className} style={{ color }}>
       <div
         className={`${sizeClasses[size]} rounded-full border-current border-t-transparent animate-spin motion-reduce:animate-none`}
       />

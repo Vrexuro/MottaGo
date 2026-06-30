@@ -25,11 +25,7 @@ export function Divider({
   className,
   ...rest
 }: DividerProps) {
-  const computedClassName = [
-    orientationClasses[orientation],
-    variantClasses[variant],
-    className,
-  ]
+  const computedClassName = [orientationClasses[orientation], variantClasses[variant], className]
     .filter(Boolean)
     .join(' ');
 

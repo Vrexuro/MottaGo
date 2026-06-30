@@ -7,12 +7,7 @@ interface DateInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'ty
   error?: boolean;
 }
 
-export function DateInput({
-  error = false,
-  disabled,
-  className,
-  ...rest
-}: DateInputProps) {
+export function DateInput({ error = false, disabled, className, ...rest }: DateInputProps) {
   const borderAndFocusClasses = error
     ? 'border-error-border shadow-[0_0_0_3px_rgba(244,67,54,0.10)] focus:border-error-border focus:shadow-[0_0_0_3px_rgba(244,67,54,0.15)]'
     : 'border-mottago-border focus:border-brand-primary focus:shadow-[0_0_0_3px_rgba(31,78,121,0.12)]';

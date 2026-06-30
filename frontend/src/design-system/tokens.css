@@ -55,7 +55,10 @@
   --color-error-border: #f44336;
   --color-error-text: #991b1b;
   --color-warning-bg: #fffbeb;
+  --color-warning-border: #d97706;
+  --color-warning-text: #92400e;
   --color-info-bg: #dbeafe;
+  --color-info-border: #3b82f6;
   --color-info-text: #1e40af;
 
   /* =========================================
@@ -133,15 +136,15 @@
      Mobile-First: default = <768px (no Tailwind prefix)
      md: = 768px+ (tablet) · lg: = 1024px+ (desktop) · xl: = 1280px+ (wide)
      ========================================= */
-  --bp-tablet: 768px;    /* Tailwind md: — batas bawah tablet */
-  --bp-desktop: 1024px;  /* Tailwind lg: — batas bawah desktop */
-  --bp-wide: 1280px;     /* Tailwind xl: — max-width konten saja */
+  --bp-tablet: 768px; /* Tailwind md: — batas bawah tablet */
+  --bp-desktop: 1024px; /* Tailwind lg: — batas bawah desktop */
+  --bp-wide: 1280px; /* Tailwind xl: — max-width konten saja */
 
   /* =========================================
      NAVIGATION SIZING — DL-09 (19 Juni 2026)
      ========================================= */
-  --nav-header-height-mobile: 56px;  /* AppHeader tinggi di mobile <768px */
-  --nav-header-height: 64px;         /* AppHeader tinggi di tablet dan desktop */
-  --nav-side-collapsed: 64px;        /* SideNav collapsed (tablet, icon-only) */
-  --nav-side-expanded: 240px;        /* SideNav expanded (desktop, selalu terlihat) */
+  --nav-header-height-mobile: 56px; /* AppHeader tinggi di mobile <768px */
+  --nav-header-height: 64px; /* AppHeader tinggi di tablet dan desktop */
+  --nav-side-collapsed: 64px; /* SideNav collapsed (tablet, icon-only) */
+  --nav-side-expanded: 240px; /* SideNav expanded (desktop, selalu terlihat) */
 }
