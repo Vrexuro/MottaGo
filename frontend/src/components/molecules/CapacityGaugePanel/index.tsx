@@ -1,4 +1,5 @@
 import { Badge } from '../../atoms/Badge';
+import { CAPACITY_THRESHOLDS } from '../../../constants/capacity';
 import { ProgressBar } from '../../atoms/ProgressBar';
 import { Button } from '../../atoms/Button';
 import { Icon } from '../../atoms/Icon';
@@ -30,8 +31,8 @@ const STATE_CFG: Record<CapacityState, StateConfig> = {
 };
 
 function getState(pct: number): CapacityState {
-  if (pct >= 90) return 'kritis';
-  if (pct >= 60) return 'perlu-perhatian';
+  if (pct >= CAPACITY_THRESHOLDS.CRITICAL) return 'kritis';
+  if (pct >= CAPACITY_THRESHOLDS.WARNING) return 'perlu-perhatian';
   return 'aman';
 }
 

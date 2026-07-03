@@ -11,10 +11,11 @@ type AppHeaderProps = {
 
 const roleBgClasses: Record<UserRole, string> = {
   manajer: 'bg-role-manajer-bg',
-  pelayan: 'bg-role-pelayan-bg',
   utility: 'bg-role-utility-bg',
-  vendor: 'bg-role-vendor-bg',
 };
+
+/** Jumlah notifikasi — ganti dengan polling NOTIFICATION table (DL-04) saat backend siap */
+const MOCK_NOTIFICATION_COUNT = 3;
 
 export function AppHeader({
   userRole,
@@ -65,14 +66,41 @@ export function AppHeader({
           </div>
         </div>
 
-        {/* Right — notification bell only (date has moved to content area) */}
-        <button
-          type="button"
-          className="p-2 rounded-[var(--radius-md)] hover:bg-black/5 transition-colors"
-          aria-label="Notifikasi"
-        >
-          <Icon name="Bell" size={20} className="text-text-primary" />
-        </button>
+        {/* Center — search bar (desktop only, visual placeholder) */}
+        <div className="hidden lg:flex flex-1 mx-6">
+          <div className="relative w-full max-w-md">
+            <Icon
+              name="Search"
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Cari pickup, vendor..."
+              readOnly
+              disabled
+              title="Fitur pencarian akan tersedia pada pembaruan berikutnya."
+              className="w-full pl-9 pr-4 py-1.5 text-sm bg-mottago-surface-subtle border border-mottago-border rounded-[var(--radius-md)] text-text-primary placeholder:text-text-secondary focus:outline-none cursor-not-allowed opacity-60"
+            />
+          </div>
+        </div>
+
+        {/* Right — notification bell with badge */}
+        <div className="relative">
+          <button
+            type="button"
+            className="p-2 rounded-[var(--radius-md)] hover:bg-black/5 transition-colors"
+            aria-label="Notifikasi"
+          >
+            <Icon name="Bell" size={20} className="text-text-primary" />
+          </button>
+          <span
+            className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-capacity-warning text-[10px] font-bold text-white px-1 pointer-events-none"
+            aria-hidden="true"
+          >
+            {MOCK_NOTIFICATION_COUNT}
+          </span>
+        </div>
       </div>
     </header>
   );

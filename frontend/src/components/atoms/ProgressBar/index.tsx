@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'react';
+import { CAPACITY_THRESHOLDS } from '../../../constants/capacity';
 
 type ProgressBarVariant = 'default' | 'capacity';
 type ProgressBarSize = 'sm' | 'md' | 'lg';
@@ -16,8 +17,8 @@ const sizeClasses: Record<ProgressBarSize, string> = {
 };
 
 function getCapacityFillColor(value: number): string {
-  if (value >= 90) return 'bg-capacity-critical';
-  if (value >= 70) return 'bg-capacity-warning';
+  if (value >= CAPACITY_THRESHOLDS.CRITICAL) return 'bg-capacity-critical';
+  if (value >= CAPACITY_THRESHOLDS.WARNING) return 'bg-capacity-warning';
   return 'bg-capacity-normal';
 }
 

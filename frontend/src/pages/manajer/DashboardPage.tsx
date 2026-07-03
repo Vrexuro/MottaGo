@@ -6,43 +6,23 @@ import { CapacityCard } from '../../components/molecules/CapacityCard';
 import { StatusPickupCard } from '../../components/molecules/StatusPickupCard';
 import { QuickActionsCard } from '../../components/molecules/QuickActionsCard';
 import { PickupSummaryCard } from '../../components/molecules/PickupSummaryCard';
-import { Icon } from '../../components/atoms/Icon';
 import { manajerNavItems } from '../../router/navigation';
-
-const TODAY_LABEL = new Date().toLocaleDateString('id-ID', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-});
+import { useAuth } from '../../hooks/useAuth';
 
 function DashboardPage() {
+  const { profile } = useAuth();
+  const userName = profile?.fullName ?? 'Manajer';
+
   return (
     <DashboardLayout
       navItems={manajerNavItems}
       userRole="manajer"
-      userName="Mock Manajer"
+      userName={userName}
       onLogout={() => undefined}
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
-          {/* Mobile-only date row — above heading, hidden on tablet+ */}
-          <div className="flex md:hidden items-center gap-1.5 text-text-secondary">
-            <Icon name="CalendarDays" size={16} className="shrink-0" />
-            <span className="text-xs font-medium">{TODAY_LABEL}</span>
-          </div>
-
-          {/* Page heading row: title+subtitle (left) | date with calendar icon (right, tablet+) */}
-          <div className="flex items-start justify-between gap-4">
-            <DashboardHeader
-              title="Dashboard"
-              subtitle="Semua operasional berjalan normal. Tidak ada tindakan mendesak saat ini."
-            />
-            <div className="hidden md:flex items-center gap-1.5 text-text-secondary shrink-0 pt-1.5">
-              <Icon name="CalendarDays" size={16} className="shrink-0" />
-              <span className="text-xs font-medium whitespace-nowrap">{TODAY_LABEL}</span>
-            </div>
-          </div>
+          <DashboardHeader title="Dashboard" userName={userName} />
 
           {/* Row 1 — 4 KPI Cards: 2 col mobile → 4 col tablet+ */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -11,7 +11,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const colorClasses: Record<BadgeColor, string> = {
   success: 'bg-accent-success-bg text-accent-success-text',
-  warning: 'bg-warning-bg text-[#92400E]',
+  warning: 'bg-warning-bg text-warning-text',
   danger: 'bg-error-bg text-error-text',
   info: 'bg-info-bg text-info-text',
   neutral: 'bg-mottago-surface-subtle text-text-secondary',

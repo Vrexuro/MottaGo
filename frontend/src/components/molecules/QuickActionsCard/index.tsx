@@ -1,7 +1,10 @@
+import { Link } from 'react-router-dom';
 import { Icon } from '../../atoms/Icon';
+import { ROUTES } from '../../../router/routes';
 
 interface ActionItem {
   id: string;
+  to: string | null; // null = route belum tersedia (S-04)
   label: string;
   iconName: string;
   iconBgClass: string;
@@ -11,31 +14,36 @@ interface ActionItem {
 const ACTION_ITEMS: ActionItem[] = [
   {
     id: 'request-pickup',
+    to: ROUTES.MANAJER_PICKUP_REQUEST,
     label: 'Request Pickup',
     iconName: 'Truck',
     iconBgClass: 'bg-accent-success-bg',
     iconColorClass: 'text-accent-success-text',
   },
   {
-    id: 'monitoring-kapasitas',
-    label: 'Monitoring Kapasitas',
-    iconName: 'BarChart3',
-    iconBgClass: 'bg-info-bg',
-    iconColorClass: 'text-info-text',
-  },
-  {
     id: 'lihat-laporan',
+    to: ROUTES.MANAJER_LAPORAN,
     label: 'Lihat Laporan',
     iconName: 'FileText',
-    iconBgClass: 'bg-amber-100',
-    iconColorClass: 'text-amber-600',
+    iconBgClass: 'bg-warning-bg',
+    iconColorClass: 'text-capacity-warning',
   },
   {
-    id: 'kelola-vendor',
-    label: 'Kelola Vendor',
+    // S-04: MANAJER_PENGATURAN belum ada di routes.ts — ditampilkan disabled
+    id: 'pengaturan-store',
+    to: null,
+    label: 'Pengaturan Store',
+    iconName: 'Settings',
+    iconBgClass: 'bg-mottago-surface-subtle',
+    iconColorClass: 'text-text-secondary',
+  },
+  {
+    id: 'manajemen-vendor',
+    to: ROUTES.MANAJER_VENDOR_MANAGEMENT,
+    label: 'Manajemen Vendor',
     iconName: 'Building2',
-    iconBgClass: 'bg-purple-100',
-    iconColorClass: 'text-sh-indicator',
+    iconBgClass: 'bg-info-bg',
+    iconColorClass: 'text-info-text',
   },
 ];
 
@@ -63,12 +71,9 @@ export function QuickActionsCard({ className }: QuickActionsCardProps) {
 
       {/* ── Action list ────────────────────────────────── */}
       <ul className="flex-1 divide-y divide-mottago-border">
-        {ACTION_ITEMS.map((item) => (
-          <li key={item.id}>
-            <button
-              type="button"
-              className="w-full flex items-center gap-3 px-4 md:px-5 py-3.5 hover:bg-mottago-surface-subtle transition-colors text-left"
-            >
+        {ACTION_ITEMS.map((item) => {
+          const content = (
+            <>
               {/* Icon circle */}
               <span
                 className={[
@@ -91,9 +96,30 @@ export function QuickActionsCard({ className }: QuickActionsCardProps) {
                 size={16}
                 className="shrink-0 text-text-secondary opacity-50"
               />
-            </button>
-          </li>
-        ))}
+            </>
+          );
+
+          return (
+            <li key={item.id}>
+              {item.to !== null ? (
+                <Link
+                  to={item.to}
+                  className="w-full flex items-center gap-3 px-4 md:px-5 py-3.5 hover:bg-mottago-surface-subtle transition-colors"
+                >
+                  {content}
+                </Link>
+              ) : (
+                <span
+                  className="w-full flex items-center gap-3 px-4 md:px-5 py-3.5 opacity-50 cursor-not-allowed select-none"
+                  aria-disabled="true"
+                  title="Segera tersedia"
+                >
+                  {content}
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

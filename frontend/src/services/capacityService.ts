@@ -46,7 +46,7 @@ export const capacityService = {
       .limit(1)
       .single();
 
-    if (error) return null; // TODO: table not yet created — returns null until schema is ready
+    if (error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     return {
       currentKg: data.current_kg as number,
@@ -69,7 +69,7 @@ export const capacityService = {
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: true });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     const rows = (data ?? []) as Array<{
       current_kg: number;
@@ -87,10 +87,10 @@ export const capacityService = {
   },
 
   getCapacitySummary: async (_storeId: number): Promise<CapacitySummary | null> => {
-    // TODO: implement once stores, capacity_readings, and waste_items tables are created.
+    // TODO: implement once stores, capacity_snapshots, and waste_items tables are queried.
     // Requires three queries:
     //   1. stores.max_capacity for _storeId
-    //   2. Latest capacity_readings.current_kg for _storeId
+    //   2. Latest capacity_snapshots.current_kg for _storeId
     //   3. SUM(waste_items.quantity_kg) WHERE date = today AND store_id = _storeId (wasteHariIniKg)
     //   4. 7-day rolling AVG(daily total) from waste_items for _storeId (rataHarianKg)
     return null;
@@ -103,7 +103,7 @@ export const capacityService = {
       .eq('store_id', storeId)
       .order('created_at', { ascending: false });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     const rows = (data ?? []) as Array<{
       id: string;

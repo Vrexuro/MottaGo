@@ -44,6 +44,9 @@ const MOCK: Record<Range, DataPoint[]> = {
 const RANGES: Range[] = [7, 14, 30];
 const RANGE_LABELS: Record<Range, string> = { 7: '7 Hari', 14: '14 Hari', 30: '30 Hari' };
 
+const getCSSVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 export function WasteTrendCard({ className }: { className?: string }) {
   const [range, setRange] = useState<Range>(7);
   const data = MOCK[range];
@@ -90,22 +93,22 @@ export function WasteTrendCard({ className }: { className?: string }) {
           <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 4 }}>
             <defs>
               <linearGradient id="wasteAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--color-accent-primary)" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="var(--color-accent-primary)" stopOpacity={0} />
               </linearGradient>
             </defs>
 
             {/* Very subtle horizontal grid only */}
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#d9d9d9"
+              stroke={getCSSVar('--color-border')}
               strokeOpacity={0.5}
               vertical={false}
             />
 
             <XAxis
               dataKey="day"
-              tick={{ fontSize: 11, fill: '#666666' }}
+              tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
               axisLine={false}
               tickLine={false}
               interval={xInterval}
@@ -115,7 +118,7 @@ export function WasteTrendCard({ className }: { className?: string }) {
               domain={[0, 60]}
               ticks={[0, 20, 40, 60]}
               tickFormatter={(v: number) => (v === 0 ? '0' : `${v} kg`)}
-              tick={{ fontSize: 11, fill: '#666666' }}
+              tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
               axisLine={false}
               tickLine={false}
               width={44}
@@ -124,7 +127,7 @@ export function WasteTrendCard({ className }: { className?: string }) {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#16a34a"
+              stroke={getCSSVar('--color-accent-primary')}
               strokeWidth={2}
               fill="url(#wasteAreaGradient)"
               dot={false}

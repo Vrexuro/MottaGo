@@ -29,7 +29,7 @@ export function SelectInput({
     'pl-3 pr-10 py-2.5',
     'appearance-none cursor-pointer',
     borderAndFocusClasses,
-    'disabled:bg-[#F3F4F6] disabled:border-[#E5E7EB] disabled:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
+    'disabled:bg-input-disabled-bg disabled:border-input-disabled-border disabled:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
     className,
   ]
     .filter(Boolean)

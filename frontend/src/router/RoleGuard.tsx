@@ -12,7 +12,7 @@ interface RoleGuardProps {
 }
 
 export function RoleGuard({ allowedRoles, redirectTo, children }: RoleGuardProps) {
-  const { user, loading } = useAuth();
+  const { session, loading, profile } = useAuth();
 
   if (loading) {
     return (
@@ -22,14 +22,11 @@ export function RoleGuard({ allowedRoles, redirectTo, children }: RoleGuardProps
     );
   }
 
-  if (!user) {
-    // Temporary placeholder — redirects to root until login page (SCR-SYS-01) is built
-    return <Navigate to={redirectTo ?? ROUTES.ROOT} replace />;
+  if (!session) {
+    return <Navigate to={redirectTo ?? ROUTES.LOGIN} replace />;
   }
 
-  const currentRole = (user.user_metadata?.role ?? null) as UserRole | null;
-
-  if (!currentRole || !allowedRoles.includes(currentRole)) {
+  if (!profile || !allowedRoles.includes(profile.role)) {
     return <Navigate to={redirectTo ?? ROUTES.ROOT} replace />;
   }
 

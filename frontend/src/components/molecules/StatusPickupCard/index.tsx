@@ -1,3 +1,4 @@
+import { Button } from '../../atoms/Button';
 import { Icon } from '../../atoms/Icon';
 
 interface StatusItem {
@@ -17,8 +18,8 @@ const STATUS_ITEMS: StatusItem[] = [
     label: 'Menunggu Konfirmasi',
     count: 2,
     iconName: 'Clock',
-    iconBgClass: 'bg-amber-100',
-    iconColorClass: 'text-amber-600',
+    iconBgClass: 'bg-warning-bg',
+    iconColorClass: 'text-capacity-warning',
     countColorClass: 'text-text-primary',
     rowBgClass: 'bg-warning-bg',
   },
@@ -105,14 +106,11 @@ export function StatusPickupCard({ className }: StatusPickupCardProps) {
       </ul>
 
       {/* ── Footer CTA ─────────────────────────────────── */}
+      {/* S-04: MANAJER_RIWAYAT_PICKUP belum ada di routes.ts — navigasi belum diwiring */}
       <div className="border-t border-mottago-border mt-auto">
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-1 py-3 text-xs font-medium text-accent-primary hover:bg-mottago-surface-subtle transition-colors"
-        >
+        <Button variant="ghost" size="sm" rightIcon="ChevronRight" className="w-full">
           Lihat Semua Pickup
-          <Icon name="ChevronRight" size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );

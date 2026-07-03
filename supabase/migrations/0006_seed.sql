@@ -24,7 +24,7 @@
 --   8. sequence resets       — ensure future app INSERTs don't conflict
 -- =============================================================================
 -- UUID scheme (explicit, for idempotency across re-runs):
---   profiles            aaaaaaaa-0000-0000-0000-0000000000{01–03}
+--   profiles            aaaaaaaa-0000-0000-0000-0000000000{01–02}
 --   capacity_snapshots  bbbbbbbb-0000-0000-0000-0000000000{01–03}
 --   waste_items         cccccccc-0000-0000-0000-0000000000{01–04}
 --   notifications       dddddddd-0000-0000-0000-0000000000{01–02}  (manual only)
@@ -32,14 +32,14 @@
 -- Row counts:
 --   vendors             4   (3 active + 1 inactive)
 --   stores              2
---   profiles            3   (manajer, utility, pelayan)
+--   profiles            2   (manajer, utility)
 --   capacity_snapshots  3   (normal 30%, perlu-perhatian 70%, kritis 92%)
 --   capacity_alerts     2   [AUTO — created by fn_create_capacity_alert trigger]
 --   waste_items         4   (organic, liquid, recyclable, non-recyclable)
 --   pickups             4   (waiting, in-transit, completed, cancelled)
 --   notifications       4   [2 AUTO via trigger + 2 manual]
 --   ─────────────────────────────────────────────────────────────────────────
---   TOTAL               26 rows
+--   TOTAL               24 rows
 -- =============================================================================
 
 BEGIN;
@@ -52,6 +52,8 @@ BEGIN;
 -- Vendor 4 is inactive (DL-05): excluded from new pickup creation but
 -- existing FK references from pickups.vendor_id are preserved.
 -- =============================================================================
+-- whatsapp_number column is added by migration 0010 (runs after this seed).
+-- Placeholder numbers are applied by UPDATE statements in 0010.
 INSERT INTO vendors (id, name, is_active)
 VALUES
     (1, 'PT Limbah Bersih Indonesia',     true),
@@ -69,11 +71,11 @@ ON CONFLICT (id) DO NOTHING;
 --   Store 1 → holds the 'waiting' pickup
 --   Store 2 → holds the 'in-transit' pickup
 -- =============================================================================
-INSERT INTO stores (id, store_name, city, max_capacity, default_vendor_id)
+INSERT INTO stores (id, store_name, city, max_capacity)
 OVERRIDING SYSTEM VALUE
 VALUES
-    (1, 'Warung MottaGo Sudirman', 'Jakarta', 100.00, 1),
-    (2, 'Warung MottaGo Blok M',   'Jakarta',  75.00, 2)
+    (1, 'Warung MottaGo Sudirman', 'Jakarta', 100.00),
+    (2, 'Warung MottaGo Blok M',   'Jakarta',  75.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- =============================================================================
@@ -86,11 +88,12 @@ ON CONFLICT (id) DO NOTHING;
 -- =============================================================================
 SET session_replication_role = 'replica';
 
+-- username column is added by migration 0011 (runs after this seed).
+-- Username values are derived from full_name in 0011 via UPDATE.
 INSERT INTO profiles (id, store_id, role, full_name)
 VALUES
     ('aaaaaaaa-0000-0000-0000-000000000001', 1, 'manajer', 'Budi Santoso'),
-    ('aaaaaaaa-0000-0000-0000-000000000002', 1, 'utility', 'Agus Pratama'),
-    ('aaaaaaaa-0000-0000-0000-000000000003', 1, 'pelayan', 'Siti Rahayu')
+    ('aaaaaaaa-0000-0000-0000-000000000002', 1, 'utility', 'Agus Pratama')
 ON CONFLICT (id) DO NOTHING;
 
 SET session_replication_role = DEFAULT;
@@ -158,7 +161,7 @@ ON CONFLICT (id) DO NOTHING;
 -- 6. pickups
 -- =============================================================================
 -- Four pickups covering all status values.
--- DL-03: uix_pickups_one_active_per_store enforces 1 active pickup per store.
+-- DL-03: uix_pickups_one_active_per_store_per_category enforces 1 active pickup per store per category.
 --   PU-SEED-001  store_id=1  'waiting'     → active; only active row on store 1 ✓
 --   PU-SEED-002  store_id=2  'in-transit'  → active; only active row on store 2 ✓
 --   PU-SEED-003  store_id=1  'completed'   → outside partial index, OK ✓
@@ -178,13 +181,22 @@ VALUES
         'CV Daur Ulang Nusantara',        30.00, 'in-transit', NULL
     ),
     (
-        'PU-SEED-003', 1, 1,
-        'PT Limbah Bersih Indonesia',     52.00, 'completed',  now() - INTERVAL '2 days'
-    ),
-    (
         'PU-SEED-004', 1, 3,
         'UD Pengelola Organik Sejahtera', 20.00, 'cancelled',  NULL
     )
+ON CONFLICT (id) DO NOTHING;
+
+-- PU-SEED-003: inserted separately to provide explicit requested_at.
+-- Without explicit requested_at, the column defaults to now() at seed time,
+-- which is AFTER completed_at (now() - 2 days) — violating chk_pickups_completed_at.
+-- Fix: requested_at = now() - 3 days, completed_at = now() - 2 days (1-day duration).
+INSERT INTO pickups (id, store_id, vendor_id, vendor_name, estimasi_kg, status, requested_at, completed_at)
+VALUES (
+    'PU-SEED-003', 1, 1,
+    'PT Limbah Bersih Indonesia', 52.00, 'completed',
+    now() - INTERVAL '3 days',
+    now() - INTERVAL '2 days'
+)
 ON CONFLICT (id) DO NOTHING;
 
 -- =============================================================================

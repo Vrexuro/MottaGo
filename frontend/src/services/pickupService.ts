@@ -46,7 +46,7 @@ export const pickupService = {
       .in('status', ['waiting', 'in-transit'])
       .order('requested_at', { ascending: false });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     return ((data ?? []) as PickupRow[]).map(mapRow);
   },
@@ -60,7 +60,7 @@ export const pickupService = {
       .order('completed_at', { ascending: false })
       .limit(50);
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     return ((data ?? []) as PickupRow[]).map(mapRow);
   },
@@ -82,7 +82,7 @@ export const pickupService = {
       .eq('id', pickupId)
       .eq('status', 'waiting'); // Only cancel pickups still waiting for confirmation
 
-    return !error; // TODO: table not yet created — returns false until schema is ready
+    return !error; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
   },
 
   getPickupSummary: async (storeId: number): Promise<PickupStatusCount | null> => {
@@ -107,7 +107,7 @@ export const pickupService = {
         .gte('completed_at', `${today}T00:00:00.000Z`),
     ]);
 
-    if (waitingRes.error || transitRes.error || completedRes.error) return null; // TODO: table not yet created
+    if (waitingRes.error || transitRes.error || completedRes.error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     return {
       waiting: waitingRes.count ?? 0,

@@ -1,5 +1,9 @@
 import { Badge } from '../../atoms/Badge';
+import { Button } from '../../atoms/Button';
 import { Icon } from '../../atoms/Icon';
+import { getCapacityStatus, CAPACITY_STATUS_TOKENS } from '../../../constants/capacity';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../router/routes';
 
 interface CapacityCardProps {
   currentKg?: number;
@@ -14,15 +18,17 @@ type StatusConfig = {
 };
 
 function getStatus(pct: number): StatusConfig {
-  if (pct >= 85) return { label: 'Kritis', badge: 'danger', gaugeColor: '#f44336' };
-  if (pct >= 60) return { label: 'Perlu Perhatian', badge: 'warning', gaugeColor: '#ff9800' };
-  return { label: 'Aman', badge: 'success', gaugeColor: '#4caf50' };
+  const status = getCapacityStatus(pct);
+  const gaugeColor = CAPACITY_STATUS_TOKENS[status];
+  if (status === 'critical') return { label: 'Kritis', badge: 'danger', gaugeColor };
+  if (status === 'warning') return { label: 'Perlu Perhatian', badge: 'warning', gaugeColor };
+  return { label: 'Aman', badge: 'success', gaugeColor };
 }
 
 const LEGEND = [
   { colorClass: 'bg-capacity-normal', label: 'Aman', range: '< 60%' },
-  { colorClass: 'bg-capacity-warning', label: 'Perlu Perhatian', range: '60–84%' },
-  { colorClass: 'bg-capacity-critical', label: 'Kritis', range: '≥ 85%' },
+  { colorClass: 'bg-capacity-warning', label: 'Perlu Perhatian', range: '60–89%' },
+  { colorClass: 'bg-capacity-critical', label: 'Kritis', range: '≥ 90%' },
 ] as const;
 
 function CapacityGauge({ percentage, color }: { percentage: number; color: string }) {
@@ -36,7 +42,14 @@ function CapacityGauge({ percentage, color }: { percentage: number; color: strin
   return (
     <svg viewBox="0 0 120 120" className="w-full" aria-label={`Kapasitas terpakai ${percentage}%`}>
       {/* Background track */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth={sw} />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="var(--color-input-disabled-border)"
+        strokeWidth={sw}
+      />
       {/* Filled arc — starts at 12-o'clock, clockwise */}
       <circle
         cx={cx}
@@ -69,7 +82,7 @@ function CapacityGauge({ percentage, color }: { percentage: number; color: strin
         y={70}
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#888888"
+        fill="var(--color-text-secondary)"
         fontSize="10"
         fontFamily="Inter, Arial, sans-serif"
       >
@@ -80,6 +93,7 @@ function CapacityGauge({ percentage, color }: { percentage: number; color: strin
 }
 
 export function CapacityCard({ currentKg = 263, maxKg = 400, className }: CapacityCardProps) {
+  const navigate = useNavigate();
   const percentage = Math.round((currentKg / maxKg) * 100);
   const { label, badge, gaugeColor } = getStatus(percentage);
 
@@ -136,21 +150,16 @@ export function CapacityCard({ currentKg = 263, maxKg = 400, className }: Capaci
         </div>
       </div>
 
-      {/* ── Footer: pill outline CTA — bottom-right ────────── */}
+      {/* ── Footer: CTA — bottom-right ────────── */}
       <div className="flex justify-end px-4 pb-4 pt-2 md:px-5 md:pb-5">
-        <button
-          type="button"
-          className={[
-            'inline-flex items-center gap-1',
-            'border border-mottago-border rounded-full',
-            'px-3 py-1.5',
-            'text-xs font-medium text-text-primary',
-            'hover:bg-mottago-surface-subtle transition-colors',
-          ].join(' ')}
+        <Button
+          variant="secondary"
+          size="sm"
+          rightIcon="ChevronRight"
+          onClick={() => navigate(ROUTES.MANAJER_KAPASITAS)}
         >
           Lihat Detail Kapasitas
-          <Icon name="ChevronRight" size={16} className="text-text-secondary" />
-        </button>
+        </Button>
       </div>
     </div>
   );

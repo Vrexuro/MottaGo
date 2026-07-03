@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CAPACITY_THRESHOLDS } from '../../../constants/capacity';
 import {
   AreaChart,
   Area,
@@ -184,9 +185,9 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
               }}
             />
 
-            {/* Threshold: Kritis 85% */}
+            {/* Threshold: Kritis 90% */}
             <ReferenceLine
-              y={85}
+              y={CAPACITY_THRESHOLDS.CRITICAL}
               stroke="#EF4444"
               strokeDasharray="4 3"
               strokeWidth={1.5}

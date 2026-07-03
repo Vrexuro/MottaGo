@@ -1,8 +1,10 @@
+import { CAPACITY_THRESHOLDS } from '../../../constants/capacity';
+
 type CapacityState = 'aman' | 'perlu-perhatian' | 'kritis';
 
 function getState(pct: number): CapacityState {
-  if (pct >= 90) return 'kritis';
-  if (pct >= 60) return 'perlu-perhatian';
+  if (pct >= CAPACITY_THRESHOLDS.CRITICAL) return 'kritis';
+  if (pct >= CAPACITY_THRESHOLDS.WARNING) return 'perlu-perhatian';
   return 'aman';
 }
 

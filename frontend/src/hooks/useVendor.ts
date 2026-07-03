@@ -4,16 +4,14 @@ import { vendorService } from '../services/vendorService';
 
 export interface UseVendorReturn {
   vendors: Vendor[];
-  defaultVendor: Vendor | null;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
   search: (keyword: string) => Promise<void>;
 }
 
-export function useVendor(storeId: number): UseVendorReturn {
+export function useVendor(): UseVendorReturn {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [defaultVendor, setDefaultVendor] = useState<Vendor | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,18 +19,14 @@ export function useVendor(storeId: number): UseVendorReturn {
     setLoading(true);
     setError(null);
     try {
-      const [activeVendors, defVendor] = await Promise.all([
-        vendorService.getActiveVendors(),
-        vendorService.getDefaultVendor(storeId),
-      ]);
+      const activeVendors = await vendorService.getActiveVendors();
       setVendors(activeVendors);
-      setDefaultVendor(defVendor);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Gagal memuat data vendor');
     } finally {
       setLoading(false);
     }
-  }, [storeId]);
+  }, []);
 
   const search = useCallback(async (keyword: string) => {
     try {
@@ -49,7 +43,6 @@ export function useVendor(storeId: number): UseVendorReturn {
 
   return {
     vendors,
-    defaultVendor,
     loading,
     error,
     refresh: fetchAll,

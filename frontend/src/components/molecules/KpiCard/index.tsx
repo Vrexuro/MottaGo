@@ -41,7 +41,7 @@ const accentCfg: Record<KpiAccent, { chipBg: string; chipIcon: string; valueFg: 
   },
   warning: {
     chipBg: 'bg-warning-bg',
-    chipIcon: 'text-[#92400E]',
+    chipIcon: 'text-warning-text',
     valueFg: 'text-text-primary',
   },
   orange: {

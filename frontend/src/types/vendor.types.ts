@@ -1,4 +1,5 @@
-// Vendor — from requestPickup.ts VENDOR_OPTIONS display; DL-05: isActive gate; DL-06: defaultVendorId on Store
+// Vendor — Master Data entity. DL-05: isActive gate prevents inactive vendor selection.
+// Mapping vendor per store per waste category dilakukan via store_vendor_assignments (Sprint B).
 export interface Vendor {
   id: number;
   name: string;

@@ -5,9 +5,7 @@ import type { UserRole } from '../../../types/user.types';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   manajer: 'Manajer',
-  pelayan: 'Pelayan',
   utility: 'Utility',
-  vendor: 'Vendor',
 };
 
 const getInitials = (name: string): string =>
@@ -131,14 +129,14 @@ export function SideNav({
         {state === 'collapsed' ? (
           <div className="shrink-0 flex justify-center py-4">
             <div className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center">
-              <span className="text-xs font-bold text-white leading-none">{initials}</span>
+              <span className="text-xs font-bold text-on-dark leading-none">{initials}</span>
             </div>
           </div>
         ) : (
           <div className="shrink-0 flex items-center gap-3 px-4 py-3">
             {/* Avatar */}
             <div className="shrink-0 w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center">
-              <span className="text-xs font-bold text-white leading-none">{initials}</span>
+              <span className="text-xs font-bold text-on-dark leading-none">{initials}</span>
             </div>
             {/* Name + role */}
             <div className="flex-1 min-w-0">

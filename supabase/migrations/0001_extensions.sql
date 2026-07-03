@@ -11,7 +11,7 @@
 BEGIN;
 
 -- ── Extensions ────────────────────────────────────────────────────────────────
--- TODO: CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
--- TODO: CREATE EXTENSION IF NOT EXISTS "pg_trgm"   WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "pg_trgm"   WITH SCHEMA extensions;
 
 COMMIT;

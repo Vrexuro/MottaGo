@@ -1,4 +1,4 @@
-export type UserRole = 'pelayan' | 'utility' | 'manajer' | 'vendor';
+export type UserRole = 'utility' | 'manajer';
 
 export interface User {
   id: string;

@@ -20,7 +20,7 @@ export function DateInput({ error = false, disabled, className, ...rest }: DateI
     'outline-none transition-colors duration-150',
     'px-3 py-2.5',
     borderAndFocusClasses,
-    'disabled:bg-[#F3F4F6] disabled:border-[#E5E7EB] disabled:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
+    'disabled:bg-input-disabled-bg disabled:border-input-disabled-border disabled:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
     className,
   ]
     .filter(Boolean)

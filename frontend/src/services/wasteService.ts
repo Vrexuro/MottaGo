@@ -46,7 +46,7 @@ export const wasteService = {
       .eq('store_id', storeId)
       .gte('created_at', `${today}T00:00:00.000Z`);
 
-    if (error) return null; // TODO: table not yet created
+    if (error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     const rows = (data ?? []) as Array<{ waste_type: WasteType; quantity: number }>;
     const byCategory = aggregateByType(rows);
@@ -71,7 +71,7 @@ export const wasteService = {
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: true });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     const rows = (data ?? []) as Array<{ quantity: number; created_at: string }>;
 
@@ -104,7 +104,7 @@ export const wasteService = {
       .eq('store_id', storeId)
       .gte('created_at', since);
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
 
     const rows = (data ?? []) as Array<{ waste_type: WasteType; quantity: number }>;
     return aggregateByType(rows);

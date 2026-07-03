@@ -32,8 +32,7 @@
 
   /* =========================================
      CAPACITY STATUS — DL-04 Behavior
-     Normal < 70% · Warning 70–89% · Critical ≥ 90%
-     (60% = threshold CTA Request Pickup di SCR-M-02, bukan threshold warna)
+     Normal < 60% · Warning 60–89% · Critical ≥ 90%
      ========================================= */
   --color-capacity-normal: #4caf50;
   --color-capacity-warning: #ff9800;
@@ -54,9 +53,17 @@
   --color-error-bg: #fee2e2;
   --color-error-border: #f44336;
   --color-error-text: #991b1b;
+  --color-error-action: #dc2626;
+  --color-error-action-hover: #b91c1c;
   --color-warning-bg: #fffbeb;
   --color-warning-border: #d97706;
   --color-warning-text: #92400e;
+
+  /* =========================================
+     INPUT STATES
+     ========================================= */
+  --color-input-disabled-bg: #f3f4f6;
+  --color-input-disabled-border: #e5e7eb;
   --color-info-bg: #dbeafe;
   --color-info-border: #3b82f6;
   --color-info-text: #1e40af;

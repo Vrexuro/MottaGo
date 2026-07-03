@@ -27,7 +27,7 @@ export const vendorService = {
       .eq('is_active', true)
       .order('name', { ascending: true });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return [];
 
     return ((data ?? []) as VendorRow[]).map(mapRow);
   },
@@ -39,25 +39,9 @@ export const vendorService = {
       .eq('id', vendorId)
       .single();
 
-    if (error) return null; // TODO: table not yet created
+    if (error) return null;
 
     return mapRow(data as VendorRow);
-  },
-
-  getDefaultVendor: async (storeId: number): Promise<Vendor | null> => {
-    // DL-06: each store has a default_vendor_id FK → vendors
-    const { data: storeData, error: storeError } = await supabase
-      .from('stores')
-      .select('default_vendor_id')
-      .eq('id', storeId)
-      .single();
-
-    if (storeError || !storeData) return null; // TODO: table not yet created
-
-    const defaultVendorId = (storeData as { default_vendor_id: number | null }).default_vendor_id;
-    if (!defaultVendorId) return null;
-
-    return vendorService.getVendorById(defaultVendorId);
   },
 
   searchVendors: async (keyword: string): Promise<Vendor[]> => {
@@ -70,7 +54,7 @@ export const vendorService = {
       .ilike('name', `%${keyword}%`)
       .order('name', { ascending: true });
 
-    if (error) return []; // TODO: table not yet created
+    if (error) return [];
 
     return ((data ?? []) as VendorRow[]).map(mapRow);
   },

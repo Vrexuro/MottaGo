@@ -181,7 +181,7 @@ CREATE INDEX idx_vendors_is_active
 -- Requires pg_trgm extension (0001_extensions.sql).
 -- gin_trgm_ops: splits text into trigrams; GIN lookup matches any containing trigram.
 CREATE INDEX idx_vendors_name_trgm
-    ON vendors USING GIN (name gin_trgm_ops);
+    ON vendors USING GIN (name extensions.gin_trgm_ops);
 
 -- =============================================================================
 -- GROUP 7 — notifications (DL-04: 30-second polling)

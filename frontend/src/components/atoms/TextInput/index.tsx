@@ -31,8 +31,8 @@ export function TextInput({
     `${paddingLeft} py-2.5 ${paddingRight}`,
     'placeholder:text-text-secondary',
     borderAndFocusClasses,
-    'disabled:bg-[#F3F4F6] disabled:border-[#E5E7EB] disabled:text-text-disabled disabled:placeholder:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
-    'read-only:bg-mottago-surface-subtle read-only:border-[#E5E7EB] read-only:cursor-default',
+    'disabled:bg-input-disabled-bg disabled:border-input-disabled-border disabled:text-text-disabled disabled:placeholder:text-text-disabled disabled:cursor-not-allowed disabled:pointer-events-none',
+    'read-only:bg-mottago-surface-subtle read-only:border-input-disabled-border read-only:cursor-default',
     className,
   ]
     .filter(Boolean)
