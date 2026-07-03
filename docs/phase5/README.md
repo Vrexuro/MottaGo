@@ -38,12 +38,13 @@ Memastikan seluruh workflow sesuai dengan BPMN dan proses bisnis yang telah dise
 
 ### User Validation
 
-Memastikan kebutuhan setiap stakeholder terpenuhi:
+Memastikan kebutuhan setiap stakeholder aktif terpenuhi:
 
-* Waiters
-* Utility Staff
-* Restaurant Managers
-* Waste Management Vendors
+* Pegawai Utility (Utility Staff)
+* Manajer Restoran (Restaurant Managers)
+
+*(Catatan: Role Pelayan dan Vendor telah dihapus dari sistem — DL-05, DL-13, 2 Juli 2026.
+Vendor sekarang adalah Master Data murni tanpa akun login. Validasi scope disesuaikan.)*
 
 ## Rules
 

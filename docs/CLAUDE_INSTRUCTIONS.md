@@ -18,10 +18,11 @@ Help restaurant businesses reduce food waste through structured recording, class
 
 Primary Stakeholders:
 
-* Waiters (Pelayan)
 * Utility Staff (Pegawai Utility)
-* Restaurant Managers
-* Waste Management Vendors
+* Restaurant Managers (Manajer)
+
+*(Catatan: Role Pelayan dan Vendor telah dihapus dari sistem — DL-05, DL-13, 2 Juli 2026.
+Vendor sekarang adalah Master Data murni tanpa akun login.)*
 
 The uploaded PRD is the official source of truth for this project.
 

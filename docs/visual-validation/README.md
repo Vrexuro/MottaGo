@@ -192,7 +192,7 @@ SCR-M-02 Visual Specification    Approved
 SCR-M-04 Visual Specification    Approved
 Prototype Generation (Figma)     Completed
 High-Fidelity Mockup             Completed
-Phase 4 Build                    Not Started
+Phase 4 Build                    In Progress (Sprint A selesai — Batch A1–A5, EA-01, EA-02 complete)
 
 ---
 
@@ -215,7 +215,7 @@ mewakili user journey utama Manajer dalam MottaGo:
 
 Dashboard → Monitoring Kapasitas → Request Pickup
 
-Phase 4 tidak boleh dimulai sebelum visual utama telah divalidasi dan disetujui.
+Phase 4 Sprint A telah selesai. Implementasi frontend aktif berjalan.
 # Visual Validation
 
 ## Tujuan
@@ -406,7 +406,7 @@ SCR-M-02 Visual Specification    Approved
 SCR-M-04 Visual Specification    Approved
 Prototype Generation (Figma)     Completed
 High-Fidelity Mockup             Completed
-Phase 4 Build                    Not Started
+Phase 4 Build                    In Progress (Sprint A selesai — Batch A1–A5, EA-01, EA-02 complete)
 
 ---
 
@@ -421,4 +421,4 @@ Visual Specification yang telah disetujui menjadi sumber referensi untuk:
 * Prototype Generation
 * Frontend Implementation
 
-Phase 4 tidak boleh dimulai sebelum visual utama telah divalidasi dan disetujui.
+Phase 4 Sprint A telah selesai. Implementasi frontend aktif berjalan.

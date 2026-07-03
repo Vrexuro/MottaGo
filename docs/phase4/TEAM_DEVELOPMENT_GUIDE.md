@@ -2,11 +2,11 @@
 ## MottaGo – Phase 4 Frontend Development
 
 **Dokumen:** TEAM_DEVELOPMENT_GUIDE
-**Tanggal:** 19 Juni 2026
-**Versi:** 1.1
+**Tanggal:** 19 Juni 2026 *(status diperbarui 3 Juli 2026)*
+**Versi:** 1.2
 **Status:** ACTIVE
-**Berlaku untuk:** Phase 4 Sprint 1 dan seterusnya
-**Maintainer:** Rifqi (Project Leader)
+**Berlaku untuk:** Phase 4 Sprint A dan seterusnya
+**Maintainer:** Rifqi Dzakwan Nasution (24523061) — Project Leader
 
 ---
 
@@ -33,21 +33,30 @@ repository.
 
 **Status Sprint:**
 
-| Sprint | Branch | Status |
+| Sprint / Batch | Branch | Status |
 |---|---|---|
-| Sprint 0 – Frontend Foundation | `main` | Selesai |
-| Sprint 1 – Shared Layout & Components | `feature/shared-foundation` | Belum dimulai |
-| Sprint 2 – Screen Implementation | `feature/dashboard` · `feature/monitoring-kapasitas` · `feature/request-pickup` | Belum dimulai |
+| Sprint 0 – Frontend Foundation | `main` | ✅ Selesai |
+| Sprint 1 – Shared Layout & Components | `feature/shared-foundation` → merged `main` | ✅ Selesai |
+| Sprint 2 – Screen Implementation | `feature/dashboard` → merged `main` | ✅ Selesai (mock data) |
+| Batch A1 – DB Migration + Route Cleanup | `main` | ✅ Selesai |
+| Batch A2 – Route Architecture + Role Cleanup | `main` | ✅ Selesai |
+| Batch A3 – AuthCard Organism | `main` | ✅ Selesai |
+| Batch A4 – LoginPage (Username Auth) | `main` | ✅ Selesai |
+| Batch A5 – Dashboard Token Cleanup + Nav | `main` | ✅ Selesai |
+| EA-01 – Environment Activation | — | ✅ Selesai |
+| EA-02 – Development Test Accounts | — | ✅ Selesai |
+| C2 – Real Data Integration | `main` | ⏳ Belum dimulai |
+| Monitoring Kapasitas (Azizah) | `feature/monitoring-kapasitas` | 🔄 In progress |
 
 ---
 
 ## 2. Team Structure
 
-| Nama | Role |
-|---|---|
-| Rifqi | Project Leader · Tech Lead |
-| Azizah | Frontend Developer |
-| Dhia | Frontend Developer |
+| Nama | NIM | Role |
+|---|---|---|
+| Rifqi Dzakwan Nasution | 24523061 | Project Leader · Tech Lead · Backend |
+| Nur Azizah Basyirah Syamsuddin | 24523238 | Frontend Developer — Monitoring Kapasitas |
+| Aufa Dhia Arkan | 24523156 | Frontend Developer — Shared Foundation |
 
 **Project Leader bertanggung jawab atas:**
 - Arsitektur frontend secara keseluruhan

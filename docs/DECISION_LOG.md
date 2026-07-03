@@ -7,18 +7,25 @@ Store menggunakan max_capacity yang dikonfigurasi manajer.
 Unit ditentukan otomatis berdasarkan waste_type.
 Qty diinput manual oleh Utility.
 
-## DL-03
-Satu pickup aktif per store.
+## DL-03 *(Direvisi 2 Juli 2026 — lihat 0010)*
+~~Satu pickup aktif per store.~~
+
+**Versi terbaru:** Satu pickup aktif per store **per waste_category**.
+Partial UNIQUE index lama (`uix_pickups_one_active_per_store`) diganti dengan index baru yang menyertakan kolom `waste_category`. Diimplementasikan di `0010_vendor_whatsapp_and_pickup_amendments.sql`.
 
 ## DL-04
 Menggunakan tabel NOTIFICATION dan polling 30 detik.
 
-## DL-05
-Vendor nonaktif tidak dapat login.
-Pickup aktif tetap dapat diselesaikan.
+## DL-05 *(Direvisi 2 Juli 2026 — lihat 0009)*
+~~Vendor nonaktif tidak dapat login. Pickup aktif tetap dapat diselesaikan.~~
 
-## DL-06
-Store memiliki default_vendor_id.
+**Versi terbaru:** Vendor adalah **Master Data murni** — tidak memiliki akun Supabase Auth, tidak dapat login, tidak ada RLS khusus vendor. Role `'vendor'` dihapus dari sistem. Semua profil dengan role `'vendor'` atau `'pelayan'` dikonversi ke `'utility'`. Kolom `profiles.vendor_id` (yang ditambahkan sementara di 0008) juga dihapus.
+Referensi: `VENDOR_ARCHITECTURE_v1.1.md`. Diimplementasikan di `0009_remove_vendor_role.sql`.
+
+## DL-06 *(Direvisi 2 Juli 2026 — lihat 0010)*
+~~Store memiliki default_vendor_id.~~
+
+**Versi terbaru:** Penugasan vendor dilakukan melalui tabel `store_vendor_assignments` (per-store, per-waste_category), bukan kolom `default_vendor_id` di tabel `stores`. Kolom `stores.default_vendor_id` telah dihapus. Diimplementasikan di `0010_vendor_whatsapp_and_pickup_amendments.sql`.
 
 ## DL-07
 Utility dapat memulai klasifikasi tanpa menunggu konfirmasi Pelayan.
@@ -116,6 +123,51 @@ Catatan Penomoran:
 
 Preseden: DL-08 (Visual Specs sebagai implementation-level source of truth), DL-09.
 Disetujui: 19 Juni 2026.
+
+## DL-11
+**Username-based Authentication**
+Disetujui: 2 Juli 2026. Diimplementasikan di `0011_username_auth.sql`.
+
+Login MottaGo menggunakan **username**, bukan email. Alur transformasi:
+1. User memasukkan username (contoh: `manager_demo`)
+2. Frontend (`LoginPage.tsx`) mentransformasi ke synthetic email: `manager_demo@mottago.internal`
+3. Supabase Auth dipanggil dengan `signInWithPassword({ email: syntheticEmail, password })`
+4. Trigger `fn_handle_new_user` mengekstrak username kembali dari email: `SPLIT_PART(email, '@', 1)`
+
+Kolom `profiles.username` ditambahkan dengan UNIQUE constraint (`uq_profiles_username`).
+
+Development accounts (EA-02, 3 Juli 2026):
+- `manager_demo` / password `123456` → role `manajer`, store_id `1`
+- `utility_demo` / password `123456` → role `utility`, store_id `1`
+
+## DL-12
+**Supabase sebagai Platform Backend**
+Disetujui: awal Sprint A (Juni–Juli 2026).
+
+MottaGo menggunakan Supabase sebagai satu-satunya backend platform:
+- **Auth**: Supabase Auth (email/password dengan synthetic email pattern — lihat DL-11)
+- **Database**: PostgreSQL 15 via Supabase
+- **API**: PostgREST (auto-REST dari schema, tanpa custom API server)
+- **RLS**: Row Level Security aktif di semua 8 tabel, enforced via `get_my_store_id()` dan `get_my_role()`
+- **Tidak ada** custom Node.js/Express server di production
+
+Tidak ada WebSocket/Realtime di MVP — polling 30 detik (DL-04) digunakan untuk notifikasi.
+
+## DL-13
+**Vendor sebagai Master Data (bukan pengguna sistem)**
+Disetujui: Sprint A Batch A1, 2 Juli 2026. Referensi: `VENDOR_ARCHITECTURE_v1.1.md`.
+
+Vendor adalah entitas Master Data murni:
+- Vendor **tidak memiliki akun** di Supabase Auth
+- Vendor **tidak dapat login** ke sistem
+- Tidak ada RLS policy khusus vendor
+- Role `'vendor'` telah dihapus dari enum `profiles.role`
+- Penugasan vendor ke store dilakukan via tabel `store_vendor_assignments` (DL-06 revised)
+- Koordinasi pickup dengan vendor menggunakan WhatsApp (`vendors.whatsapp_number`)
+
+Role aktif yang tersisa: `'manajer'`, `'utility'`.
+
+---
 
 ## Referensi Keputusan Bisnis
 

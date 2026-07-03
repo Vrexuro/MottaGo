@@ -1,7 +1,7 @@
 # MottaGo — Project Status
 
-**Terakhir diperbarui:** 30 Juni 2026
-**Diperbarui oleh:** Claude Code (Sonnet 4.6)
+**Terakhir diperbarui:** 3 Juli 2026
+**Diperbarui oleh:** Independent Auditor MottaGo
 
 ---
 
@@ -13,9 +13,10 @@
 
 ## Current Milestone
 
-**C1 — Authentication Integration** (belum dimulai)
+**Git Push Pending** → setelah push, lanjut ke **C2 — Real Data Integration**
 
-Milestone ini adalah titik awal sesi berikutnya di device baru.
+Migration 0007–0011, LoginPage, AuthCard, dan seluruh perubahan Sprint A belum di-push ke GitHub.
+Gunakan `Prompt_GitPush_ClaudeCode.md` (di folder audit) untuk eksekusi push.
 
 ---
 
@@ -38,30 +39,39 @@ Milestone ini adalah titik awal sesi berikutnya di device baru.
 | B2.4 | Performance Indexes (13 indexes) | ✅ Selesai |
 | B2.5 | Trigger Functions & Triggers (4 functions, 6 triggers) | ✅ Selesai |
 | B2.6 | Seed Data (26 rows across 8 tables) | ✅ Selesai |
-| B2.7 | Migration Verification & Database Lock | ✅ **PASS — Database LOCKED** |
+| B2.7 | Migration Verification & Database Lock | ✅ **PASS** |
 | B2.8 | Service Compatibility Fix (5 incompatibilities resolved) | ✅ Selesai |
+| Batch A1 | DB Migration amendments (0007–0011), route cleanup, vendor architecture | ✅ Selesai |
+| Batch A2 | Route architecture + UserRole cleanup (hapus vendor/pelayan) | ✅ Selesai |
+| Batch A3 | AuthCard organism component | ✅ Selesai |
+| Batch A4 | LoginPage refactor (username-based auth, AuthCard integration) | ✅ Selesai |
+| Batch A5 | Dashboard SCR-M-01 token cleanup, navigation wiring, DashboardHeader refactor | ✅ Selesai |
+| EA-01 | Environment Activation — Supabase credentials, 11 migrations applied | ✅ Selesai |
+| EA-02 | Development Test Accounts — manager_demo + utility_demo via Admin API | ✅ Selesai |
 
 ---
 
 ## Backend Status
 
-**Database Foundation: LOCKED ✅**
+### Supabase Migrations
 
-Tidak ada perubahan migration yang diizinkan tanpa approval eksplisit.
+| File | Deskripsi | Git Status | Supabase |
+|---|---|---|---|
+| `0001_extensions.sql` | pg_uuid, pg_trgm (amended) | ✅ Committed (modified locally) | ✅ Applied |
+| `0002_tables.sql` | 8 tables + pickup_seq | ✅ Committed | ✅ Applied |
+| `0003_constraints.sql` | 12 FK, 14 CHECK, 2 UNIQUE | ✅ Committed | ✅ Applied |
+| `0004_indexes.sql` | 13 performance indexes (amended) | ✅ Committed (modified locally) | ✅ Applied |
+| `0005_triggers.sql` | 4 functions, 6 triggers | ✅ Committed | ✅ Applied |
+| `0006_seed.sql` | Dev seed data (amended) | ✅ Committed (modified locally) | ✅ Applied |
+| `0007_rls.sql` | RLS policies, helper functions | ⚠️ Local only — push pending | ✅ Applied |
+| `0008_vendor_identity.sql` | Vendor identity patch (interim) | ⚠️ Local only — push pending | ✅ Applied |
+| `0009_remove_vendor_role.sql` | Hapus role vendor & pelayan | ⚠️ Local only — push pending | ✅ Applied |
+| `0010_vendor_whatsapp_and_pickup_amendments.sql` | WhatsApp, store_vendor_assignments, DL-03/DL-06 revision | ⚠️ Local only — push pending | ✅ Applied |
+| `0011_username_auth.sql` | Username auth, profiles.username UNIQUE | ⚠️ Local only — push pending | ✅ Applied |
 
-| File | Deskripsi | Status |
-|---|---|---|
-| `supabase/migrations/0001_extensions.sql` | Extension declarations (uuid-ossp, pg_trgm) | ✅ LOCKED |
-| `supabase/migrations/0002_tables.sql` | 8 tables + pickup_seq | ✅ LOCKED |
-| `supabase/migrations/0003_constraints.sql` | 12 FK, 14 CHECK, 2 UNIQUE | ✅ LOCKED |
-| `supabase/migrations/0004_indexes.sql` | 13 performance indexes | ✅ LOCKED |
-| `supabase/migrations/0005_triggers.sql` | 4 functions, 6 triggers | ✅ LOCKED |
-| `supabase/migrations/0006_seed.sql` | Dev seed data (26 rows, idempotent) | ✅ LOCKED |
+**Tabel database aktif:** vendors, stores, profiles, pickups, waste_items, capacity_snapshots, notifications, capacity_alerts, store_vendor_assignments
 
-**Tabel database:** vendors, stores, profiles, pickups, waste_items, capacity_snapshots, notifications, capacity_alerts
-
-**Supabase client:** `frontend/src/lib/supabase.ts`
-Saat ini menggunakan **placeholder credentials**. Credentials nyata harus dikonfigurasi via `frontend/.env` sebelum C1.
+**Supabase credentials:** Dikonfigurasi di `frontend/.env` (EA-01 selesai).
 
 ---
 
@@ -71,15 +81,17 @@ Saat ini menggunakan **placeholder credentials**. Credentials nyata harus dikonf
 |---|---|---|
 | Design System | ✅ Selesai | `tokens.css`, `globals.css`, `typography.css`, `tailwind.config.ts` |
 | Atoms (COMP-01–09) | ✅ Selesai | Button, TextInput, SelectInput, DateInput, Badge, Icon, Divider, ProgressBar, LoadingSpinner |
-| Molecules (COMP-10–17) | ✅ Selesai | FormField, NotificationBadge, AlertBanner, CapacityCard, DashboardHeader, KpiCard, PickupSummaryCard, QuickActionsCard, StatusPickupCard, StatusThresholdCard, CapacityGaugePanel, CapacitySummaryStats, CapacityAlertHistoryCard, CapacityTrendCard, CategoryBreakdownCard, WasteTrendCard |
-| Organisms | ✅ Selesai | AppHeader (COMP-19), SideNav (COMP-21) |
+| Molecules (COMP-10–17) | ✅ Selesai | FormField, NotificationBadge, AlertBanner, CapacityCard, DashboardHeader, KpiCard, PickupSummaryCard, QuickActionsCard, StatusPickupCard, CapacityGaugePanel, CapacitySummaryStats, CapacityTrendCard, WasteTrendCard |
+| Organisms | ✅ Selesai | AppHeader (COMP-19), SideNav (COMP-21), **AuthCard** (COMP-22, baru) |
 | Layouts | ✅ Selesai | AuthLayout (LT-01), SimpleLayout (LT-02), DashboardLayout (LT-03), FormLayout (LT-04) |
-| Pages | ✅ Selesai (mock) | DashboardPage, KapasitasPage, RequestPickupPage — semua menggunakan mock data |
-| Router | ✅ Selesai | Routes, ROUTES const, RoleGuard skeleton |
-| Services | ✅ Selesai + Sinkron | authService, capacityService, wasteService, pickupService, vendorService |
+| Pages (Manajer) | ✅ Selesai (mock) | DashboardPage, KapasitasPage, RequestPickupPage, + placeholder: KelolaPenggunaPage, LaporanPage, VendorManagementPage |
+| LoginPage | ✅ Selesai | Username-based auth, AuthCard integration, error handling (Batch A4) |
+| Router | ✅ Selesai | Routes, ROUTES const, RoleGuard aktif (bukan skeleton) |
+| Services | ✅ Selesai | authService, capacityService, wasteService, pickupService, vendorService |
 | Hooks | ✅ Skeleton | useAuth, useCapacity, usePickup, useVendor, useWaste |
-| Auth | ⏳ Skeleton | AuthContext, lib/supabase.ts (placeholder) |
-| Auth Flow | ❌ Belum | Login page, register, real auth wiring — milestone C1 |
+| AuthContext | ✅ Updated | Profile fetching dari tabel profiles, role-aware |
+| Constants | ✅ Selesai | `constants/capacity.ts` — CAPACITY_THRESHOLDS sebagai SSOT |
+| Mock Data → Real | ❌ Pending | DashboardPage, KapasitasPage, RequestPickupPage masih mock — milestone C2 |
 
 ---
 
@@ -87,17 +99,17 @@ Saat ini menggunakan **placeholder credentials**. Credentials nyata harus dikonf
 
 | Objek | Jumlah | Status |
 |---|---|---|
-| Tables | 8 | ✅ |
+| Tables | 9 | ✅ (8 core + store_vendor_assignments) |
 | Sequences | 1 (pickup_seq) | ✅ |
-| Foreign Keys | 12 | ✅ |
-| CHECK Constraints | 14 | ✅ |
-| UNIQUE Constraints | 2 (1 standard + 1 partial) | ✅ |
-| Performance Indexes | 13 | ✅ |
+| Foreign Keys | 12+ | ✅ |
+| CHECK Constraints | 14+ | ✅ |
+| UNIQUE Constraints | 3 (1 standard + 1 partial per-store-category + uq_profiles_username) | ✅ |
+| Performance Indexes | 13+ | ✅ |
 | Functions | 4 | ✅ |
 | Triggers | 6 | ✅ |
 | Seed Rows | 26 | ✅ |
-
-**Deployment prerequisite:** Aktifkan `pg_trgm` via Supabase Dashboard > Database > Extensions sebelum menjalankan migrations (diperlukan oleh `idx_vendors_name_trgm` di 0004).
+| Auth Users (dev) | 2 | ✅ manager_demo + utility_demo |
+| RLS Policies | Aktif di semua tabel | ✅ |
 
 ---
 
@@ -107,11 +119,13 @@ Saat ini menggunakan **placeholder credentials**. Credentials nyata harus dikonf
 
 ---
 
-## Latest Commit
+## Latest Commit (GitHub)
 
 ```
-47df9e2 feat: complete backend foundation with Supabase migration
+287b1e3 docs: add project handoff and session documentation
 ```
+
+**Local ahead of GitHub:** Semua perubahan Sprint A (Batch A1–A5, EA-01, EA-02) ada di local tapi belum di-push. Gunakan `Prompt_GitPush_ClaudeCode.md` untuk push.
 
 ---
 
@@ -121,11 +135,15 @@ Saat ini menggunakan **placeholder credentials**. Credentials nyata harus dikonf
 MottaGo
 ├── Frontend  : React 18 + TypeScript 5 + Vite 6 + TailwindCSS v3
 │               React Router v6 + Supabase JS Client
-├── Backend   : Supabase (PostgreSQL 15, Auth, Realtime)
-│               No custom API server — Supabase PostgREST auto-API
+│               Auth: username → synthetic email @mottago.internal (DL-11)
+├── Backend   : Supabase (PostgreSQL 15, Auth, PostgREST auto-API, RLS)
+│               No custom API server (DL-12)
 └── Database  : PostgreSQL via Supabase
-                8 tables, migrations 0001–0006 (LOCKED)
+                9 tables, migrations 0001–0011
+                RLS aktif, get_my_store_id() + get_my_role() helpers
 ```
+
+**Role aktif:** `manajer`, `utility` (role `vendor` dan `pelayan` dihapus — DL-13, DL-05)
 
 **Pattern komunikasi data:**
 - Supabase JS Client → PostgREST (auto REST dari schema)
@@ -138,27 +156,34 @@ MottaGo
 
 ```
 D:\Project\MottaGo\
-├── frontend/                 # React SPA (aktif dikembangkan)
+├── frontend/
 │   ├── src/
-│   │   ├── components/       # atoms/ molecules/ organisms/
+│   │   ├── components/
+│   │   │   ├── atoms/        # Button, TextInput, SelectInput, DateInput, Badge, Icon, Divider, ProgressBar, LoadingSpinner
+│   │   │   ├── molecules/    # FormField, NotificationBadge, CapacityCard, DashboardHeader, KpiCard, dll
+│   │   │   └── organisms/    # AppHeader, SideNav, AuthCard
+│   │   ├── constants/        # capacity.ts (CAPACITY_THRESHOLDS)
 │   │   ├── design-system/    # tokens.css globals.css typography.css
 │   │   ├── hooks/            # useAuth useCapacity usePickup useVendor useWaste
 │   │   ├── layouts/          # AuthLayout DashboardLayout FormLayout SimpleLayout
 │   │   ├── lib/              # supabase.ts (Supabase client)
-│   │   ├── mock/             # Mock data (sementara, diganti real data di C1)
-│   │   ├── pages/manajer/    # DashboardPage KapasitasPage RequestPickupPage
-│   │   ├── router/           # index.tsx routes.ts navigation/ RoleGuard.tsx
+│   │   ├── pages/
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── NotFoundPage.tsx
+│   │   │   └── manajer/      # DashboardPage KapasitasPage RequestPickupPage + placeholders
+│   │   ├── router/           # index.tsx routes.ts RoleGuard.tsx
 │   │   ├── services/         # authService capacityService wasteService pickupService vendorService
 │   │   ├── store/            # AuthContext.tsx
 │   │   └── types/            # common pickup user vendor waste
-│   ├── .env.example          # Template env vars
 │   └── tailwind.config.ts
 ├── supabase/
-│   └── migrations/           # 0001–0006 SQL files (LOCKED)
-├── docs/                     # Project documentation
+│   └── migrations/           # 0001–0011 SQL files
+│                             # 0001–0006: committed to GitHub
+│                             # 0007–0011: local only, push pending
+├── docs/
 │   ├── CLAUDE_INSTRUCTIONS.md
 │   ├── CURRENT_FOCUS.md
-│   ├── DECISION_LOG.md
+│   ├── DECISION_LOG.md       # DL-01–DL-13 (updated 3 Juli 2026)
 │   ├── TECHNICAL_DEBT.md
 │   ├── PROJECT_STATUS.md     # ← file ini
 │   ├── HANDOFF_2026-06-30.md
@@ -179,6 +204,7 @@ D:\Project\MottaGo\
 | Routing | React Router | v6 |
 | Styling | TailwindCSS | v3 |
 | Icons | Lucide React | v0.447+ |
+| Charts | Recharts | v3.9+ |
 | Backend/DB | Supabase | latest JS client |
 | Database | PostgreSQL | 15 (via Supabase) |
 | Linting | ESLint v8 + Prettier v3 | 0 warning tolerance |
@@ -187,29 +213,26 @@ D:\Project\MottaGo\
 
 ## Next Milestone
 
-**C1 — Authentication Integration** (Phase 6)
+**C2 — Real Data Integration** (setelah git push selesai)
 
 Scope:
-1. Buat project Supabase, dapatkan credentials nyata
-2. Isi `frontend/.env` dengan `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`
-3. Jalankan migrations 0001–0006 di Supabase
-4. Jalankan seed data 0006
-5. Implementasi login page (email + password)
-6. Wire AuthContext dengan Supabase Auth
-7. Implementasi RoleGuard penuh (baca role dari profiles table)
-8. Ganti mock data pages dengan real Supabase queries
-9. Implementasi logout
-10. Pastikan build clean + lint 0 warning
+1. Push semua perubahan lokal ke GitHub (gunakan `Prompt_GitPush_ClaudeCode.md`)
+2. Ganti mock data di DashboardPage dengan Supabase queries nyata
+3. Ganti mock data di KapasitasPage dengan Supabase queries nyata
+4. Ganti mock data di RequestPickupPage dengan Supabase queries nyata
+5. Wire notifikasi polling ke tabel `notifications` (DL-04)
+6. Implementasi role Utility (halaman & workflow)
+7. Pastikan build clean + lint 0 warning
 
 ---
 
 ## Technical Debt
 
-| ID | Komponen | Deskripsi | Target |
-|---|---|---|---|
-| TD-01 | TextInput | `leftIcon`/`rightIcon` bertipe `string`, bukan union `LucideIconName` | Sprint 2 |
-| TD-02 | TextInput | State `readOnly` menggunakan `#F7F8FA` tanpa token eksplisit; perlu visual validation | Visual Validation Phase |
-| TD-03 | Badge | Warning variant menggunakan arbitrary `text-[#92400E]`; perlu token `--color-warning-text` | Sprint 2 |
+| ID | Komponen | Deskripsi | Status | Target |
+|---|---|---|---|---|
+| TD-01 | TextInput / Button | `leftIcon`/`rightIcon` bertipe `string`, bukan `LucideIconName` | Open | C2 |
+| TD-02 | TextInput | State `readOnly` menggunakan `#F7F8FA` tanpa token eksplisit | Open | Visual Validation |
+| TD-03 | Badge | Warning variant `text-[#92400E]` tanpa token | **Resolved** | ✅ Sprint A |
 
 Detail lengkap: `docs/TECHNICAL_DEBT.md`
 
@@ -219,21 +242,26 @@ Detail lengkap: `docs/TECHNICAL_DEBT.md`
 
 | ID | File | Deskripsi | Severity |
 |---|---|---|---|
-| WARN-01 | `0005_triggers.sql` | `fn_handle_new_user` akan gagal jika `raw_user_meta_data` tidak menyertakan `store_id` untuk non-vendor role. Semua user creation harus menyertakan metadata lengkap. | Medium |
-| WARN-02 | `0001_extensions.sql` | `pg_trgm` harus diaktifkan manual di Supabase Dashboard sebelum migration 0004 dijalankan | Medium |
+| WARN-01 | `0005_triggers.sql` | `fn_handle_new_user` akan gagal jika `raw_user_meta_data` tidak menyertakan `role`. Desain ini **disengaja** (fail-fast pattern — DL-12). Semua pembuatan akun wajib menyertakan metadata lengkap. | Medium (by design) |
+| WARN-02 | `0001_extensions.sql` | `pg_trgm` harus diaktifkan manual di Supabase Dashboard sebelum migration 0004 dijalankan | ✅ Resolved (EA-01) |
+| WARN-03 | Git | Migration 0007–0011, LoginPage, AuthCard, dan banyak frontend files belum di-commit ke GitHub | 🔴 High — push segera |
 
 ---
 
 ## Important Decisions
 
-Seluruh keputusan arsitektur tersimpan di `docs/DECISION_LOG.md` (DL-01 s/d DL-10).
+Seluruh keputusan arsitektur tersimpan di `docs/DECISION_LOG.md` (DL-01 s/d DL-13).
 
 Ringkasan kritis:
-- **DL-01**: `stores.max_capacity` dikonfigurasi oleh Manajer (nullable)
-- **DL-02**: `waste_items.unit` di-GENERATE otomatis dari `waste_type` (liquid→liter, else→kg)
-- **DL-03**: Hanya 1 pickup aktif per store (`uix_pickups_one_active_per_store`)
-- **DL-04**: Notifikasi via tabel NOTIFICATION + polling 30 detik (bukan WebSocket)
-- **DL-06**: Setiap store memiliki `default_vendor_id`
+- **DL-01**: `stores.max_capacity` dikonfigurasi oleh Manajer
+- **DL-02**: `waste_items.unit` di-GENERATE otomatis dari `waste_type`
+- **DL-03** *(revised)*: Satu pickup aktif per store **per waste_category**
+- **DL-04**: Notifikasi via tabel NOTIFICATION + polling 30 detik
+- **DL-05** *(revised)*: Vendor = Master Data murni, tidak dapat login
+- **DL-06** *(revised)*: Vendor assignment via `store_vendor_assignments`, bukan `default_vendor_id`
 - **DL-08**: Phase 3B v1.0 = source of truth screen inventory & frontend architecture
 - **DL-09**: Responsive — Mobile <768px, Tablet 768–1023px, Desktop ≥1024px; Mobile-First CSS
 - **DL-10**: SCR-M-01 & SCR-M-02 → DashboardLayout; SCR-M-04 → FormLayout
+- **DL-11**: Username-based auth — synthetic email `username@mottago.internal`
+- **DL-12**: Supabase sebagai satu-satunya backend platform (no custom server)
+- **DL-13**: Role aktif hanya `manajer` dan `utility`
