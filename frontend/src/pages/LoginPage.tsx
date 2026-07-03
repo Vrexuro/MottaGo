@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { AuthCard } from '../components/organisms/AuthCard';
 import { AuthLayout } from '../layouts/AuthLayout';
@@ -7,8 +8,10 @@ import { TextInput } from '../components/atoms/TextInput';
 import { Button } from '../components/atoms/Button';
 import { FormField } from '../components/molecules/FormField';
 import { supabase } from '../lib/supabase';
+import { ROUTES } from '../router/routes';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,9 +32,10 @@ export default function LoginPage() {
     if (error) {
       setErrorMessage(error.message);
       setLoading(false);
+    } else {
+      setLoading(false);
+      navigate(ROUTES.ROOT);
     }
-    // Jika berhasil, AuthContext.onAuthStateChange akan update state
-    // dan RootPage akan redirect otomatis ke dashboard sesuai role
   }
 
   return (
