@@ -6,11 +6,14 @@ import { CapacityCard } from '../../components/molecules/CapacityCard';
 import { StatusPickupCard } from '../../components/molecules/StatusPickupCard';
 import { QuickActionsCard } from '../../components/molecules/QuickActionsCard';
 import { PickupSummaryCard } from '../../components/molecules/PickupSummaryCard';
+import { useNavigate } from 'react-router-dom';
 import { manajerNavItems } from '../../router/navigation';
+import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 
 function DashboardPage() {
-  const { profile } = useAuth();
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
 
   return (
@@ -18,11 +21,16 @@ function DashboardPage() {
       navItems={manajerNavItems}
       userRole="manajer"
       userName={userName}
-      onLogout={() => undefined}
+      onLogout={logout}
+      onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
-          <DashboardHeader title="Dashboard" userName={userName} />
+          <DashboardHeader
+            title="Dashboard"
+            userName={userName}
+            onDateClick={() => navigate(ROUTES.MANAJER_LAPORAN)}
+          />
 
           {/* Row 1 — 4 KPI Cards: 2 col mobile → 4 col tablet+ */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -66,22 +74,25 @@ function DashboardPage() {
               <CapacityCard className="w-full h-full" />
             </div>
             <div className="md:col-span-2">
-              <StatusPickupCard className="w-full h-full" />
+              <StatusPickupCard
+                className="w-full h-full"
+                onLihatSemua={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
+              />
             </div>
           </div>
 
           {/* Row 3 — 60/40: Tren Waste | Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="md:col-span-3">
-              <WasteTrendCard className="w-full" />
+              <WasteTrendCard className="w-full h-full" />
             </div>
             <div className="md:col-span-2">
               <QuickActionsCard className="w-full h-full" />
             </div>
           </div>
 
-          {/* Row 4 — Full-width: Pickup Summary */}
-          <PickupSummaryCard className="w-full" />
+          {/* Row 4 — Full-width: Pickup Summary Table */}
+          <PickupSummaryCard onLihatSemua={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)} />
         </div>
       </div>
     </DashboardLayout>

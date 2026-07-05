@@ -1,28 +1,28 @@
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Button } from '../../components/atoms/Button';
-import { SelectInput } from '../../components/atoms/SelectInput';
 import { CapacityGaugePanel } from '../../components/molecules/CapacityGaugePanel';
 import { CapacitySummaryStats } from '../../components/molecules/CapacitySummaryStats';
 import { CapacityTrendCard } from '../../components/molecules/CapacityTrendCard';
 import { CategoryBreakdownCard } from '../../components/molecules/CategoryBreakdownCard';
 import { StatusThresholdCard } from '../../components/molecules/StatusThresholdCard';
 import { CapacityAlertHistoryCard } from '../../components/molecules/CapacityAlertHistoryCard';
+import { useNavigate } from 'react-router-dom';
 import { manajerNavItems } from '../../router/navigation';
-import type { SelectOption } from '../../types/common.types';
-
-const STORE_OPTIONS: SelectOption[] = [
-  { value: 'all', label: 'Semua Store' },
-  { value: 'store-1', label: 'Store Pusat' },
-  { value: 'store-2', label: 'Store Cabang 1' },
-];
+import { ROUTES } from '../../router/routes';
+import { useAuth } from '../../hooks/useAuth';
 
 function KapasitasPage() {
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
+  const userName = profile?.fullName ?? 'Manajer';
+
   return (
     <DashboardLayout
       navItems={manajerNavItems}
       userRole="manajer"
-      userName="Mock Manajer"
-      onLogout={() => undefined}
+      userName={userName}
+      onLogout={logout}
+      onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 lg:p-8 space-y-6">
@@ -44,15 +44,13 @@ function KapasitasPage() {
               </div>
             </div>
 
-            {/* Right: Store selector + CTA */}
+            {/* Right: CTA */}
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm text-text-secondary whitespace-nowrap hidden md:block">
-                Store:
-              </span>
-              <div className="w-[160px] md:w-[200px]">
-                <SelectInput options={STORE_OPTIONS} defaultValue="all" aria-label="Pilih Store" />
-              </div>
-              <Button variant="primary" leftIcon="Truck">
+              <Button
+                variant="primary"
+                leftIcon="Truck"
+                onClick={() => navigate(ROUTES.MANAJER_PICKUP_REQUEST)}
+              >
                 Request Pickup
               </Button>
             </div>
@@ -73,11 +71,11 @@ function KapasitasPage() {
 
           {/* ── Row 4: Category Breakdown 50% + Threshold 50% ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CategoryBreakdownCard className="min-h-[280px]" />
-            <StatusThresholdCard className="min-h-[280px]" />
+            <CategoryBreakdownCard className="min-h-[240px]" />
+            <StatusThresholdCard />
           </div>
 
-          {/* ── Row 5: Recent Capacity Alerts ────────────────── */}
+          {/* ── Row 5: Alert History ──────────────────────────── */}
           <CapacityAlertHistoryCard />
         </div>
       </div>

@@ -9,8 +9,14 @@ export const ROUTES = {
   MANAJER_KELOLA_USER: '/manajer/users',
   MANAJER_VENDOR_MANAGEMENT: '/manajer/vendor',
   MANAJER_LAPORAN: '/manajer/laporan',
+  MANAJER_RIWAYAT_PICKUP: '/manajer/pickup/history',
+  MANAJER_NOTIFICATIONS: '/manajer/notifikasi',
+  MANAJER_PENGATURAN: '/manajer/pengaturan',
 
   UTILITY_ROOT: '/utility',
+  UTILITY_CATAT_WASTE: '/utility/catat',
+  UTILITY_RIWAYAT_INPUT: '/utility/riwayat',
+  UTILITY_PROFIL: '/utility/profil',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

@@ -10,9 +10,15 @@ import RequestPickupPage from '../pages/manajer/RequestPickupPage';
 import KelolaPenggunaPage from '../pages/manajer/KelolaPenggunaPage';
 import VendorManagementPage from '../pages/manajer/VendorManagementPage';
 import LaporanPage from '../pages/manajer/LaporanPage';
+import NotifikasiPage from '../pages/manajer/NotifikasiPage';
+import RiwayatPickupPage from '../pages/manajer/RiwayatPickupPage';
+import UtilityDashboardPage from '../pages/utility/UtilityDashboardPage';
+import CatatSampahPage from '../pages/utility/CatatSampahPage';
+import RiwayatInputPage from '../pages/utility/RiwayatInputPage';
+import ProfilPage from '../pages/utility/ProfilPage';
 
 export const router = createBrowserRouter([
-  // ── Public routes ─────────────────────────────────────────────────────────
+  // ── Public routes ─────────────────────────────────────────────────────
   {
     path: ROUTES.ROOT,
     element: <RootPage />,
@@ -26,7 +32,7 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 
-  // ── Manajer routes ────────────────────────────────────────────────────────
+  // ── Manajer routes ────────────────────────────────────────────
   {
     path: ROUTES.MANAJER_DASHBOARD,
     element: (
@@ -75,20 +81,68 @@ export const router = createBrowserRouter([
       </RoleGuard>
     ),
   },
+  {
+    path: ROUTES.MANAJER_RIWAYAT_PICKUP,
+    element: (
+      <RoleGuard allowedRoles={['manajer']}>
+        <RiwayatPickupPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.MANAJER_NOTIFICATIONS,
+    element: (
+      <RoleGuard allowedRoles={['manajer']}>
+        <NotifikasiPage />
+      </RoleGuard>
+    ),
+  },
 
-  // ── Utility routes (placeholder — halaman belum diimplementasi) ───────────
+  // ── Utility routes ─────────────────────────────────────────────────────
   {
     path: ROUTES.UTILITY_ROOT,
     element: (
       <RoleGuard allowedRoles={['utility']}>
+        <UtilityDashboardPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.UTILITY_CATAT_WASTE,
+    element: (
+      <RoleGuard allowedRoles={['utility']}>
+        <CatatSampahPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.UTILITY_RIWAYAT_INPUT,
+    element: (
+      <RoleGuard allowedRoles={['utility']}>
+        <RiwayatInputPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.UTILITY_PROFIL,
+    element: (
+      <RoleGuard allowedRoles={['utility']}>
+        <ProfilPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.MANAJER_PENGATURAN,
+    element: (
+      <RoleGuard allowedRoles={['manajer']}>
         <div className="flex items-center justify-center min-h-screen bg-mottago-surface-subtle">
-          <p className="text-sm text-text-secondary">Halaman Utility — segera hadir.</p>
+          <p className="text-sm text-text-secondary">Pengaturan Store — segera hadir (Batch 2).</p>
         </div>
       </RoleGuard>
     ),
   },
 
-  // ── Fallback ───────────────────────────────────────────────────────────────────────────────
+  // ── Fallback ──────────────────────────────────────────────────────────────────────────────────────
   {
     path: '*',
     element: <Navigate to={ROUTES.NOT_FOUND} replace />,

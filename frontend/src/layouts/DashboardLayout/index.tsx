@@ -14,6 +14,7 @@ type DashboardLayoutProps = {
   userName: string;
   navItems: NavItem[];
   onLogout: () => void;
+  onNotificationClick?: () => void;
   className?: string;
 };
 
@@ -29,6 +30,7 @@ export function DashboardLayout({
   userName,
   navItems,
   onLogout,
+  onNotificationClick,
   className,
 }: DashboardLayoutProps) {
   const [sideNavState, setSideNavState] = useState<SideNavState>(getBreakpointState);
@@ -68,6 +70,7 @@ export function DashboardLayout({
         sideNavOpen={sideNavState === 'expanded'}
         onMenuToggle={handleMenuToggle}
         pageTitle={pageTitle}
+        onNotificationClick={onNotificationClick}
       />
 
       <div className="flex flex-1 min-h-0 overflow-hidden">

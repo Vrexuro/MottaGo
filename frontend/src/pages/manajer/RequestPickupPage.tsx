@@ -5,10 +5,17 @@ import { FormField } from '../../components/molecules/FormField';
 import { SelectInput } from '../../components/atoms/SelectInput';
 import { Button } from '../../components/atoms/Button';
 import { Icon } from '../../components/atoms/Icon';
+import { useNavigate } from 'react-router-dom';
 import { manajerNavItems } from '../../router/navigation';
+import { ROUTES } from '../../router/routes';
+import { useAuth } from '../../hooks/useAuth';
 import { MOCK_STATE, MOCK_ACTIVE_PICKUP_ID, VENDOR_OPTIONS } from '../../mock/pickup/requestPickup';
 
 function RequestPickupPage() {
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
+  const userName = profile?.fullName ?? 'Manajer';
+
   const isActivePickup = MOCK_STATE === 'activePickup';
   const isNoVendor = MOCK_STATE === 'noVendor';
   const submitDisabled = isActivePickup || isNoVendor;
@@ -17,14 +24,16 @@ function RequestPickupPage() {
     <FormLayout
       navItems={manajerNavItems}
       userRole="manajer"
-      userName="Mock Manajer"
-      onLogout={() => undefined}
+      userName={userName}
+      onLogout={logout}
+      onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
     >
       <div className="py-6 md:py-8 pb-10 space-y-5">
         {/* ── Zone A — Page Header ─────────────────────────── */}
         <div className="space-y-2">
           <button
             type="button"
+            onClick={() => navigate(ROUTES.MANAJER_DASHBOARD)}
             className="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
           >
             <Icon
@@ -54,7 +63,7 @@ function RequestPickupPage() {
             title={`Sudah ada pickup aktif (${MOCK_ACTIVE_PICKUP_ID}).`}
             description="Selesaikan atau batalkan pickup yang sedang berlangsung sebelum membuat yang baru."
             actionLabel="Lihat Pickup Aktif"
-            onAction={() => undefined}
+            onAction={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
           />
         )}
         {isNoVendor && (
@@ -63,7 +72,7 @@ function RequestPickupPage() {
             title="Tidak ada vendor aktif yang tersedia."
             description="Tambahkan vendor aktif terlebih dahulu untuk dapat melakukan pickup."
             actionLabel="Kelola Vendor"
-            onAction={() => undefined}
+            onAction={() => navigate(ROUTES.MANAJER_VENDOR_MANAGEMENT)}
           />
         )}
 
@@ -98,13 +107,19 @@ function RequestPickupPage() {
 
           {/* Action buttons */}
           <div className="px-4 pb-5 md:px-6 md:pb-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <Button variant="secondary" className="w-full sm:w-auto justify-center">
+            <Button
+              variant="secondary"
+              className="w-full sm:w-auto justify-center"
+              onClick={() => navigate(ROUTES.MANAJER_DASHBOARD)}
+            >
               Batal
             </Button>
             <Button
+              type="submit"
               variant="primary"
-              disabled={submitDisabled}
+              leftIcon="Truck"
               className="w-full sm:w-auto justify-center"
+              disabled={submitDisabled}
             >
               Buat Pickup
             </Button>

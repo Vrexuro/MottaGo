@@ -22,6 +22,7 @@ export interface AuthContextValue {
   session: Session | null;
   loading: boolean;
   profile: ProfileData | null;
+  logout: () => Promise<void>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -54,6 +55,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  const logout = async (): Promise<void> => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+  };
+
   useEffect(() => {
     authService.getSession().then(async ({ data: { session } }) => {
       setSession(session);
@@ -83,7 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, profile }}>
+    <AuthContext.Provider value={{ user, session, loading, profile, logout }}>
       {children}
     </AuthContext.Provider>
   );

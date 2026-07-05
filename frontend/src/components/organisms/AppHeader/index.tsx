@@ -1,11 +1,13 @@
 import { Icon } from '../../atoms/Icon';
 import type { UserRole } from '../../../types/user.types';
+import { NOTIFICATIONS } from '../../../mock/notification';
 
 type AppHeaderProps = {
   userRole: UserRole;
   sideNavOpen?: boolean;
   onMenuToggle: () => void;
   pageTitle?: string;
+  onNotificationClick?: () => void;
   className?: string;
 };
 
@@ -15,13 +17,14 @@ const roleBgClasses: Record<UserRole, string> = {
 };
 
 /** Jumlah notifikasi — ganti dengan polling NOTIFICATION table (DL-04) saat backend siap */
-const MOCK_NOTIFICATION_COUNT = 3;
+const MOCK_NOTIFICATION_COUNT = NOTIFICATIONS.filter((n) => !n.isRead).length;
 
 export function AppHeader({
   userRole,
   sideNavOpen = false,
   onMenuToggle,
   pageTitle,
+  onNotificationClick,
   className,
 }: AppHeaderProps) {
   const headerClassName = [
@@ -66,31 +69,13 @@ export function AppHeader({
           </div>
         </div>
 
-        {/* Center — search bar (desktop only, visual placeholder) */}
-        <div className="hidden lg:flex flex-1 mx-6">
-          <div className="relative w-full max-w-md">
-            <Icon
-              name="Search"
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
-            />
-            <input
-              type="text"
-              placeholder="Cari pickup, vendor..."
-              readOnly
-              disabled
-              title="Fitur pencarian akan tersedia pada pembaruan berikutnya."
-              className="w-full pl-9 pr-4 py-1.5 text-sm bg-mottago-surface-subtle border border-mottago-border rounded-[var(--radius-md)] text-text-primary placeholder:text-text-secondary focus:outline-none cursor-not-allowed opacity-60"
-            />
-          </div>
-        </div>
-
         {/* Right — notification bell with badge */}
         <div className="relative">
           <button
             type="button"
             className="p-2 rounded-[var(--radius-md)] hover:bg-black/5 transition-colors"
             aria-label="Notifikasi"
+            onClick={onNotificationClick}
           >
             <Icon name="Bell" size={20} className="text-text-primary" />
           </button>

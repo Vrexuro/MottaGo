@@ -35,6 +35,12 @@ npm run format    # Prettier format src/**/*.{ts,tsx,css}
 npm run preview   # Preview production build locally
 ```
 
+**CRITICAL — TypeScript check:** `tsconfig.json` is solution-style (`"files": []`, only `references`). Plain `npx tsc --noEmit` does NOT type-check anything and always returns exit 0 (false positive). Always use:
+```bash
+npx tsc -b --noEmit   # ← correct: uses build mode, checks all referenced tsconfigs
+```
+Discovered in Sprint B2 (Batch 2B) — a `BadgeColor` type error (`'error'` instead of `'danger'`) passed `tsc --noEmit` silently but was caught by `tsc -b --noEmit`.
+
 ## Frontend Architecture
 
 **Stack:** React 18, TypeScript 5, Vite 6, React Router v6, TailwindCSS v3, Lucide React, Recharts.

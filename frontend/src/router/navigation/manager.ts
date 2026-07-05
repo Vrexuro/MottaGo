@@ -23,4 +23,32 @@ export const manajerNavItems: NavItem[] = [
     path: ROUTES.MANAJER_PICKUP_REQUEST,
     allowedRoles: ['manajer'],
   },
+  {
+    id: 'manajer-riwayat-pickup',
+    label: 'Riwayat Pickup',
+    iconName: 'ClipboardList',
+    path: ROUTES.MANAJER_RIWAYAT_PICKUP,
+    allowedRoles: ['manajer'],
+  },
+  {
+    id: 'manajer-laporan',
+    label: 'Laporan',
+    iconName: 'FileText',
+    path: ROUTES.MANAJER_LAPORAN,
+    allowedRoles: ['manajer'],
+  },
+  {
+    id: 'manajer-kelola-pengguna',
+    label: 'Kelola Pengguna',
+    iconName: 'Users',
+    path: ROUTES.MANAJER_KELOLA_USER,
+    allowedRoles: ['manajer'],
+  },
+  {
+    id: 'manajer-vendor',
+    label: 'Manajemen Vendor',
+    iconName: 'Building2',
+    path: ROUTES.MANAJER_VENDOR_MANAGEMENT,
+    allowedRoles: ['manajer'],
+  },
 ];

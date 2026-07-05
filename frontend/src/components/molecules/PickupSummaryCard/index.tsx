@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../atoms/Badge';
 import { Icon } from '../../atoms/Icon';
+import { ROUTES } from '../../../router/routes';
 
 type PickupStatus = 'waiting' | 'in-transit' | 'completed';
 type PickupAksi = 'detail' | 'lacak';
@@ -15,6 +17,7 @@ interface PickupRecord {
 
 interface PickupSummaryCardProps {
   className?: string;
+  onLihatSemua?: () => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -58,7 +61,8 @@ const MOCK_PICKUPS: PickupRecord[] = [
   },
 ];
 
-export function PickupSummaryCard({ className }: PickupSummaryCardProps) {
+export function PickupSummaryCard({ className, onLihatSemua }: PickupSummaryCardProps) {
+  const navigate = useNavigate();
   return (
     <div
       className={[
@@ -75,6 +79,7 @@ export function PickupSummaryCard({ className }: PickupSummaryCardProps) {
         <h3 className="text-sm font-semibold text-text-primary">Pickup Aktif Saat Ini</h3>
         <button
           type="button"
+          onClick={onLihatSemua}
           className="flex items-center gap-0.5 text-xs font-medium text-text-secondary hover:text-text-primary transition-colors"
         >
           Lihat semua
@@ -138,6 +143,7 @@ export function PickupSummaryCard({ className }: PickupSummaryCardProps) {
                       className={['text-xs font-medium transition-colors', aksi.colorClass].join(
                         ' '
                       )}
+                      onClick={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
                     >
                       {aksi.label}
                     </button>

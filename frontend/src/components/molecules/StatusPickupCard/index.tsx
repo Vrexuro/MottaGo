@@ -45,9 +45,10 @@ const STATUS_ITEMS: StatusItem[] = [
 
 interface StatusPickupCardProps {
   className?: string;
+  onLihatSemua?: () => void;
 }
 
-export function StatusPickupCard({ className }: StatusPickupCardProps) {
+export function StatusPickupCard({ className, onLihatSemua }: StatusPickupCardProps) {
   return (
     <div
       className={[
@@ -106,9 +107,14 @@ export function StatusPickupCard({ className }: StatusPickupCardProps) {
       </ul>
 
       {/* ── Footer CTA ─────────────────────────────────── */}
-      {/* S-04: MANAJER_RIWAYAT_PICKUP belum ada di routes.ts — navigasi belum diwiring */}
       <div className="border-t border-mottago-border mt-auto">
-        <Button variant="ghost" size="sm" rightIcon="ChevronRight" className="w-full">
+        <Button
+          variant="ghost"
+          size="sm"
+          rightIcon="ChevronRight"
+          className="w-full"
+          onClick={onLihatSemua}
+        >
           Lihat Semua Pickup
         </Button>
       </div>

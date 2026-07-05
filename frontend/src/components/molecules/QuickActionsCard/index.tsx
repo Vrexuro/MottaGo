@@ -29,9 +29,8 @@ const ACTION_ITEMS: ActionItem[] = [
     iconColorClass: 'text-capacity-warning',
   },
   {
-    // S-04: MANAJER_PENGATURAN belum ada di routes.ts — ditampilkan disabled
     id: 'pengaturan-store',
-    to: null,
+    to: ROUTES.MANAJER_PENGATURAN,
     label: 'Pengaturan Store',
     iconName: 'Settings',
     iconBgClass: 'bg-mottago-surface-subtle',

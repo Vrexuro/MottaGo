@@ -13,10 +13,9 @@
 
 ## Current Milestone
 
-**Git Push Pending** → setelah push, lanjut ke **C2 — Real Data Integration**
+**C2 — Real Data Integration**
 
-Migration 0007–0011, LoginPage, AuthCard, dan seluruh perubahan Sprint A belum di-push ke GitHub.
-Gunakan `Prompt_GitPush_ClaudeCode.md` (di folder audit) untuk eksekusi push.
+Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3a1af1c` (Docs Audit, 15 files). Repository sudah sinkron dengan GitHub.
 
 ---
 
@@ -63,11 +62,11 @@ Gunakan `Prompt_GitPush_ClaudeCode.md` (di folder audit) untuk eksekusi push.
 | `0004_indexes.sql` | 13 performance indexes (amended) | ✅ Committed (modified locally) | ✅ Applied |
 | `0005_triggers.sql` | 4 functions, 6 triggers | ✅ Committed | ✅ Applied |
 | `0006_seed.sql` | Dev seed data (amended) | ✅ Committed (modified locally) | ✅ Applied |
-| `0007_rls.sql` | RLS policies, helper functions | ⚠️ Local only — push pending | ✅ Applied |
-| `0008_vendor_identity.sql` | Vendor identity patch (interim) | ⚠️ Local only — push pending | ✅ Applied |
-| `0009_remove_vendor_role.sql` | Hapus role vendor & pelayan | ⚠️ Local only — push pending | ✅ Applied |
-| `0010_vendor_whatsapp_and_pickup_amendments.sql` | WhatsApp, store_vendor_assignments, DL-03/DL-06 revision | ⚠️ Local only — push pending | ✅ Applied |
-| `0011_username_auth.sql` | Username auth, profiles.username UNIQUE | ⚠️ Local only — push pending | ✅ Applied |
+| `0007_rls.sql` | RLS policies, helper functions | ✅ Committed (cf0390d) | ✅ Applied |
+| `0008_vendor_identity.sql` | Vendor identity patch (interim) | ✅ Committed (cf0390d) | ✅ Applied |
+| `0009_remove_vendor_role.sql` | Hapus role vendor & pelayan | ✅ Committed (cf0390d) | ✅ Applied |
+| `0010_vendor_whatsapp_and_pickup_amendments.sql` | WhatsApp, store_vendor_assignments, DL-03/DL-06 revision | ✅ Committed (cf0390d) | ✅ Applied |
+| `0011_username_auth.sql` | Username auth, profiles.username UNIQUE | ✅ Committed (cf0390d) | ✅ Applied |
 
 **Tabel database aktif:** vendors, stores, profiles, pickups, waste_items, capacity_snapshots, notifications, capacity_alerts, store_vendor_assignments
 
@@ -122,10 +121,11 @@ Gunakan `Prompt_GitPush_ClaudeCode.md` (di folder audit) untuk eksekusi push.
 ## Latest Commit (GitHub)
 
 ```
-287b1e3 docs: add project handoff and session documentation
+3a1af1c docs: documentation audit — sync all docs to Sprint A state
+cf0390d feat: Sprint A — RLS migrations, username auth, and frontend implementation
 ```
 
-**Local ahead of GitHub:** Semua perubahan Sprint A (Batch A1–A5, EA-01, EA-02) ada di local tapi belum di-push. Gunakan `Prompt_GitPush_ClaudeCode.md` untuk push.
+**Repository status:** ✅ Sinkron dengan GitHub. Push selesai 3 Juli 2026 (fast-forward, tidak ada divergensi).
 
 ---
 
@@ -178,8 +178,7 @@ D:\Project\MottaGo\
 │   └── tailwind.config.ts
 ├── supabase/
 │   └── migrations/           # 0001–0011 SQL files
-│                             # 0001–0006: committed to GitHub
-│                             # 0007–0011: local only, push pending
+│                             # 0001–0011: semua committed ke GitHub (cf0390d)
 ├── docs/
 │   ├── CLAUDE_INSTRUCTIONS.md
 │   ├── CURRENT_FOCUS.md
@@ -213,15 +212,15 @@ D:\Project\MottaGo\
 
 ## Next Milestone
 
-**C2 — Real Data Integration** (setelah git push selesai)
+**C2 — Real Data Integration**
 
 Scope:
-1. Push semua perubahan lokal ke GitHub (gunakan `Prompt_GitPush_ClaudeCode.md`)
-2. Ganti mock data di DashboardPage dengan Supabase queries nyata
-3. Ganti mock data di KapasitasPage dengan Supabase queries nyata
-4. Ganti mock data di RequestPickupPage dengan Supabase queries nyata
-5. Wire notifikasi polling ke tabel `notifications` (DL-04)
-6. Implementasi role Utility (halaman & workflow)
+1. Ganti mock data di DashboardPage dengan Supabase queries nyata
+2. Ganti mock data di KapasitasPage dengan Supabase queries nyata
+3. Ganti mock data di RequestPickupPage dengan Supabase queries nyata
+4. Wire notifikasi polling ke tabel `notifications` (DL-04)
+5. Implementasi role Utility (halaman & workflow)
+6. Tambah missing routes (TD-05): `MANAJER_RIWAYAT_PICKUP`, `MANAJER_PENGATURAN`
 7. Pastikan build clean + lint 0 warning
 
 ---
@@ -244,7 +243,7 @@ Detail lengkap: `docs/TECHNICAL_DEBT.md`
 |---|---|---|---|
 | WARN-01 | `0005_triggers.sql` | `fn_handle_new_user` akan gagal jika `raw_user_meta_data` tidak menyertakan `role`. Desain ini **disengaja** (fail-fast pattern — DL-12). Semua pembuatan akun wajib menyertakan metadata lengkap. | Medium (by design) |
 | WARN-02 | `0001_extensions.sql` | `pg_trgm` harus diaktifkan manual di Supabase Dashboard sebelum migration 0004 dijalankan | ✅ Resolved (EA-01) |
-| WARN-03 | Git | Migration 0007–0011, LoginPage, AuthCard, dan banyak frontend files belum di-commit ke GitHub | 🔴 High — push segera |
+| WARN-03 | Git | Migration 0007–0011, LoginPage, AuthCard, dan banyak frontend files belum di-commit ke GitHub | ✅ Resolved — push selesai 3 Juli 2026 (cf0390d + 3a1af1c) |
 
 ---
 
