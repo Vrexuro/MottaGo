@@ -41,23 +41,27 @@ function StatItem({
   );
 }
 
-const MOCK = {
-  maxKg: 400,
-  currentKg: 263,
-  rataHarian: 38.5,
-};
-
 interface CapacitySummaryStatsProps {
+  maxKg: number;
+  currentKg: number;
+  wasteHariIniKg: number;
+  rataHarianKg: number;
   className?: string;
 }
 
-export function CapacitySummaryStats({ className }: CapacitySummaryStatsProps) {
-  const sisaKg = MOCK.maxKg - MOCK.currentKg;
-  const pct = Math.round((MOCK.currentKg / MOCK.maxKg) * 100);
+export function CapacitySummaryStats({
+  maxKg,
+  currentKg,
+  wasteHariIniKg,
+  rataHarianKg,
+  className,
+}: CapacitySummaryStatsProps) {
+  const sisaKg = maxKg - currentKg;
+  const pct = Math.round((currentKg / maxKg) * 100);
   const state = getState(pct);
   const thresholdClass = STATE_TEXT_CLASS[state];
 
-  const proyeksiHari = sisaKg / MOCK.rataHarian;
+  const proyeksiHari = sisaKg / rataHarianKg;
   const proyeksiClass =
     proyeksiHari < 3
       ? 'text-capacity-critical'
@@ -85,12 +89,17 @@ export function CapacitySummaryStats({ className }: CapacitySummaryStatsProps) {
       <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-6 px-6 py-5">
         <StatItem
           label="Kapasitas Maks."
-          value={MOCK.maxKg.toLocaleString('id-ID')}
+          value={maxKg.toLocaleString('id-ID')}
           unit="kg"
           sublabel="batas yang ditetapkan"
         />
 
-        <StatItem label="Waste Masuk Hari Ini" value="47,3" unit="kg" sublabel="total hari ini" />
+        <StatItem
+          label="Waste Masuk Hari Ini"
+          value={String(wasteHariIniKg).replace('.', ',')}
+          unit="kg"
+          sublabel="total hari ini"
+        />
 
         <StatItem
           label="Sisa Kapasitas"
@@ -102,7 +111,7 @@ export function CapacitySummaryStats({ className }: CapacitySummaryStatsProps) {
 
         <StatItem
           label="Rata-rata Harian"
-          value="38,5"
+          value={String(rataHarianKg).replace('.', ',')}
           unit="kg/hari"
           sublabel="7 hari terakhir"
           valueClass="text-xl font-semibold text-text-primary"

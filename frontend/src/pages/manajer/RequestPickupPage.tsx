@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { AlertBanner } from '../../components/molecules/AlertBanner';
 import { FormLayout } from '../../layouts/FormLayout';
 import { KpiCard } from '../../components/molecules/KpiCard';
@@ -10,14 +11,35 @@ import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { MOCK_STATE, MOCK_ACTIVE_PICKUP_ID, VENDOR_OPTIONS } from '../../mock/pickup/requestPickup';
+import { getManagerState, subscribeManager } from '../../mock/managerStore';
+import { getCapacityStatus } from '../../constants/capacity';
 
 function RequestPickupPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
 
-  const isActivePickup = MOCK_STATE === 'activePickup';
-  const isNoVendor = MOCK_STATE === 'noVendor';
+  const [mgr, setMgr] = useState(() => getManagerState());
+
+  useEffect(() => {
+    return subscribeManager(() => setMgr(getManagerState()));
+  }, []);
+
+  const pct = Math.round((mgr.kapasitas.currentKg / mgr.kapasitas.maxKg) * 100);
+  const status = getCapacityStatus(pct);
+  const badgeLabel =
+    status === 'critical' ? 'Kritis' : status === 'warning' ? 'Perlu Perhatian' : 'Aman';
+  const badgeColor: 'success' | 'warning' | 'danger' =
+    status === 'critical' ? 'danger' : status === 'warning' ? 'warning' : 'success';
+  const proyeksiHari =
+    mgr.wasteHariIni.rataHarianKg > 0
+      ? Math.round(
+          ((mgr.kapasitas.maxKg - mgr.kapasitas.currentKg) / mgr.wasteHariIni.rataHarianKg) * 10
+        ) / 10
+      : null;
+
+  const isActivePickup = import.meta.env.DEV && MOCK_STATE === 'activePickup';
+  const isNoVendor = import.meta.env.DEV && MOCK_STATE === 'noVendor';
   const submitDisabled = isActivePickup || isNoVendor;
 
   return (
@@ -43,17 +65,22 @@ function RequestPickupPage() {
             />
             Kembali ke Dashboard
           </button>
-          <h1 className="text-2xl font-bold text-text-primary">Buat Pickup Manual</h1>
+          <h1 className="text-2xl font-semibold text-text-primary">Buat Pickup Manual</h1>
         </div>
 
         {/* ── Zone B — Capacity Context Card ───────────────── */}
         <KpiCard
           label="Kapasitas Saat Ini"
           iconName="Gauge"
-          accent="warning"
-          value="66%"
-          badge={{ label: 'Perlu Perhatian', color: 'warning' }}
-          subtexts={['263 kg dari 400 kg kapasitas maksimum', 'Proyeksi penuh dalam 3,6 hari']}
+          accent={status === 'critical' ? 'orange' : 'warning'}
+          value={`${pct}%`}
+          badge={{ label: badgeLabel, color: badgeColor }}
+          subtexts={[
+            `${mgr.kapasitas.currentKg} kg dari ${mgr.kapasitas.maxKg} kg kapasitas maksimum`,
+            proyeksiHari !== null
+              ? `Proyeksi penuh dalam ${proyeksiHari} hari`
+              : 'Data proyeksi tidak tersedia',
+          ]}
         />
 
         {/* ── Zone C — Business State Banners (DL-03 / DL-05) ─ */}

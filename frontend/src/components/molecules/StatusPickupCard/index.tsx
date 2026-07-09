@@ -12,43 +12,52 @@ interface StatusItem {
   rowBgClass?: string;
 }
 
-const STATUS_ITEMS: StatusItem[] = [
-  {
-    id: 'waiting',
-    label: 'Menunggu Konfirmasi',
-    count: 2,
-    iconName: 'Clock',
-    iconBgClass: 'bg-warning-bg',
-    iconColorClass: 'text-capacity-warning',
-    countColorClass: 'text-text-primary',
-    rowBgClass: 'bg-warning-bg',
-  },
-  {
-    id: 'in-transit',
-    label: 'Dalam Perjalanan',
-    count: 1,
-    iconName: 'Truck',
-    iconBgClass: 'bg-info-bg',
-    iconColorClass: 'text-info-text',
-    countColorClass: 'text-info-text',
-  },
-  {
-    id: 'completed',
-    label: 'Selesai Hari Ini',
-    count: 5,
-    iconName: 'CircleCheck',
-    iconBgClass: 'bg-accent-success-bg',
-    iconColorClass: 'text-accent-success-text',
-    countColorClass: 'text-accent-success-text',
-  },
-];
-
 interface StatusPickupCardProps {
+  waiting: number;
+  inTransit: number;
+  completedToday: number;
   className?: string;
   onLihatSemua?: () => void;
 }
 
-export function StatusPickupCard({ className, onLihatSemua }: StatusPickupCardProps) {
+export function StatusPickupCard({
+  waiting,
+  inTransit,
+  completedToday,
+  className,
+  onLihatSemua,
+}: StatusPickupCardProps) {
+  const STATUS_ITEMS: StatusItem[] = [
+    {
+      id: 'waiting',
+      label: 'Menunggu Konfirmasi',
+      count: waiting,
+      iconName: 'Clock',
+      iconBgClass: 'bg-warning-bg',
+      iconColorClass: 'text-capacity-warning',
+      countColorClass: 'text-text-primary',
+      rowBgClass: 'bg-warning-bg',
+    },
+    {
+      id: 'in-transit',
+      label: 'Dalam Perjalanan',
+      count: inTransit,
+      iconName: 'Truck',
+      iconBgClass: 'bg-info-bg',
+      iconColorClass: 'text-info-text',
+      countColorClass: 'text-info-text',
+    },
+    {
+      id: 'completed',
+      label: 'Selesai Hari Ini',
+      count: completedToday,
+      iconName: 'CircleCheck',
+      iconBgClass: 'bg-accent-success-bg',
+      iconColorClass: 'text-accent-success-text',
+      countColorClass: 'text-accent-success-text',
+    },
+  ];
+
   return (
     <div
       className={[

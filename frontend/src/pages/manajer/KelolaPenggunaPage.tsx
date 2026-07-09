@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Badge } from '../../components/atoms/Badge';
+import { Button } from '../../components/atoms/Button';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
@@ -23,16 +24,25 @@ export default function KelolaPenggunaPage() {
   const userName = profile?.fullName ?? 'Manajer';
 
   const [users, setUsers] = useState<UserRecord[]>(USERS);
+  const [confirmUser, setConfirmUser] = useState<UserRecord | null>(null);
 
   const toggleAktif = (id: string) => {
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, isAktif: !u.isAktif } : u)));
   };
 
   const handleToggleClick = (user: UserRecord) => {
-    const confirmed = window.confirm(
-      `${user.isAktif ? 'Nonaktifkan' : 'Aktifkan'} pengguna ${user.nama}?`
-    );
-    if (confirmed) toggleAktif(user.id);
+    setConfirmUser(user);
+  };
+
+  const handleConfirm = () => {
+    if (confirmUser) {
+      toggleAktif(confirmUser.id);
+      setConfirmUser(null);
+    }
+  };
+
+  const handleCancelConfirm = () => {
+    setConfirmUser(null);
   };
 
   return (
@@ -116,6 +126,38 @@ export default function KelolaPenggunaPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Inline Confirm Modal ──────────────────────── */}
+      {confirmUser && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+        >
+          <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-6 w-full max-w-sm space-y-4">
+            <h2 id="confirm-dialog-title" className="text-base font-semibold text-text-primary">
+              Konfirmasi Perubahan
+            </h2>
+            <p className="text-sm text-text-secondary">
+              {confirmUser.isAktif ? 'Nonaktifkan' : 'Aktifkan'} pengguna{' '}
+              <span className="font-semibold text-text-primary">{confirmUser.nama}</span>?
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <Button variant="secondary" size="sm" onClick={handleCancelConfirm}>
+                Batal
+              </Button>
+              <Button
+                variant={confirmUser.isAktif ? 'danger' : 'primary'}
+                size="sm"
+                onClick={handleConfirm}
+              >
+                {confirmUser.isAktif ? 'Nonaktifkan' : 'Aktifkan'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

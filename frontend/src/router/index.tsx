@@ -16,6 +16,7 @@ import UtilityDashboardPage from '../pages/utility/UtilityDashboardPage';
 import CatatSampahPage from '../pages/utility/CatatSampahPage';
 import RiwayatInputPage from '../pages/utility/RiwayatInputPage';
 import ProfilPage from '../pages/utility/ProfilPage';
+import PengaturanPage from '../pages/manajer/PengaturanPage';
 
 export const router = createBrowserRouter([
   // ── Public routes ─────────────────────────────────────────────────────
@@ -135,9 +136,7 @@ export const router = createBrowserRouter([
     path: ROUTES.MANAJER_PENGATURAN,
     element: (
       <RoleGuard allowedRoles={['manajer']}>
-        <div className="flex items-center justify-center min-h-screen bg-mottago-surface-subtle">
-          <p className="text-sm text-text-secondary">Pengaturan Store — segera hadir (Batch 2).</p>
-        </div>
+        <PengaturanPage />
       </RoleGuard>
     ),
   },

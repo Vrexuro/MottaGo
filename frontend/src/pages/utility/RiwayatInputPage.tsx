@@ -1,29 +1,23 @@
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Badge } from '../../components/atoms/Badge';
 import { utilityNavItems } from '../../router/navigation';
 import { useAuth } from '../../hooks/useAuth';
-import { UTILITY_ENTRIES } from '../../mock/utility';
-import type { WasteCategoryDb } from '../../mock/utility';
-
-const UNIT_MAP: Record<WasteCategoryDb, string> = {
-  organik: 'kg',
-  anorganik: 'kg',
-  minyak: 'liter',
-};
-const LABEL_MAP: Record<WasteCategoryDb, string> = {
-  organik: 'Organik',
-  anorganik: 'Anorganik',
-  minyak: 'Minyak Jelantah',
-};
-const STATUS_COLOR: Record<WasteCategoryDb, 'success' | 'warning' | 'info'> = {
-  organik: 'success',
-  anorganik: 'info',
-  minyak: 'warning',
-};
+import { getEntries, subscribeUtility } from '../../mock/utilityStore';
+import { WASTE_UNIT_MAP, WASTE_LABEL_MAP, WASTE_BADGE_COLOR } from '../../constants/waste';
 
 export default function RiwayatInputPage() {
   const { profile, logout } = useAuth();
   const userName = profile?.fullName ?? 'Utility';
+
+  const [entries, setEntries] = useState(() => getEntries());
+
+  useEffect(() => {
+    const unsub = subscribeUtility(() => {
+      setEntries(getEntries());
+    });
+    return unsub;
+  }, []);
 
   return (
     <DashboardLayout
@@ -37,7 +31,7 @@ export default function RiwayatInputPage() {
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
           <div>
             <h1 className="text-2xl font-semibold text-text-primary">Riwayat Input Sampah</h1>
-            <p className="text-sm text-text-secondary mt-1">Total {UTILITY_ENTRIES.length} entri</p>
+            <p className="text-sm text-text-secondary mt-1">Total {entries.length} entri</p>
           </div>
 
           <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
@@ -66,7 +60,7 @@ export default function RiwayatInputPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-mottago-border">
-                  {UTILITY_ENTRIES.map((entry, index) => (
+                  {entries.map((entry, index) => (
                     <tr
                       key={entry.id}
                       className="hover:bg-mottago-surface-subtle transition-colors"
@@ -81,13 +75,13 @@ export default function RiwayatInputPage() {
                         <span className="text-sm text-text-secondary">{entry.waktu}</span>
                       </td>
                       <td className="px-3 py-3.5">
-                        <Badge color={STATUS_COLOR[entry.kategori]} size="sm">
-                          {LABEL_MAP[entry.kategori]}
+                        <Badge color={WASTE_BADGE_COLOR[entry.kategori]} size="sm">
+                          {WASTE_LABEL_MAP[entry.kategori]}
                         </Badge>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         <span className="text-sm font-semibold text-text-primary tabular-nums">
-                          {entry.kuantitas} {UNIT_MAP[entry.kategori]}
+                          {entry.kuantitas} {WASTE_UNIT_MAP[entry.kategori]}
                         </span>
                       </td>
                       <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">

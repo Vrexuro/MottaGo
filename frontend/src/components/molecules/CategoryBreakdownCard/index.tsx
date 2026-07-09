@@ -14,50 +14,44 @@ interface Category {
   id: string;
   name: string;
   kg: number;
-  fillClass: string;
-  dotClass: string;
+  colorClass: string;
 }
 
 const MAX_CAPACITY_KG = 400;
 
-// Sorted largest → smallest; total sums to 263 kg (matches CapacityGaugePanel mock)
-const CATEGORIES: Category[] = [
-  {
-    id: 'organic',
-    name: 'Organic Waste',
-    kg: 120,
-    fillClass: 'bg-green-500',
-    dotClass: 'bg-green-500',
-  },
-  {
-    id: 'liquid',
-    name: 'Liquid Waste',
-    kg: 79,
-    fillClass: 'bg-amber-500',
-    dotClass: 'bg-amber-500',
-  },
-  {
-    id: 'recyclable',
-    name: 'Recyclable Waste',
-    kg: 51,
-    fillClass: 'bg-lime-500',
-    dotClass: 'bg-lime-500',
-  },
-  {
-    id: 'non-recyclable',
-    name: 'Non-Recyclable Waste',
-    kg: 13,
-    fillClass: 'bg-gray-400',
-    dotClass: 'bg-gray-400',
-  },
-];
+const CATEGORY_CONFIG = [
+  { key: 'organik' as const, name: 'Sampah Organik', colorClass: 'bg-accent-primary' },
+  { key: 'anorganik' as const, name: 'Sampah Anorganik', colorClass: 'bg-info-bg' },
+  { key: 'minyak' as const, name: 'Minyak Jelantah', colorClass: 'bg-capacity-warning' },
+] as const;
 
 interface CategoryBreakdownCardProps {
+  organik: number;
+  anorganik: number;
+  minyak: number;
   className?: string;
 }
 
-export function CategoryBreakdownCard({ className }: CategoryBreakdownCardProps) {
+export function CategoryBreakdownCard({
+  organik,
+  anorganik,
+  minyak,
+  className,
+}: CategoryBreakdownCardProps) {
   const [period, setPeriod] = useState<Period>('today');
+
+  const VALUES: Record<'organik' | 'anorganik' | 'minyak', number> = {
+    organik,
+    anorganik,
+    minyak,
+  };
+
+  const CATEGORIES: Category[] = CATEGORY_CONFIG.map((cfg) => ({
+    id: cfg.key,
+    name: cfg.name,
+    kg: VALUES[cfg.key],
+    colorClass: cfg.colorClass,
+  }));
 
   const total = CATEGORIES.reduce((sum, c) => sum + c.kg, 0);
   const capacityPct = Math.round((total / MAX_CAPACITY_KG) * 100);
@@ -108,7 +102,7 @@ export function CategoryBreakdownCard({ className }: CategoryBreakdownCardProps)
                 <div className="flex items-center gap-2 min-w-0">
                   <span
                     aria-hidden="true"
-                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${cat.dotClass}`}
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${cat.colorClass}`}
                   />
                   <span className="text-sm font-medium text-text-primary truncate">{cat.name}</span>
                 </div>
@@ -130,7 +124,7 @@ export function CategoryBreakdownCard({ className }: CategoryBreakdownCardProps)
                 <div
                   className={[
                     'h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none',
-                    cat.fillClass,
+                    cat.colorClass,
                   ].join(' ')}
                   style={{ width: `${pct}%` }}
                 />

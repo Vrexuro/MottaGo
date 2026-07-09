@@ -59,12 +59,7 @@ export function CapacityAlertHistoryCard({ className }: CapacityAlertHistoryCard
       {/* ── Header ─────────────────────────────────────── */}
       <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-mottago-border">
         <h3 className="text-base font-semibold text-text-primary">Riwayat Alert Kapasitas</h3>
-        <button
-          type="button"
-          className="text-xs font-medium text-brand-primary hover:opacity-80 transition-opacity whitespace-nowrap"
-        >
-          Lihat Semua
-        </button>
+        <span className="text-xs font-medium text-text-disabled whitespace-nowrap">6 terakhir</span>
       </div>
 
       {/* ── Desktop / Tablet: Table ────────────────────── */}

@@ -10,20 +10,16 @@ import { Button } from '../../components/atoms/Button';
 import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
+import { addEntry } from '../../mock/utilityStore';
 import type { WasteCategoryDb } from '../../mock/utility';
 import type { SelectOption } from '../../types/common.types';
+import { WASTE_UNIT_MAP } from '../../constants/waste';
 
 const KATEGORI_OPTIONS: SelectOption[] = [
   { value: 'organik', label: 'Organik (Sisa Makanan, dll)' },
   { value: 'anorganik', label: 'Anorganik (Plastik, Kertas, dll)' },
   { value: 'minyak', label: 'Minyak Jelantah' },
 ];
-
-const UNIT_MAP: Record<WasteCategoryDb, string> = {
-  organik: 'kg',
-  anorganik: 'kg',
-  minyak: 'liter',
-};
 
 export default function CatatSampahPage() {
   const { profile, logout } = useAuth();
@@ -40,6 +36,12 @@ export default function CatatSampahPage() {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
+      addEntry({
+        kategori,
+        kuantitas: parseFloat(jumlah) || 0,
+        unit: WASTE_UNIT_MAP[kategori] as 'kg' | 'liter',
+        dicatatOleh: profile?.fullName ?? 'Utility',
+      });
       setLoading(false);
       setSubmitted(true);
       setJumlah('');
@@ -58,7 +60,7 @@ export default function CatatSampahPage() {
     >
       <div className="py-6 md:py-8 space-y-4">
         <div>
-          <h1 className="text-xl font-semibold text-text-primary">Catat Sampah Baru</h1>
+          <h1 className="text-2xl font-semibold text-text-primary">Catat Sampah Baru</h1>
           <p className="text-sm text-text-secondary mt-1">Tambahkan entri sampah untuk shift ini</p>
         </div>
 
@@ -79,7 +81,7 @@ export default function CatatSampahPage() {
 
           <p className="text-sm text-text-secondary">
             Unit otomatis:{' '}
-            <span className="font-medium text-text-primary">{UNIT_MAP[kategori]}</span>
+            <span className="font-medium text-text-primary">{WASTE_UNIT_MAP[kategori]}</span>
           </p>
 
           <FormField label="Jumlah" htmlFor="jumlah" required>

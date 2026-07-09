@@ -6,26 +6,23 @@ import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { PICKUP_HISTORY } from '../../mock/pickup';
 import type { PickupHistoryRecord } from '../../mock/pickup';
+import { PICKUP_KATEGORI_COLOR, PICKUP_KATEGORI_LABEL } from '../../constants/waste';
 
-const STATUS_COLOR: Record<PickupHistoryRecord['status'], 'success' | 'danger'> = {
+const STATUS_COLOR: Record<
+  PickupHistoryRecord['status'],
+  'success' | 'danger' | 'warning' | 'info'
+> = {
   completed: 'success',
   cancelled: 'danger',
+  waiting: 'warning',
+  'in-transit': 'info',
 };
 
 const STATUS_LABEL: Record<PickupHistoryRecord['status'], string> = {
   completed: 'Selesai',
   cancelled: 'Dibatalkan',
-};
-
-const KATEGORI_COLOR: Record<string, 'success' | 'info' | 'warning'> = {
-  organik: 'success',
-  anorganik: 'info',
-  minyak: 'warning',
-};
-const KATEGORI_LABEL: Record<string, string> = {
-  organik: 'Organik',
-  anorganik: 'Anorganik',
-  minyak: 'Minyak Jelantah',
+  waiting: 'Menunggu',
+  'in-transit': 'Dalam Perjalanan',
 };
 
 export default function RiwayatPickupPage() {
@@ -86,8 +83,8 @@ export default function RiwayatPickupPage() {
                         <span className="text-sm text-text-primary">{pickup.vendor}</span>
                       </td>
                       <td className="px-3 py-3.5">
-                        <Badge color={KATEGORI_COLOR[pickup.kategori]} size="sm">
-                          {KATEGORI_LABEL[pickup.kategori]}
+                        <Badge color={PICKUP_KATEGORI_COLOR[pickup.kategori]} size="sm">
+                          {PICKUP_KATEGORI_LABEL[pickup.kategori]}
                         </Badge>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">

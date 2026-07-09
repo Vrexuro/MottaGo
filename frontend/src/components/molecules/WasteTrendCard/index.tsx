@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { CHART_7D, CHART_30D } from '../../../mock/report';
 
+// TODO Sprint C: selaraskan range dengan CapacityTrendCard (7/14/30/90)
 type Range = 7 | 14 | 30;
 
 interface DataPoint {
@@ -8,37 +10,20 @@ interface DataPoint {
   value: number;
 }
 
-const WEEKDAY: Record<number, string> = {
-  0: 'Min',
-  1: 'Sen',
-  2: 'Sel',
-  3: 'Rab',
-  4: 'Kam',
-  5: 'Jum',
-  6: 'Sab',
-};
-
-// Fixed seed values — chart stays deterministic across renders
-const SEED = [
-  23.5, 31.2, 28.8, 44.1, 47.3, 38.6, 19.4, 27.1, 35.8, 42.2, 33.5, 22.8, 38.4, 45.1, 29.3, 18.7,
-  36.9, 43.2, 51.4, 28.6, 37.8, 44.5, 32.1, 25.9, 41.3, 36.7, 29.5, 48.2, 22.4, 34.8,
-];
-
-function buildData(days: number): DataPoint[] {
-  const today = new Date();
-  return Array.from({ length: days }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (days - 1 - i));
-    const day = days === 7 ? WEEKDAY[d.getDay()] : `${d.getDate()}/${d.getMonth() + 1}`;
-    return { day, value: SEED[i % SEED.length] };
-  });
-}
-
-// Computed once at module load — shared across all instances
+// Data bersumber dari src/mock/report.ts — satu sumber kebenaran untuk seluruh sistem.
 const MOCK: Record<Range, DataPoint[]> = {
-  7: buildData(7),
-  14: buildData(14),
-  30: buildData(30),
+  7: CHART_7D.map((p) => ({
+    day: p.minggu,
+    value: p.organik + p.anorganik + p.minyak,
+  })),
+  14: [...CHART_7D, ...CHART_7D].map((p, i) => ({
+    day: `H-${14 - i}`,
+    value: p.organik + p.anorganik + p.minyak,
+  })),
+  30: CHART_30D.map((p) => ({
+    day: p.minggu,
+    value: p.organik + p.anorganik + p.minyak,
+  })),
 };
 
 const RANGES: Range[] = [7, 14, 30];
@@ -115,8 +100,7 @@ export function WasteTrendCard({ className }: { className?: string }) {
             />
 
             <YAxis
-              domain={[0, 60]}
-              ticks={[0, 20, 40, 60]}
+              domain={[0, 'dataMax']}
               tickFormatter={(v: number) => (v === 0 ? '0' : `${v} kg`)}
               tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
               axisLine={false}

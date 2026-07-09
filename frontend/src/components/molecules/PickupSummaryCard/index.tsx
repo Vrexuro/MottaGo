@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../atoms/Badge';
 import { Icon } from '../../atoms/Icon';
 import { ROUTES } from '../../../router/routes';
+import { PICKUP_HISTORY } from '../../../mock/pickup';
 
 type PickupStatus = 'waiting' | 'in-transit' | 'completed';
 type PickupAksi = 'detail' | 'lacak';
@@ -34,32 +35,19 @@ const AKSI_CONFIG: Record<PickupAksi, { label: string; colorClass: string }> = {
   lacak: { label: 'Lacak', colorClass: 'text-info-text hover:opacity-80' },
 };
 
-const MOCK_PICKUPS: PickupRecord[] = [
-  {
-    id: '#PU-2406-018',
-    vendor: 'Bank Sampah Hijau',
-    estimasi: '85 kg',
-    status: 'waiting',
-    waktuRequest: 'Hari Ini, 09:24',
-    aksi: 'detail',
-  },
-  {
-    id: '#PU-2406-017',
-    vendor: 'CV Daur Ulang Mandiri',
-    estimasi: '120 kg',
-    status: 'in-transit',
-    waktuRequest: 'Hari Ini, 07:13',
-    aksi: 'lacak',
-  },
-  {
-    id: '#PU-2406-016',
-    vendor: 'Bank Sampah Hijau',
-    estimasi: '95 kg',
-    status: 'completed',
-    waktuRequest: 'Kemarin, 16:40',
-    aksi: 'detail',
-  },
-];
+// CATATAN B3.3-06: PICKUP_HISTORY hanya berisi status 'completed'|'cancelled' — tidak ada
+// 'waiting'/'in-transit' di data mock saat ini. Ambil 3 record 'completed' terbaru sebagai
+// pendekatan aman (record 'cancelled' dikecualikan karena tidak ada STATUS_CONFIG untuknya).
+const DISPLAY_PICKUPS: PickupRecord[] = PICKUP_HISTORY.filter((p) => p.status === 'completed')
+  .slice(0, 3)
+  .map((p) => ({
+    id: p.id,
+    vendor: p.vendor,
+    estimasi: `${p.estimasiKg} kg`,
+    status: 'completed' as const,
+    waktuRequest: p.tanggal,
+    aksi: 'detail' as const,
+  }));
 
 export function PickupSummaryCard({ className, onLihatSemua }: PickupSummaryCardProps) {
   const navigate = useNavigate();
@@ -113,7 +101,7 @@ export function PickupSummaryCard({ className, onLihatSemua }: PickupSummaryCard
             </tr>
           </thead>
           <tbody className="divide-y divide-mottago-border">
-            {MOCK_PICKUPS.map((pickup) => {
+            {DISPLAY_PICKUPS.map((pickup) => {
               const status = STATUS_CONFIG[pickup.status];
               const aksi = AKSI_CONFIG[pickup.aksi];
               return (

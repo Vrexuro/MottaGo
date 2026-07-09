@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { DashboardHeader } from '../../components/molecules/DashboardHeader';
 import { KpiCard } from '../../components/molecules/KpiCard';
@@ -7,31 +8,27 @@ import { useNavigate } from 'react-router-dom';
 import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { UTILITY_TODAY_SUMMARY, UTILITY_ENTRIES } from '../../mock/utility';
-import type { WasteCategoryDb } from '../../mock/utility';
-
-const UNIT_MAP: Record<WasteCategoryDb, string> = {
-  organik: 'kg',
-  anorganik: 'kg',
-  minyak: 'liter',
-};
-const LABEL_MAP: Record<WasteCategoryDb, string> = {
-  organik: 'Organik',
-  anorganik: 'Anorganik',
-  minyak: 'Minyak Jelantah',
-};
-const STATUS_COLOR: Record<WasteCategoryDb, 'success' | 'warning' | 'info'> = {
-  organik: 'success',
-  anorganik: 'info',
-  minyak: 'warning',
-};
+import { getEntries, getTodaySummary, subscribeUtility } from '../../mock/utilityStore';
+import { WASTE_UNIT_MAP, WASTE_LABEL_MAP, WASTE_BADGE_COLOR } from '../../constants/waste';
 
 export default function UtilityDashboardPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Utility';
-  const recentEntries = UTILITY_ENTRIES.slice(0, 3);
-  const kapasitasPct = UTILITY_TODAY_SUMMARY.kapasitasPct;
+
+  const [entries, setEntries] = useState(() => getEntries());
+  const [todaySummary, setTodaySummary] = useState(() => getTodaySummary());
+
+  useEffect(() => {
+    const unsub = subscribeUtility(() => {
+      setEntries(getEntries());
+      setTodaySummary(getTodaySummary());
+    });
+    return unsub;
+  }, []);
+
+  const recentEntries = entries.slice(0, 3);
+  const kapasitasPct = todaySummary.kapasitasPct;
   const kapasitasAccent: 'success' | 'warning' | 'orange' =
     kapasitasPct >= 90 ? 'orange' : kapasitasPct >= 60 ? 'warning' : 'success';
 
@@ -53,21 +50,21 @@ export default function UtilityDashboardPage() {
               label="Entri Hari Ini"
               iconName="PenLine"
               accent="success"
-              value={String(UTILITY_TODAY_SUMMARY.totalEntri)}
+              value={String(todaySummary.totalEntri)}
               unit="entri"
             />
             <KpiCard
               label="Total Sampah"
               iconName="Scale"
               accent="success"
-              value={String(UTILITY_TODAY_SUMMARY.totalKg)}
+              value={String(todaySummary.totalKg)}
               unit="kg"
             />
             <KpiCard
               label="Pickup Aktif"
               iconName="Truck"
               accent="orange"
-              value={String(UTILITY_TODAY_SUMMARY.pickupAktif)}
+              value={String(todaySummary.pickupAktif)}
               unit="aktif"
             />
             <KpiCard
@@ -75,9 +72,7 @@ export default function UtilityDashboardPage() {
               iconName="Gauge"
               accent={kapasitasAccent}
               value={`${kapasitasPct}%`}
-              subtexts={[
-                `${UTILITY_TODAY_SUMMARY.kapasitasKg} kg dari ${UTILITY_TODAY_SUMMARY.maxKg} kg`,
-              ]}
+              subtexts={[`${todaySummary.kapasitasKg} kg dari ${todaySummary.maxKg} kg`]}
             />
           </div>
 
@@ -138,13 +133,13 @@ export default function UtilityDashboardPage() {
                         <span className="text-sm text-text-secondary">{entry.waktu}</span>
                       </td>
                       <td className="px-3 py-3.5">
-                        <Badge color={STATUS_COLOR[entry.kategori]} size="sm">
-                          {LABEL_MAP[entry.kategori]}
+                        <Badge color={WASTE_BADGE_COLOR[entry.kategori]} size="sm">
+                          {WASTE_LABEL_MAP[entry.kategori]}
                         </Badge>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         <span className="text-sm font-semibold text-text-primary tabular-nums">
-                          {entry.kuantitas} {UNIT_MAP[entry.kategori]}
+                          {entry.kuantitas} {WASTE_UNIT_MAP[entry.kategori]}
                         </span>
                       </td>
                       <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">

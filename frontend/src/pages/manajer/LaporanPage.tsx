@@ -21,6 +21,10 @@ import type { ReportKpi, WeeklyChartPoint } from '../../mock/report';
 const getCSSVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
+const CSS_BAR_ORGANIK = getCSSVar('--color-accent-primary');
+const CSS_BAR_ANORGANIK = getCSSVar('--color-info-text');
+const CSS_BAR_MINYAK = getCSSVar('--color-capacity-warning');
+
 type Period = '7d' | '30d' | '90d';
 
 const PERIOD_LABELS: Record<Period, string> = {
@@ -61,7 +65,7 @@ export default function LaporanPage() {
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-lg font-semibold text-text-primary">Laporan Sampah</h1>
+            <h1 className="text-2xl font-semibold text-text-primary">Laporan Sampah</h1>
             <div className="flex items-center gap-3">
               {(['7d', '30d', '90d'] as Period[]).map((p) => (
                 <button
@@ -119,24 +123,9 @@ export default function LaporanPage() {
                 <YAxis tickFormatter={(v: number) => `${v} kg`} tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend />
-                <Bar
-                  dataKey="organik"
-                  name="Organik"
-                  stackId="a"
-                  fill={getCSSVar('--color-accent-primary')}
-                />
-                <Bar
-                  dataKey="anorganik"
-                  name="Anorganik"
-                  stackId="a"
-                  fill={getCSSVar('--color-info-text')}
-                />
-                <Bar
-                  dataKey="minyak"
-                  name="Minyak Jelantah"
-                  stackId="a"
-                  fill={getCSSVar('--color-capacity-warning')}
-                />
+                <Bar dataKey="organik" name="Organik" stackId="a" fill={CSS_BAR_ORGANIK} />
+                <Bar dataKey="anorganik" name="Anorganik" stackId="a" fill={CSS_BAR_ANORGANIK} />
+                <Bar dataKey="minyak" name="Minyak Jelantah" stackId="a" fill={CSS_BAR_MINYAK} />
               </BarChart>
             </ResponsiveContainer>
           </div>

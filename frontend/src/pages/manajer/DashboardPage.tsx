@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { DashboardHeader } from '../../components/molecules/DashboardHeader';
 import { KpiCard } from '../../components/molecules/KpiCard';
@@ -10,11 +11,25 @@ import { useNavigate } from 'react-router-dom';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
+import { getManagerState, subscribeManager } from '../../mock/managerStore';
+import { getCapacityStatus } from '../../constants/capacity';
 
 function DashboardPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
+
+  const [mgr, setMgr] = useState(() => getManagerState());
+
+  useEffect(() => {
+    return subscribeManager(() => setMgr(getManagerState()));
+  }, []);
+
+  const pct = Math.round((mgr.kapasitas.currentKg / mgr.kapasitas.maxKg) * 100);
+  const status = getCapacityStatus(pct);
+  const badgeColor =
+    status === 'critical' ? 'danger' : status === 'warning' ? 'warning' : 'success';
+  const badgeLabel = status === 'critical' ? 'Kritis' : status === 'warning' ? 'Perhatian' : 'Aman';
 
   return (
     <DashboardLayout
@@ -38,7 +53,7 @@ function DashboardPage() {
               label="Waste Masuk Hari Ini"
               iconName="Scale"
               accent="success"
-              value="47,3"
+              value={String(mgr.wasteHariIni.totalKg).replace('.', ',')}
               unit="kg"
               trend={{ direction: 'up', label: '+12% vs kemarin', positive: true }}
             />
@@ -46,23 +61,26 @@ function DashboardPage() {
               label="Kapasitas Terpakai"
               iconName="Gauge"
               accent="warning"
-              value="66%"
-              badge={{ label: 'Perhatian', color: 'warning' }}
-              subtexts={['263 kg dari 400 kg']}
+              value={`${pct}%`}
+              badge={{ label: badgeLabel, color: badgeColor }}
+              subtexts={[`${mgr.kapasitas.currentKg} kg dari ${mgr.kapasitas.maxKg} kg`]}
             />
             <KpiCard
               label="Pickup Aktif"
               iconName="Truck"
               accent="orange"
-              value="3"
+              value={String(mgr.pickupAktif)}
               valueAccent
-              subtexts={['2 pending', '1 dalam perjalanan']}
+              subtexts={[
+                `${mgr.pickup.waiting} menunggu`,
+                `${mgr.pickup.inTransit} dalam perjalanan`,
+              ]}
             />
             <KpiCard
               label="Pickup Bulan Ini"
               iconName="CalendarCheck"
               accent="success"
-              value="24"
+              value={String(mgr.pickupBulanIni)}
               valueAccent
               trend={{ direction: 'up', label: '+6 vs bulan lalu', positive: true }}
             />
@@ -71,10 +89,17 @@ function DashboardPage() {
           {/* Row 2 — 60/40: Kapasitas Waste Store | Status Pickup */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="md:col-span-3">
-              <CapacityCard className="w-full h-full" />
+              <CapacityCard
+                currentKg={mgr.kapasitas.currentKg}
+                maxKg={mgr.kapasitas.maxKg}
+                className="w-full h-full"
+              />
             </div>
             <div className="md:col-span-2">
               <StatusPickupCard
+                waiting={mgr.pickup.waiting}
+                inTransit={mgr.pickup.inTransit}
+                completedToday={mgr.pickup.completedToday}
                 className="w-full h-full"
                 onLihatSemua={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
               />

@@ -121,21 +121,21 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 4 }}>
             <defs>
               <linearGradient id="capacityAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22C55E" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--color-capacity-normal)" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="var(--color-capacity-normal)" stopOpacity={0} />
               </linearGradient>
             </defs>
 
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#F3F4F6"
+              stroke="var(--color-border)"
               strokeOpacity={1}
               vertical={false}
             />
 
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 11, fill: '#9CA3AF' }}
+              tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
               axisLine={false}
               tickLine={false}
               interval={INTERVAL_MAP[range]}
@@ -145,7 +145,7 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
               domain={[0, 100]}
               ticks={[0, 20, 40, 60, 80, 100]}
               tickFormatter={(v: number) => `${v}%`}
-              tick={{ fontSize: 11, fill: '#9CA3AF' }}
+              tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
               axisLine={false}
               tickLine={false}
               width={40}
@@ -157,11 +157,13 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
                 const point = payload[0]?.payload as DataPoint | undefined;
                 if (!point) return null;
                 return (
-                  <div className="bg-gray-800 text-white text-[11px] rounded px-3 py-2 shadow-lg whitespace-nowrap">
-                    <p className="font-semibold text-gray-100 mb-0.5">{point.dateLabel}</p>
-                    <p className="text-gray-300">
+                  <div className="bg-[var(--color-text-primary)] text-[var(--color-text-on-dark)] text-[11px] rounded px-3 py-2 shadow-lg whitespace-nowrap">
+                    <p className="font-semibold text-[var(--color-nav-dark-item-text)] mb-0.5">
+                      {point.dateLabel}
+                    </p>
+                    <p className="text-[var(--color-nav-dark-muted)]">
                       {point.pct}%{' '}
-                      <span className="text-gray-400">
+                      <span className="text-[var(--color-text-disabled)]">
                         ({point.kg} kg dari {MAX_KG} kg)
                       </span>
                     </p>
@@ -173,14 +175,14 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
             {/* Threshold: Perlu Perhatian 60% */}
             <ReferenceLine
               y={60}
-              stroke="#F59E0B"
+              stroke="var(--color-capacity-warning)"
               strokeDasharray="4 3"
               strokeWidth={1.5}
               label={{
                 value: 'Perlu Perhatian',
                 position: 'insideTopRight',
                 fontSize: 10,
-                fill: '#F59E0B',
+                fill: 'var(--color-capacity-warning)',
                 dy: -4,
               }}
             />
@@ -188,14 +190,14 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
             {/* Threshold: Kritis 90% */}
             <ReferenceLine
               y={CAPACITY_THRESHOLDS.CRITICAL}
-              stroke="#EF4444"
+              stroke="var(--color-capacity-critical)"
               strokeDasharray="4 3"
               strokeWidth={1.5}
               label={{
                 value: 'Kritis',
                 position: 'insideTopRight',
                 fontSize: 10,
-                fill: '#EF4444',
+                fill: 'var(--color-capacity-critical)',
                 dy: -4,
               }}
             />
@@ -203,11 +205,11 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
             <Area
               type="monotone"
               dataKey="pct"
-              stroke="#22C55E"
+              stroke="var(--color-capacity-normal)"
               strokeWidth={2}
               fill="url(#capacityAreaGradient)"
               dot={false}
-              activeDot={{ r: 4, fill: '#22C55E', strokeWidth: 0 }}
+              activeDot={{ r: 4, fill: 'var(--color-capacity-normal)', strokeWidth: 0 }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -216,7 +218,7 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
       {/* ── Legend ──────────────────────────────────────── */}
       <div className="flex items-center gap-5 pt-3 mt-4 border-t border-mottago-border flex-wrap">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-green-500" />
+          <div className="w-3 h-3 rounded-sm bg-capacity-normal" />
           <span className="text-xs text-text-secondary">Kapasitas Terpakai</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -226,7 +228,7 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
               y1="1.5"
               x2="20"
               y2="1.5"
-              stroke="#F59E0B"
+              stroke="var(--color-capacity-warning)"
               strokeWidth="1.5"
               strokeDasharray="4 3"
             />
@@ -240,7 +242,7 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
               y1="1.5"
               x2="20"
               y2="1.5"
-              stroke="#EF4444"
+              stroke="var(--color-capacity-critical)"
               strokeWidth="1.5"
               strokeDasharray="4 3"
             />

@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Badge } from '../../atoms/Badge';
 import { Button } from '../../atoms/Button';
+import { CAPACITY_THRESHOLDS, getCapacityStatus } from '../../../constants/capacity';
+import { getManagerState, subscribeManager } from '../../../mock/managerStore';
 
 type ThresholdLevel = 'normal' | 'perlu-perhatian' | 'kritis';
 
@@ -15,29 +18,30 @@ const LEVELS: Level[] = [
   {
     id: 'normal',
     label: 'Normal',
-    range: '0 – 60%',
-    dotClass: 'bg-green-500',
+    range: `< ${CAPACITY_THRESHOLDS.WARNING}%`,
+    dotClass: 'bg-capacity-normal',
     badgeColor: 'success',
   },
   {
     id: 'perlu-perhatian',
     label: 'Perlu Perhatian',
-    range: '61 – 80%',
-    dotClass: 'bg-amber-500',
+    range: `${CAPACITY_THRESHOLDS.WARNING}% – ${CAPACITY_THRESHOLDS.CRITICAL - 1}%`,
+    dotClass: 'bg-capacity-warning',
     badgeColor: 'warning',
   },
   {
     id: 'kritis',
     label: 'Kritis',
-    range: '81 – 100%',
-    dotClass: 'bg-red-500',
+    range: `≥ ${CAPACITY_THRESHOLDS.CRITICAL}%`,
+    dotClass: 'bg-capacity-critical',
     badgeColor: 'danger',
   },
 ];
 
-const MOCK = {
-  currentLevel: 'perlu-perhatian' as ThresholdLevel,
-  currentPct: 66,
+const STATUS_TO_LEVEL: Record<'normal' | 'warning' | 'critical', ThresholdLevel> = {
+  normal: 'normal',
+  warning: 'perlu-perhatian',
+  critical: 'kritis',
 };
 
 interface StatusThresholdCardProps {
@@ -45,7 +49,15 @@ interface StatusThresholdCardProps {
 }
 
 export function StatusThresholdCard({ className }: StatusThresholdCardProps) {
-  const currentLevel = LEVELS.find((l) => l.id === MOCK.currentLevel)!;
+  const [mgr, setMgr] = useState(() => getManagerState());
+
+  useEffect(() => {
+    return subscribeManager(() => setMgr(getManagerState()));
+  }, []);
+
+  const currentPct = Math.round((mgr.kapasitas.currentKg / mgr.kapasitas.maxKg) * 100);
+  const currentLevelId = STATUS_TO_LEVEL[getCapacityStatus(currentPct)];
+  const currentLevel = LEVELS.find((l) => l.id === currentLevelId)!;
 
   return (
     <div
@@ -90,7 +102,7 @@ export function StatusThresholdCard({ className }: StatusThresholdCardProps) {
           <Badge color={currentLevel.badgeColor}>{currentLevel.label}</Badge>
           <p className="text-sm text-text-secondary leading-relaxed">
             Kapasitas saat ini berada pada{' '}
-            <span className="font-semibold text-text-primary">{MOCK.currentPct}%</span>.
+            <span className="font-semibold text-text-primary">{currentPct}%</span>.
           </p>
         </div>
 

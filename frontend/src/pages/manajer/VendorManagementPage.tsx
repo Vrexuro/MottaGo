@@ -11,24 +11,13 @@ import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { VENDORS } from '../../mock/vendor';
 import type { VendorRecord } from '../../mock/vendor';
+import { PICKUP_KATEGORI_COLOR, PICKUP_KATEGORI_LABEL } from '../../constants/waste';
 
 const KATEGORI_OPTIONS = [
   { value: 'organik', label: 'Organik' },
   { value: 'anorganik', label: 'Anorganik' },
   { value: 'minyak', label: 'Minyak Jelantah' },
 ];
-
-const KATEGORI_COLOR: Record<string, 'success' | 'info' | 'warning'> = {
-  organik: 'success',
-  anorganik: 'info',
-  minyak: 'warning',
-};
-
-const KATEGORI_LABEL: Record<string, string> = {
-  organik: 'Organik',
-  anorganik: 'Anorganik',
-  minyak: 'Minyak Jelantah',
-};
 
 type VendorFormData = Omit<VendorRecord, 'id' | 'lastUpdated'>;
 
@@ -151,8 +140,8 @@ export default function VendorManagementPage() {
                         <span className="text-sm text-text-secondary">{vendor.whatsapp}</span>
                       </td>
                       <td className="px-3 py-3.5">
-                        <Badge color={KATEGORI_COLOR[vendor.kategori]} size="sm">
-                          {KATEGORI_LABEL[vendor.kategori]}
+                        <Badge color={PICKUP_KATEGORI_COLOR[vendor.kategori]} size="sm">
+                          {PICKUP_KATEGORI_LABEL[vendor.kategori]}
                         </Badge>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">

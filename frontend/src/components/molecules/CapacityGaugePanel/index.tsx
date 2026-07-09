@@ -36,14 +36,20 @@ function getState(pct: number): CapacityState {
   return 'aman';
 }
 
-const MOCK = { currentKg: 263, maxKg: 400, lastUpdated: '09:24:37' };
-
 interface CapacityGaugePanelProps {
+  currentKg: number;
+  maxKg: number;
+  lastUpdated: string;
   className?: string;
 }
 
-export function CapacityGaugePanel({ className }: CapacityGaugePanelProps) {
-  const pct = Math.round((MOCK.currentKg / MOCK.maxKg) * 100);
+export function CapacityGaugePanel({
+  currentKg,
+  maxKg,
+  lastUpdated,
+  className,
+}: CapacityGaugePanelProps) {
+  const pct = Math.round((currentKg / maxKg) * 100);
   const state = getState(pct);
   const cfg = STATE_CFG[state];
   const isKritis = state === 'kritis';
@@ -76,9 +82,8 @@ export function CapacityGaugePanel({ className }: CapacityGaugePanelProps) {
         <div className="space-y-2.5">
           <ProgressBar value={pct} variant="capacity" style={{ height: '28px' }} />
           <p className="text-sm text-text-secondary">
-            <span className="font-semibold text-text-primary">{MOCK.currentKg} kg</span> dari{' '}
-            <span className="font-semibold text-text-primary">{MOCK.maxKg} kg</span> kapasitas
-            maksimum
+            <span className="font-semibold text-text-primary">{currentKg} kg</span> dari{' '}
+            <span className="font-semibold text-text-primary">{maxKg} kg</span> kapasitas maksimum
           </p>
         </div>
 
@@ -107,9 +112,7 @@ export function CapacityGaugePanel({ className }: CapacityGaugePanelProps) {
           />
           <span className="text-[11px] text-text-disabled">Data real-time</span>
         </div>
-        <span className="text-[11px] text-text-disabled">
-          Terakhir diperbarui: {MOCK.lastUpdated}
-        </span>
+        <span className="text-[11px] text-text-disabled">Terakhir diperbarui: {lastUpdated}</span>
       </div>
     </div>
   );

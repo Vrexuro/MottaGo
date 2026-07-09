@@ -1,3 +1,8 @@
+// CATATAN: WasteType enum di sini (organic/liquid/recyclable/non-recyclable)
+// sudah deprecated — taxonomy sistem menggunakan 'organik'|'anorganik'|'minyak'
+// File ini akan diupdate di Sprint C bersamaan dengan wasteService.ts
+// Jangan gunakan WasteType ini untuk komponen baru.
+
 // WasteType — from CategoryBreakdownCard.CATEGORIES ids; DL-02: unit follows type
 export type WasteType = 'organic' | 'liquid' | 'recyclable' | 'non-recyclable';
 

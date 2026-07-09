@@ -8,7 +8,7 @@ export interface PickupHistoryRecord {
   vendor: string;
   kategori: 'organik' | 'anorganik' | 'minyak';
   estimasiKg: number;
-  status: 'completed' | 'cancelled';
+  status: 'completed' | 'cancelled' | 'waiting' | 'in-transit';
   catatan: string;
 }
 

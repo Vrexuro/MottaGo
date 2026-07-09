@@ -1,3 +1,4 @@
+// TODO Sprint C: gunakan hook ini saat Supabase terhubung (ganti managerStore.getManagerState())
 import { useState, useEffect, useCallback } from 'react';
 import type { CreatePickupDto, Pickup, PickupStatusCount } from '../types/pickup.types';
 import { pickupService } from '../services/pickupService';
