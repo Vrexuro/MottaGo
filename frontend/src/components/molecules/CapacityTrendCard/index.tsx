@@ -20,48 +20,12 @@ interface DataPoint {
   kg: number;
 }
 
-const MAX_KG = 400;
-
-// Fixed seed — deterministic chart across renders
-const SEED_PCT = [
-  52, 58, 63, 61, 66, 70, 67, 62, 55, 59, 65, 72, 74, 70, 68, 64, 60, 57, 62, 68, 72, 75, 73, 69,
-  65, 61, 58, 63, 67, 66, 64, 60, 57, 55, 58, 63, 68, 72, 74, 70, 68, 65, 62, 59, 55, 52, 57, 63,
-  68, 72, 74, 70, 68, 65, 62, 59, 55, 52, 57, 63, 68, 72, 74, 70, 68, 65, 62, 59, 55, 52, 57, 63,
-  68, 72, 74, 70, 68, 65, 62, 59, 55, 52, 57, 63, 68, 72, 74, 70, 68, 66,
-];
-
-function buildData(days: number): DataPoint[] {
-  const today = new Date();
-  return Array.from({ length: days }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (days - 1 - i));
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    const pct = SEED_PCT[i % SEED_PCT.length];
-    return {
-      date: `${dd}/${mm}`,
-      dateLabel: `${dd}/${mm}/${yyyy}`,
-      pct,
-      kg: Math.round((pct / 100) * MAX_KG),
-    };
-  });
-}
-
 const RANGES: Range[] = [7, 14, 30, 90];
 const RANGE_LABELS: Record<Range, string> = {
   7: '7 Hari',
   14: '14 Hari',
   30: '30 Hari',
   90: '90 Hari',
-};
-
-// Computed once at module load
-const MOCK: Record<Range, DataPoint[]> = {
-  7: buildData(7),
-  14: buildData(14),
-  30: buildData(30),
-  90: buildData(90),
 };
 
 // Show fewer X ticks on dense ranges
@@ -74,11 +38,21 @@ const INTERVAL_MAP: Record<Range, number> = {
 
 interface CapacityTrendCardProps {
   className?: string;
+  trend?: DataPoint[];
+  maxKg?: number;
+  onRangeChange?: (range: Range) => void;
+  loading?: boolean;
 }
 
-export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
+export function CapacityTrendCard({
+  className,
+  trend,
+  maxKg,
+  onRangeChange,
+  loading,
+}: CapacityTrendCardProps) {
   const [range, setRange] = useState<Range>(7);
-  const data = MOCK[range];
+  const data = trend ?? [];
 
   return (
     <div
@@ -101,7 +75,10 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
             <button
               key={r}
               type="button"
-              onClick={() => setRange(r)}
+              onClick={() => {
+                setRange(r);
+                onRangeChange?.(r);
+              }}
               className={[
                 'text-xs px-2.5 py-1 rounded-[4px] transition-all whitespace-nowrap',
                 range === r
@@ -117,102 +94,112 @@ export function CapacityTrendCard({ className }: CapacityTrendCardProps) {
 
       {/* ── Area Chart ──────────────────────────────────── */}
       <div className="flex-1 min-h-[200px]">
-        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-          <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 4 }}>
-            <defs>
-              <linearGradient id="capacityAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-capacity-normal)" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="var(--color-capacity-normal)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+        {loading ? (
+          <div className="flex items-center justify-center h-full min-h-[200px] text-text-secondary text-sm">
+            Memuat tren...
+          </div>
+        ) : data.length === 0 ? (
+          <div className="flex items-center justify-center h-full min-h-[200px] text-text-secondary text-sm">
+            Belum ada data tren
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 4 }}>
+              <defs>
+                <linearGradient id="capacityAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-capacity-normal)" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="var(--color-capacity-normal)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
 
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="var(--color-border)"
-              strokeOpacity={1}
-              vertical={false}
-            />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+                strokeOpacity={1}
+                vertical={false}
+              />
 
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
-              axisLine={false}
-              tickLine={false}
-              interval={INTERVAL_MAP[range]}
-            />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
+                axisLine={false}
+                tickLine={false}
+                interval={INTERVAL_MAP[range]}
+              />
 
-            <YAxis
-              domain={[0, 100]}
-              ticks={[0, 20, 40, 60, 80, 100]}
-              tickFormatter={(v: number) => `${v}%`}
-              tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
-              axisLine={false}
-              tickLine={false}
-              width={40}
-            />
+              <YAxis
+                domain={[0, 100]}
+                ticks={[0, 20, 40, 60, 80, 100]}
+                tickFormatter={(v: number) => `${v}%`}
+                tick={{ fontSize: 11, fill: 'var(--color-text-disabled)' }}
+                axisLine={false}
+                tickLine={false}
+                width={40}
+              />
 
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const point = payload[0]?.payload as DataPoint | undefined;
-                if (!point) return null;
-                return (
-                  <div className="bg-[var(--color-text-primary)] text-[var(--color-text-on-dark)] text-[11px] rounded px-3 py-2 shadow-lg whitespace-nowrap">
-                    <p className="font-semibold text-[var(--color-nav-dark-item-text)] mb-0.5">
-                      {point.dateLabel}
-                    </p>
-                    <p className="text-[var(--color-nav-dark-muted)]">
-                      {point.pct}%{' '}
-                      <span className="text-[var(--color-text-disabled)]">
-                        ({point.kg} kg dari {MAX_KG} kg)
-                      </span>
-                    </p>
-                  </div>
-                );
-              }}
-            />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const point = payload[0]?.payload as DataPoint | undefined;
+                  if (!point) return null;
+                  return (
+                    <div className="bg-[var(--color-text-primary)] text-[var(--color-text-on-dark)] text-[11px] rounded px-3 py-2 shadow-lg whitespace-nowrap">
+                      <p className="font-semibold text-[var(--color-nav-dark-item-text)] mb-0.5">
+                        {point.dateLabel}
+                      </p>
+                      <p className="text-[var(--color-nav-dark-muted)]">
+                        {point.pct}%{' '}
+                        <span className="text-[var(--color-text-disabled)]">
+                          ({point.kg} kg dari {maxKg ?? 0} kg)
+                        </span>
+                      </p>
+                    </div>
+                  );
+                }}
+              />
 
-            {/* Threshold: Perlu Perhatian 60% */}
-            <ReferenceLine
-              y={60}
-              stroke="var(--color-capacity-warning)"
-              strokeDasharray="4 3"
-              strokeWidth={1.5}
-              label={{
-                value: 'Perlu Perhatian',
-                position: 'insideTopRight',
-                fontSize: 10,
-                fill: 'var(--color-capacity-warning)',
-                dy: -4,
-              }}
-            />
+              {/* Threshold: Perlu Perhatian 60% */}
+              <ReferenceLine
+                y={60}
+                stroke="var(--color-capacity-warning)"
+                strokeDasharray="4 3"
+                strokeWidth={1.5}
+                label={{
+                  value: 'Perlu Perhatian',
+                  position: 'insideTopRight',
+                  fontSize: 10,
+                  fill: 'var(--color-capacity-warning)',
+                  dy: -4,
+                }}
+              />
 
-            {/* Threshold: Kritis 90% */}
-            <ReferenceLine
-              y={CAPACITY_THRESHOLDS.CRITICAL}
-              stroke="var(--color-capacity-critical)"
-              strokeDasharray="4 3"
-              strokeWidth={1.5}
-              label={{
-                value: 'Kritis',
-                position: 'insideTopRight',
-                fontSize: 10,
-                fill: 'var(--color-capacity-critical)',
-                dy: -4,
-              }}
-            />
+              {/* Threshold: Kritis 90% */}
+              <ReferenceLine
+                y={CAPACITY_THRESHOLDS.CRITICAL}
+                stroke="var(--color-capacity-critical)"
+                strokeDasharray="4 3"
+                strokeWidth={1.5}
+                label={{
+                  value: 'Kritis',
+                  position: 'insideTopRight',
+                  fontSize: 10,
+                  fill: 'var(--color-capacity-critical)',
+                  dy: -4,
+                }}
+              />
 
-            <Area
-              type="monotone"
-              dataKey="pct"
-              stroke="var(--color-capacity-normal)"
-              strokeWidth={2}
-              fill="url(#capacityAreaGradient)"
-              dot={false}
-              activeDot={{ r: 4, fill: 'var(--color-capacity-normal)', strokeWidth: 0 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+              <Area
+                type="monotone"
+                dataKey="pct"
+                stroke="var(--color-capacity-normal)"
+                strokeWidth={2}
+                fill="url(#capacityAreaGradient)"
+                dot={false}
+                activeDot={{ r: 4, fill: 'var(--color-capacity-normal)', strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* ── Legend ──────────────────────────────────────── */}

@@ -17,6 +17,13 @@ export const utilityNavItems: NavItem[] = [
     allowedRoles: ['utility'],
   },
   {
+    id: 'utility-request-pickup',
+    label: 'Request Pickup',
+    iconName: 'Truck',
+    path: ROUTES.UTILITY_REQUEST_PICKUP,
+    allowedRoles: ['utility'],
+  },
+  {
     id: 'utility-riwayat',
     label: 'Riwayat Input',
     iconName: 'ClipboardList',

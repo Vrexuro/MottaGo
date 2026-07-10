@@ -7,7 +7,7 @@ import { SelectInput } from '../../components/atoms/SelectInput';
 import { Button } from '../../components/atoms/Button';
 import { Icon } from '../../components/atoms/Icon';
 import { useNavigate } from 'react-router-dom';
-import { manajerNavItems } from '../../router/navigation';
+import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { getCapacityStatus } from '../../constants/capacity';
@@ -23,10 +23,10 @@ const KATEGORI_OPTIONS = [
   { value: 'minyak', label: 'Minyak Jelantah' },
 ];
 
-function RequestPickupPage() {
+function UtilityRequestPickupPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
-  const userName = profile?.fullName ?? 'Manajer';
+  const userName = profile?.fullName ?? 'Utility';
   const storeId = profile?.storeId ?? null;
 
   const { currentCapacity } = useCapacity(storeId ?? 0);
@@ -91,18 +91,18 @@ function RequestPickupPage() {
 
   return (
     <FormLayout
-      navItems={manajerNavItems}
-      userRole="manajer"
+      navItems={utilityNavItems}
+      userRole="utility"
       userName={userName}
       onLogout={logout}
-      onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      onNotificationClick={() => {}}
     >
       <div className="py-6 md:py-8 pb-10 space-y-5">
         {/* ── Zone A — Page Header ─────────────────────────── */}
         <div className="space-y-2">
           <button
             type="button"
-            onClick={() => navigate(ROUTES.MANAJER_DASHBOARD)}
+            onClick={() => navigate(ROUTES.UTILITY_ROOT)}
             className="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
           >
             <Icon
@@ -130,7 +130,7 @@ function RequestPickupPage() {
           ]}
         />
 
-        {/* ── Zone C — Business State Banners (DL-03 / DL-05) ─ */}
+        {/* ── Zone C — Business State Banners (DL-03) ─────── */}
         {isSuccess && <AlertBanner variant="success" title="Request pickup berhasil dibuat!" />}
         {error && <AlertBanner variant="error" title={error} />}
         {isActivePickup && activePickupForKategori && (
@@ -138,17 +138,13 @@ function RequestPickupPage() {
             variant="error"
             title={`Sudah ada pickup aktif untuk kategori ini (${activePickupForKategori.id}).`}
             description="Selesaikan atau batalkan pickup yang sedang berlangsung sebelum membuat yang baru."
-            actionLabel="Lihat Pickup Aktif"
-            onAction={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
           />
         )}
         {isNoVendor && (
           <AlertBanner
             variant="warning"
             title="Tidak ada vendor aktif yang tersedia."
-            description="Tambahkan vendor aktif terlebih dahulu untuk dapat melakukan pickup."
-            actionLabel="Kelola Vendor"
-            onAction={() => navigate(ROUTES.MANAJER_VENDOR_MANAGEMENT)}
+            description="Hubungi manajer untuk menambahkan vendor."
           />
         )}
 
@@ -178,7 +174,7 @@ function RequestPickupPage() {
               required
               helpText={
                 isNoVendor
-                  ? 'Belum ada vendor aktif. Tambahkan vendor di halaman Pengaturan.'
+                  ? 'Belum ada vendor aktif. Hubungi manajer.'
                   : 'Hanya vendor aktif yang ditampilkan.'
               }
             >
@@ -198,7 +194,7 @@ function RequestPickupPage() {
             <Button
               variant="secondary"
               className="w-full sm:w-auto justify-center"
-              onClick={() => navigate(ROUTES.MANAJER_DASHBOARD)}
+              onClick={() => navigate(ROUTES.UTILITY_ROOT)}
             >
               Batal
             </Button>
@@ -220,4 +216,4 @@ function RequestPickupPage() {
   );
 }
 
-export default RequestPickupPage;
+export default UtilityRequestPickupPage;

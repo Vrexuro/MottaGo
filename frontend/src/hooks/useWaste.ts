@@ -17,7 +17,7 @@ export function useWaste(storeId: number): UseWasteReturn {
   const [today, setToday] = useState<WasteDailySummary | null>(null);
   const [categories, setCategories] = useState<WasteCategory[]>([]);
   const [trend, setTrend] = useState<WasteTrendPoint[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {

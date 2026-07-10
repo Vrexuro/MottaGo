@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { CHART_7D, CHART_30D } from '../../../mock/report';
 
 // TODO Sprint C: selaraskan range dengan CapacityTrendCard (7/14/30/90)
 type Range = 7 | 14 | 30;
@@ -10,31 +9,20 @@ interface DataPoint {
   value: number;
 }
 
-// Data bersumber dari src/mock/report.ts — satu sumber kebenaran untuk seluruh sistem.
-const MOCK: Record<Range, DataPoint[]> = {
-  7: CHART_7D.map((p) => ({
-    day: p.minggu,
-    value: p.organik + p.anorganik + p.minyak,
-  })),
-  14: [...CHART_7D, ...CHART_7D].map((p, i) => ({
-    day: `H-${14 - i}`,
-    value: p.organik + p.anorganik + p.minyak,
-  })),
-  30: CHART_30D.map((p) => ({
-    day: p.minggu,
-    value: p.organik + p.anorganik + p.minyak,
-  })),
-};
-
 const RANGES: Range[] = [7, 14, 30];
 const RANGE_LABELS: Record<Range, string> = { 7: '7 Hari', 14: '14 Hari', 30: '30 Hari' };
 
 const getCSSVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-export function WasteTrendCard({ className }: { className?: string }) {
+interface WasteTrendCardProps {
+  className?: string;
+  trend?: DataPoint[];
+}
+
+export function WasteTrendCard({ className, trend }: WasteTrendCardProps) {
   const [range, setRange] = useState<Range>(7);
-  const data = MOCK[range];
+  const data = trend ?? [];
   const xInterval = range === 30 ? 4 : range === 14 ? 1 : 0;
 
   return (
@@ -74,51 +62,57 @@ export function WasteTrendCard({ className }: { className?: string }) {
 
       {/* Area chart — no tooltip, subtle grid, light gradient */}
       <div className="flex-1 min-h-[180px]">
-        <ResponsiveContainer width="100%" height="100%" minHeight={180}>
-          <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 4 }}>
-            <defs>
-              <linearGradient id="wasteAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-accent-primary)" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="var(--color-accent-primary)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+        {data.length === 0 ? (
+          <div className="flex items-center justify-center h-full min-h-[180px] text-text-secondary text-sm">
+            Belum ada data tren
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%" minHeight={180}>
+            <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 4 }}>
+              <defs>
+                <linearGradient id="wasteAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-accent-primary)" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="var(--color-accent-primary)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
 
-            {/* Very subtle horizontal grid only */}
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={getCSSVar('--color-border')}
-              strokeOpacity={0.5}
-              vertical={false}
-            />
+              {/* Very subtle horizontal grid only */}
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={getCSSVar('--color-border')}
+                strokeOpacity={0.5}
+                vertical={false}
+              />
 
-            <XAxis
-              dataKey="day"
-              tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
-              axisLine={false}
-              tickLine={false}
-              interval={xInterval}
-            />
+              <XAxis
+                dataKey="day"
+                tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
+                axisLine={false}
+                tickLine={false}
+                interval={xInterval}
+              />
 
-            <YAxis
-              domain={[0, 'dataMax']}
-              tickFormatter={(v: number) => (v === 0 ? '0' : `${v} kg`)}
-              tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
-              axisLine={false}
-              tickLine={false}
-              width={44}
-            />
+              <YAxis
+                domain={[0, 'dataMax']}
+                tickFormatter={(v: number) => (v === 0 ? '0' : `${v} kg`)}
+                tick={{ fontSize: 11, fill: getCSSVar('--color-text-secondary') }}
+                axisLine={false}
+                tickLine={false}
+                width={44}
+              />
 
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke={getCSSVar('--color-accent-primary')}
-              strokeWidth={2}
-              fill="url(#wasteAreaGradient)"
-              dot={false}
-              activeDot={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke={getCSSVar('--color-accent-primary')}
+                strokeWidth={2}
+                fill="url(#wasteAreaGradient)"
+                dot={false}
+                activeDot={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

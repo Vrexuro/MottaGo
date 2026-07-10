@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Badge } from '../../components/atoms/Badge';
@@ -6,8 +6,7 @@ import { Button } from '../../components/atoms/Button';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { USERS } from '../../mock/user';
-import type { UserRecord } from '../../mock/user';
+import { userService, type ProfileUser } from '../../services/userService';
 
 const ROLE_COLOR: Record<string, 'warning' | 'info'> = {
   manajer: 'warning',
@@ -18,20 +17,42 @@ const ROLE_LABEL: Record<string, string> = {
   utility: 'Utility',
 };
 
+function formatCreatedAt(iso: string): string {
+  return new Date(iso).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function KelolaPenggunaPage() {
-  const { profile, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
+  const storeId = profile?.storeId ?? null;
 
-  const [users, setUsers] = useState<UserRecord[]>(USERS);
-  const [confirmUser, setConfirmUser] = useState<UserRecord | null>(null);
+  const [users, setUsers] = useState<ProfileUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  // MVP: profiles.is_active tidak ada di schema — toggle hanya ephemeral, local state per-id.
+  const [activeMap, setActiveMap] = useState<Record<string, boolean>>({});
+  const [confirmUser, setConfirmUser] = useState<ProfileUser | null>(null);
+
+  useEffect(() => {
+    if (!storeId) return;
+    setLoading(true);
+    userService.getUsersByStore(storeId).then((data) => {
+      setUsers(data);
+      setActiveMap(Object.fromEntries(data.map((u) => [u.id, true])));
+      setLoading(false);
+    });
+  }, [storeId]);
 
   const toggleAktif = (id: string) => {
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, isAktif: !u.isAktif } : u)));
+    setActiveMap((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleToggleClick = (user: UserRecord) => {
-    setConfirmUser(user);
+  const handleToggleClick = (targetUser: ProfileUser) => {
+    setConfirmUser(targetUser);
   };
 
   const handleConfirm = () => {
@@ -44,6 +65,22 @@ export default function KelolaPenggunaPage() {
   const handleCancelConfirm = () => {
     setConfirmUser(null);
   };
+
+  if (!storeId) {
+    return (
+      <DashboardLayout
+        navItems={manajerNavItems}
+        userRole="manajer"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      >
+        <div className="flex items-center justify-center p-8 text-text-secondary">
+          <p>Store tidak ditemukan. Hubungi administrator.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
@@ -60,70 +97,91 @@ export default function KelolaPenggunaPage() {
             <p className="text-sm text-text-secondary mt-1">Total {users.length} pengguna</p>
           </div>
 
-          <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px]">
-                <thead>
-                  <tr className="border-b border-mottago-border bg-mottago-surface-subtle">
-                    <th className="px-4 md:px-5 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-                      Nama
-                    </th>
-                    <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-                      Username
-                    </th>
-                    <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-4 md:px-5 py-2.5 text-right text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-mottago-border">
-                  {users.map((user) => {
-                    const isSelf = profile?.fullName === user.nama;
-                    return (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-mottago-surface-subtle transition-colors"
-                      >
-                        <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">
-                          <span className="text-sm font-medium text-text-primary">{user.nama}</span>
-                        </td>
-                        <td className="px-3 py-3.5 whitespace-nowrap">
-                          <span className="text-sm text-text-secondary">{user.username}</span>
-                        </td>
-                        <td className="px-3 py-3.5">
-                          <Badge color={ROLE_COLOR[user.role]} size="sm">
-                            {ROLE_LABEL[user.role]}
-                          </Badge>
-                        </td>
-                        <td className="px-3 py-3.5">
-                          <Badge color={user.isAktif ? 'success' : 'danger'} size="sm">
-                            {user.isAktif ? 'Aktif' : 'Nonaktif'}
-                          </Badge>
-                        </td>
-                        <td className="px-4 md:px-5 py-3.5 text-right whitespace-nowrap">
-                          {!isSelf && (
-                            <button
-                              type="button"
-                              onClick={() => handleToggleClick(user)}
-                              className="text-xs font-medium text-info-text hover:opacity-80 transition-opacity"
-                            >
-                              {user.isAktif ? 'Nonaktifkan' : 'Aktifkan'}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          {loading ? (
+            <div className="p-8 text-text-secondary">Memuat data...</div>
+          ) : users.length === 0 ? (
+            <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-8 text-center text-text-secondary">
+              Tidak ada pengguna ditemukan
             </div>
-          </div>
+          ) : (
+            <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px]">
+                  <thead>
+                    <tr className="border-b border-mottago-border bg-mottago-surface-subtle">
+                      <th className="px-4 md:px-5 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Nama
+                      </th>
+                      <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Username
+                      </th>
+                      <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Bergabung
+                      </th>
+                      <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-4 md:px-5 py-2.5 text-right text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-mottago-border">
+                    {users.map((profileUser) => {
+                      const isSelf = user?.id === profileUser.id;
+                      const isAktif = activeMap[profileUser.id] ?? true;
+                      return (
+                        <tr
+                          key={profileUser.id}
+                          className="hover:bg-mottago-surface-subtle transition-colors"
+                        >
+                          <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">
+                            <span className="text-sm font-medium text-text-primary">
+                              {profileUser.fullName}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3.5 whitespace-nowrap">
+                            <span className="text-sm text-text-secondary">
+                              {profileUser.username}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3.5">
+                            <Badge color={ROLE_COLOR[profileUser.role]} size="sm">
+                              {ROLE_LABEL[profileUser.role]}
+                            </Badge>
+                          </td>
+                          <td className="px-3 py-3.5 whitespace-nowrap">
+                            <span className="text-sm text-text-secondary">
+                              {formatCreatedAt(profileUser.createdAt)}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3.5">
+                            <Badge color={isAktif ? 'success' : 'danger'} size="sm">
+                              {isAktif ? 'Aktif' : 'Nonaktif'}
+                            </Badge>
+                          </td>
+                          <td className="px-4 md:px-5 py-3.5 text-right whitespace-nowrap">
+                            {!isSelf && (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleClick(profileUser)}
+                                className="text-xs font-medium text-info-text hover:opacity-80 transition-opacity"
+                              >
+                                {isAktif ? 'Nonaktifkan' : 'Aktifkan'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -140,19 +198,19 @@ export default function KelolaPenggunaPage() {
               Konfirmasi Perubahan
             </h2>
             <p className="text-sm text-text-secondary">
-              {confirmUser.isAktif ? 'Nonaktifkan' : 'Aktifkan'} pengguna{' '}
-              <span className="font-semibold text-text-primary">{confirmUser.nama}</span>?
+              {(activeMap[confirmUser.id] ?? true) ? 'Nonaktifkan' : 'Aktifkan'} pengguna{' '}
+              <span className="font-semibold text-text-primary">{confirmUser.fullName}</span>?
             </p>
             <div className="flex items-center justify-end gap-3 pt-1">
               <Button variant="secondary" size="sm" onClick={handleCancelConfirm}>
                 Batal
               </Button>
               <Button
-                variant={confirmUser.isAktif ? 'danger' : 'primary'}
+                variant={(activeMap[confirmUser.id] ?? true) ? 'danger' : 'primary'}
                 size="sm"
                 onClick={handleConfirm}
               >
-                {confirmUser.isAktif ? 'Nonaktifkan' : 'Aktifkan'}
+                {(activeMap[confirmUser.id] ?? true) ? 'Nonaktifkan' : 'Aktifkan'}
               </Button>
             </div>
           </div>

@@ -16,6 +16,7 @@ import UtilityDashboardPage from '../pages/utility/UtilityDashboardPage';
 import CatatSampahPage from '../pages/utility/CatatSampahPage';
 import RiwayatInputPage from '../pages/utility/RiwayatInputPage';
 import ProfilPage from '../pages/utility/ProfilPage';
+import UtilityRequestPickupPage from '../pages/utility/UtilityRequestPickupPage';
 import PengaturanPage from '../pages/manajer/PengaturanPage';
 
 export const router = createBrowserRouter([
@@ -113,6 +114,14 @@ export const router = createBrowserRouter([
     element: (
       <RoleGuard allowedRoles={['utility']}>
         <CatatSampahPage />
+      </RoleGuard>
+    ),
+  },
+  {
+    path: ROUTES.UTILITY_REQUEST_PICKUP,
+    element: (
+      <RoleGuard allowedRoles={['utility']}>
+        <UtilityRequestPickupPage />
       </RoleGuard>
     ),
   },

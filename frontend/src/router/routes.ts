@@ -17,6 +17,7 @@ export const ROUTES = {
   UTILITY_CATAT_WASTE: '/utility/catat',
   UTILITY_RIWAYAT_INPUT: '/utility/riwayat',
   UTILITY_PROFIL: '/utility/profil',
+  UTILITY_REQUEST_PICKUP: '/utility/pickup/request',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

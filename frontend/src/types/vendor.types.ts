@@ -4,4 +4,6 @@ export interface Vendor {
   id: number;
   name: string;
   isActive: boolean; // DL-05: inactive vendors cannot be selected for new pickups
+  whatsappNumber?: string; // dari vendors.whatsapp_number
+  updatedAt?: string; // dari vendors.updated_at
 }

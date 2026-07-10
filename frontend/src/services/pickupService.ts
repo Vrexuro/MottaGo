@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { vendorService } from './vendorService';
 import type {
   CreatePickupDto,
   Pickup,
@@ -13,8 +14,9 @@ interface PickupRow {
   store_id: number;
   vendor_id: number;
   vendor_name: string;
-  estimasi_kg: number;
+  estimasi_kg: number | null;
   status: PickupStatus;
+  waste_category: string | null;
   requested_at: string;
   completed_at: string | null;
 }
@@ -25,6 +27,7 @@ function mapRow(row: PickupRow): Pickup {
     storeId: row.store_id,
     vendorId: row.vendor_id,
     vendorName: row.vendor_name,
+    wasteCategory: row.waste_category as Pickup['wasteCategory'],
     estimasiKg: row.estimasi_kg,
     status: row.status,
     requestedAt: row.requested_at,
@@ -33,7 +36,7 @@ function mapRow(row: PickupRow): Pickup {
 }
 
 const PICKUP_SELECT =
-  'id, store_id, vendor_id, vendor_name, estimasi_kg, status, requested_at, completed_at';
+  'id, store_id, vendor_id, vendor_name, estimasi_kg, status, waste_category, requested_at, completed_at';
 
 // ── Service ───────────────────────────────────────────────────────────────────
 
@@ -65,14 +68,25 @@ export const pickupService = {
     return ((data ?? []) as PickupRow[]).map(mapRow);
   },
 
-  createPickup: async (_dto: CreatePickupDto): Promise<Pickup | null> => {
-    // TODO: implement once pickups + vendors tables are created.
-    // Steps:
-    //   1. Validate no active pickup for _dto.storeId (DL-03: one active per store)
-    //   2. Fetch vendor name from vendors table for _dto.vendorId
-    //   3. Insert: { store_id, vendor_id, vendor_name, status: 'waiting', requested_at }
-    //   4. Return mapped Pickup from insert result (.select().single())
-    return null;
+  createPickup: async (dto: CreatePickupDto): Promise<Pickup | null> => {
+    const vendor = await vendorService.getVendorById(dto.vendorId);
+    if (!vendor) return null;
+
+    const { data, error } = await supabase
+      .from('pickups')
+      .insert({
+        store_id: dto.storeId,
+        vendor_id: dto.vendorId,
+        vendor_name: vendor.name,
+        waste_category: dto.wasteCategory,
+        estimasi_kg: dto.estimasiKg ?? null,
+        status: 'waiting',
+      })
+      .select(PICKUP_SELECT)
+      .single();
+
+    if (error) return null;
+    return mapRow(data as PickupRow);
   },
 
   cancelPickup: async (pickupId: string): Promise<boolean> => {

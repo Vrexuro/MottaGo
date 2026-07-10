@@ -1,4 +1,3 @@
-// TODO Sprint C: gunakan hook ini saat Supabase terhubung (ganti managerStore.getManagerState())
 import { useState, useEffect, useCallback } from 'react';
 import {
   capacityService,
@@ -25,7 +24,7 @@ export function useCapacity(storeId: number): UseCapacityReturn {
   const [summary, setSummary] = useState<CapacitySummary | null>(null);
   const [alertHistory, setAlertHistory] = useState<CapacityAlert[]>([]);
   const [trend, setTrend] = useState<CapacityTrendPoint[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {

@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Badge } from '../../atoms/Badge';
 import { Button } from '../../atoms/Button';
 import { CAPACITY_THRESHOLDS, getCapacityStatus } from '../../../constants/capacity';
-import { getManagerState, subscribeManager } from '../../../mock/managerStore';
 
 type ThresholdLevel = 'normal' | 'perlu-perhatian' | 'kritis';
 
@@ -45,17 +43,11 @@ const STATUS_TO_LEVEL: Record<'normal' | 'warning' | 'critical', ThresholdLevel>
 };
 
 interface StatusThresholdCardProps {
+  currentPct: number;
   className?: string;
 }
 
-export function StatusThresholdCard({ className }: StatusThresholdCardProps) {
-  const [mgr, setMgr] = useState(() => getManagerState());
-
-  useEffect(() => {
-    return subscribeManager(() => setMgr(getManagerState()));
-  }, []);
-
-  const currentPct = Math.round((mgr.kapasitas.currentKg / mgr.kapasitas.maxKg) * 100);
+export function StatusThresholdCard({ currentPct, className }: StatusThresholdCardProps) {
   const currentLevelId = STATUS_TO_LEVEL[getCapacityStatus(currentPct)];
   const currentLevel = LEVELS.find((l) => l.id === currentLevelId)!;
 

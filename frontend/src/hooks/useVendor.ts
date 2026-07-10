@@ -12,7 +12,7 @@ export interface UseVendorReturn {
 
 export function useVendor(): UseVendorReturn {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {

@@ -86,14 +86,53 @@ export const capacityService = {
     });
   },
 
-  getCapacitySummary: async (_storeId: number): Promise<CapacitySummary | null> => {
-    // TODO: implement once stores, capacity_snapshots, and waste_items tables are queried.
-    // Requires three queries:
-    //   1. stores.max_capacity for _storeId
-    //   2. Latest capacity_snapshots.current_kg for _storeId
-    //   3. SUM(waste_items.quantity_kg) WHERE date = today AND store_id = _storeId (wasteHariIniKg)
-    //   4. 7-day rolling AVG(daily total) from waste_items for _storeId (rataHarianKg)
-    return null;
+  getCapacitySummary: async (storeId: number): Promise<CapacitySummary | null> => {
+    const today = new Date().toISOString().split('T')[0];
+
+    const [storeRes, latestSnapRes, todayWasteRes] = await Promise.all([
+      supabase.from('stores').select('max_capacity').eq('id', storeId).single(),
+
+      supabase
+        .from('capacity_snapshots')
+        .select('current_kg, max_kg')
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single(),
+
+      supabase
+        .from('waste_items')
+        .select('quantity_kg')
+        .eq('store_id', storeId)
+        .gte('created_at', `${today}T00:00:00.000Z`),
+    ]);
+
+    if (storeRes.error) return null;
+
+    const maxKg = Number((storeRes.data as { max_capacity: number | null }).max_capacity ?? 0);
+    const currentKg = latestSnapRes.error
+      ? 0
+      : Number((latestSnapRes.data as { current_kg: number }).current_kg);
+
+    const wasteRows = (todayWasteRes.data ?? []) as Array<{ quantity_kg: number }>;
+    const wasteHariIniKg =
+      Math.round(wasteRows.reduce((sum, r) => sum + r.quantity_kg, 0) * 10) / 10;
+
+    const since7d = new Date();
+    since7d.setDate(since7d.getDate() - 7);
+    const { data: weekData } = await supabase
+      .from('waste_items')
+      .select('quantity_kg')
+      .eq('store_id', storeId)
+      .gte('created_at', since7d.toISOString());
+
+    const weekKg = ((weekData ?? []) as Array<{ quantity_kg: number }>).reduce(
+      (sum, r) => sum + r.quantity_kg,
+      0
+    );
+    const rataHarianKg = Math.round((weekKg / 7) * 10) / 10;
+
+    return { maxKg, currentKg, wasteHariIniKg, rataHarianKg };
   },
 
   getCapacityAlertHistory: async (storeId: number): Promise<CapacityAlert[]> => {
@@ -124,5 +163,15 @@ export const capacityService = {
       pct: row.pct,
       description: row.description,
     }));
+  },
+
+  createSnapshot: async (storeId: number, currentKg: number, maxKg: number): Promise<boolean> => {
+    const { error } = await supabase.from('capacity_snapshots').insert({
+      store_id: storeId,
+      current_kg: currentKg,
+      max_kg: maxKg,
+      source: 'manual',
+    });
+    return !error;
   },
 };

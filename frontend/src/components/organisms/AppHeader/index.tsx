@@ -1,6 +1,5 @@
 import { Icon } from '../../atoms/Icon';
 import type { UserRole } from '../../../types/user.types';
-import { NOTIFICATIONS } from '../../../mock/notification';
 
 type AppHeaderProps = {
   userRole: UserRole;
@@ -8,29 +7,22 @@ type AppHeaderProps = {
   onMenuToggle: () => void;
   pageTitle?: string;
   onNotificationClick?: () => void;
+  notificationCount?: number;
   className?: string;
 };
 
-const roleBgClasses: Record<UserRole, string> = {
-  manajer: 'bg-role-manajer-bg',
-  utility: 'bg-role-utility-bg',
-};
-
-/** Jumlah notifikasi — ganti dengan polling NOTIFICATION table (DL-04) saat backend siap */
-const MOCK_NOTIFICATION_COUNT = NOTIFICATIONS.filter((n) => !n.isRead).length;
-
 export function AppHeader({
-  userRole,
   sideNavOpen = false,
   onMenuToggle,
   pageTitle,
   onNotificationClick,
+  notificationCount,
   className,
 }: AppHeaderProps) {
   const headerClassName = [
     'sticky top-0 z-50 w-full',
     'shadow-[var(--shadow-sm)]',
-    roleBgClasses[userRole],
+    'bg-role-manajer-bg',
     className,
   ]
     .filter(Boolean)
@@ -83,7 +75,7 @@ export function AppHeader({
             className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-capacity-warning text-[10px] font-bold text-white px-1 pointer-events-none"
             aria-hidden="true"
           >
-            {MOCK_NOTIFICATION_COUNT}
+            {notificationCount ?? 0}
           </span>
         </div>
       </div>

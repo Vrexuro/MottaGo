@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../atoms/Badge';
 import { Icon } from '../../atoms/Icon';
 import { ROUTES } from '../../../router/routes';
-import { PICKUP_HISTORY } from '../../../mock/pickup';
+import type { Pickup } from '../../../types/pickup.types';
 
 type PickupStatus = 'waiting' | 'in-transit' | 'completed';
 type PickupAksi = 'detail' | 'lacak';
@@ -17,6 +17,7 @@ interface PickupRecord {
 }
 
 interface PickupSummaryCardProps {
+  pickups: Pickup[];
   className?: string;
   onLihatSemua?: () => void;
 }
@@ -35,22 +36,28 @@ const AKSI_CONFIG: Record<PickupAksi, { label: string; colorClass: string }> = {
   lacak: { label: 'Lacak', colorClass: 'text-info-text hover:opacity-80' },
 };
 
-// CATATAN B3.3-06: PICKUP_HISTORY hanya berisi status 'completed'|'cancelled' — tidak ada
-// 'waiting'/'in-transit' di data mock saat ini. Ambil 3 record 'completed' terbaru sebagai
-// pendekatan aman (record 'cancelled' dikecualikan karena tidak ada STATUS_CONFIG untuknya).
-const DISPLAY_PICKUPS: PickupRecord[] = PICKUP_HISTORY.filter((p) => p.status === 'completed')
-  .slice(0, 3)
-  .map((p) => ({
-    id: p.id,
-    vendor: p.vendor,
-    estimasi: `${p.estimasiKg} kg`,
-    status: 'completed' as const,
-    waktuRequest: p.tanggal,
-    aksi: 'detail' as const,
-  }));
+// 'cancelled' dikecualikan karena tidak ada STATUS_CONFIG untuknya.
+function toDisplayPickups(pickups: Pickup[]): PickupRecord[] {
+  return pickups
+    .filter((p): p is Pickup & { status: PickupStatus } => p.status !== 'cancelled')
+    .slice(0, 3)
+    .map((p) => ({
+      id: p.id,
+      vendor: p.vendorName,
+      estimasi: p.estimasiKg !== null ? `${p.estimasiKg} kg` : '—',
+      status: p.status,
+      waktuRequest: new Date(p.requestedAt).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }),
+      aksi: 'detail' as const,
+    }));
+}
 
-export function PickupSummaryCard({ className, onLihatSemua }: PickupSummaryCardProps) {
+export function PickupSummaryCard({ pickups, className, onLihatSemua }: PickupSummaryCardProps) {
   const navigate = useNavigate();
+  const DISPLAY_PICKUPS = toDisplayPickups(pickups);
   return (
     <div
       className={[

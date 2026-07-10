@@ -8,29 +8,73 @@ import { useNavigate } from 'react-router-dom';
 import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { getEntries, getTodaySummary, subscribeUtility } from '../../mock/utilityStore';
+import { useWaste } from '../../hooks/useWaste';
+import { useCapacity } from '../../hooks/useCapacity';
+import { usePickup } from '../../hooks/usePickup';
+import { wasteService } from '../../services/wasteService';
 import { WASTE_UNIT_MAP, WASTE_LABEL_MAP, WASTE_BADGE_COLOR } from '../../constants/waste';
+
+function formatWaktu(iso: string): string {
+  return new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+}
 
 export default function UtilityDashboardPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Utility';
+  const storeId = profile?.storeId ?? null;
 
-  const [entries, setEntries] = useState(() => getEntries());
-  const [todaySummary, setTodaySummary] = useState(() => getTodaySummary());
+  const { today, loading: wasteLoading } = useWaste(storeId ?? 0);
+  const { currentCapacity, loading: capacityLoading } = useCapacity(storeId ?? 0);
+  const { activePickups, loading: pickupLoading } = usePickup(storeId ?? 0);
+  const [recentEntries, setRecentEntries] = useState<
+    Awaited<ReturnType<typeof wasteService.getWasteHistory>>
+  >([]);
 
   useEffect(() => {
-    const unsub = subscribeUtility(() => {
-      setEntries(getEntries());
-      setTodaySummary(getTodaySummary());
-    });
-    return unsub;
-  }, []);
+    if (!storeId) return;
+    wasteService.getWasteHistory(storeId, 3).then(setRecentEntries);
+  }, [storeId]);
 
-  const recentEntries = entries.slice(0, 3);
-  const kapasitasPct = todaySummary.kapasitasPct;
+  if (!storeId) {
+    return (
+      <DashboardLayout
+        navItems={utilityNavItems}
+        userRole="utility"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => {}}
+      >
+        <div className="flex items-center justify-center p-8 text-text-secondary">
+          <p>Store tidak ditemukan. Hubungi administrator.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const totalEntri = (today?.byCategory ?? []).length;
+  const totalKg = today?.totalKg ?? 0;
+  const kapasitasKg = currentCapacity?.currentKg ?? 0;
+  const maxKg = currentCapacity?.maxKg ?? 0;
+  const kapasitasPct = maxKg > 0 ? Math.round((kapasitasKg / maxKg) * 100) : 0;
   const kapasitasAccent: 'success' | 'warning' | 'orange' =
     kapasitasPct >= 90 ? 'orange' : kapasitasPct >= 60 ? 'warning' : 'success';
+  const pickupAktif = activePickups.length;
+  const loading = wasteLoading || capacityLoading || pickupLoading;
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        navItems={utilityNavItems}
+        userRole="utility"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => {}}
+      >
+        <div className="p-8 text-text-secondary">Memuat data...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
@@ -50,21 +94,21 @@ export default function UtilityDashboardPage() {
               label="Entri Hari Ini"
               iconName="PenLine"
               accent="success"
-              value={String(todaySummary.totalEntri)}
+              value={String(totalEntri)}
               unit="entri"
             />
             <KpiCard
               label="Total Sampah"
               iconName="Scale"
               accent="success"
-              value={String(todaySummary.totalKg)}
+              value={String(totalKg)}
               unit="kg"
             />
             <KpiCard
               label="Pickup Aktif"
               iconName="Truck"
               accent="orange"
-              value={String(todaySummary.pickupAktif)}
+              value={String(pickupAktif)}
               unit="aktif"
             />
             <KpiCard
@@ -72,7 +116,7 @@ export default function UtilityDashboardPage() {
               iconName="Gauge"
               accent={kapasitasAccent}
               value={`${kapasitasPct}%`}
-              subtexts={[`${todaySummary.kapasitasKg} kg dari ${todaySummary.maxKg} kg`]}
+              subtexts={[`${kapasitasKg} kg dari ${maxKg} kg`]}
             />
           </div>
 
@@ -130,20 +174,24 @@ export default function UtilityDashboardPage() {
                       className="hover:bg-mottago-surface-subtle transition-colors"
                     >
                       <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">
-                        <span className="text-sm text-text-secondary">{entry.waktu}</span>
+                        <span className="text-sm text-text-secondary">
+                          {formatWaktu(entry.createdAt)}
+                        </span>
                       </td>
                       <td className="px-3 py-3.5">
-                        <Badge color={WASTE_BADGE_COLOR[entry.kategori]} size="sm">
-                          {WASTE_LABEL_MAP[entry.kategori]}
+                        <Badge color={WASTE_BADGE_COLOR[entry.wasteType]} size="sm">
+                          {WASTE_LABEL_MAP[entry.wasteType]}
                         </Badge>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         <span className="text-sm font-semibold text-text-primary tabular-nums">
-                          {entry.kuantitas} {WASTE_UNIT_MAP[entry.kategori]}
+                          {entry.quantity} {WASTE_UNIT_MAP[entry.wasteType]}
                         </span>
                       </td>
                       <td className="px-4 md:px-5 py-3.5 whitespace-nowrap">
-                        <span className="text-sm text-text-secondary">{entry.dicatatOleh}</span>
+                        <span className="text-sm text-text-secondary">
+                          {entry.recordedByName ?? (entry.recordedBy ? '—' : 'Sistem')}
+                        </span>
                       </td>
                     </tr>
                   ))}

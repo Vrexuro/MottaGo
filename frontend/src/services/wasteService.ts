@@ -14,10 +14,9 @@ export type WastePeriod = 'today' | '7d' | 'month';
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
 const CATEGORY_NAMES: Record<WasteType, string> = {
-  organic: 'Organic Waste',
-  liquid: 'Liquid Waste',
-  recyclable: 'Recyclable Waste',
-  'non-recyclable': 'Non-Recyclable Waste',
+  organik: 'Organik',
+  anorganik: 'Anorganik',
+  minyak: 'Minyak Jelantah',
 };
 
 function aggregateByType(
@@ -46,16 +45,30 @@ export const wasteService = {
       .eq('store_id', storeId)
       .gte('created_at', `${today}T00:00:00.000Z`);
 
-    if (error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return null;
 
     const rows = (data ?? []) as Array<{ waste_type: WasteType; quantity: number }>;
     const byCategory = aggregateByType(rows);
     const totalKg = byCategory.reduce((sum, c) => sum + c.totalKg, 0);
 
+    const since7d = new Date();
+    since7d.setDate(since7d.getDate() - 7);
+    const { data: weekData } = await supabase
+      .from('waste_items')
+      .select('quantity_kg')
+      .eq('store_id', storeId)
+      .gte('created_at', since7d.toISOString());
+
+    const weekKg = ((weekData ?? []) as Array<{ quantity_kg: number }>).reduce(
+      (sum, r) => sum + r.quantity_kg,
+      0
+    );
+    const rataHarian = Math.round((weekKg / 7) * 10) / 10;
+
     return {
       date: today,
       totalKg,
-      rataHarian: 0, // TODO: compute 7-day rolling average once waste_items table is ready
+      rataHarian,
       byCategory,
     };
   },
@@ -120,5 +133,74 @@ export const wasteService = {
     //   2. AVG(daily_total) over the 7 days preceding _date (for rataHarian)
     // Consider a Supabase DB function to handle both in one round-trip.
     return null;
+  },
+
+  insertWasteItem: async (params: {
+    storeId: number;
+    wasteType: WasteType;
+    quantity: number;
+    recordedBy: string;
+    notes?: string;
+  }): Promise<{ id: string } | null> => {
+    const { data, error } = await supabase
+      .from('waste_items')
+      .insert({
+        store_id: params.storeId,
+        waste_type: params.wasteType,
+        quantity: params.quantity,
+        recorded_by: params.recordedBy,
+        notes: params.notes ?? null,
+      })
+      .select('id')
+      .single();
+    if (error) return null;
+    return { id: (data as { id: string }).id };
+  },
+
+  getWasteHistory: async (
+    storeId: number,
+    limit = 50
+  ): Promise<
+    Array<{
+      id: string;
+      wasteType: WasteType;
+      quantity: number;
+      unit: string;
+      quantityKg: number;
+      recordedBy: string | null;
+      recordedByName: string | null;
+      createdAt: string;
+    }>
+  > => {
+    const { data, error } = await supabase
+      .from('waste_items')
+      .select(
+        'id, waste_type, quantity, unit, quantity_kg, recorded_by, created_at, profiles!recorded_by(full_name, username)'
+      )
+      .eq('store_id', storeId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) return [];
+    return (
+      (data ?? []) as unknown as Array<{
+        id: string;
+        waste_type: string;
+        quantity: number;
+        unit: string;
+        quantity_kg: number;
+        recorded_by: string | null;
+        created_at: string;
+        profiles: { full_name: string | null; username: string | null } | null;
+      }>
+    ).map((row) => ({
+      id: row.id,
+      wasteType: row.waste_type as WasteType,
+      quantity: row.quantity,
+      unit: row.unit,
+      quantityKg: row.quantity_kg,
+      recordedBy: row.recorded_by,
+      recordedByName: row.profiles?.full_name ?? row.profiles?.username ?? null,
+      createdAt: row.created_at,
+    }));
   },
 };

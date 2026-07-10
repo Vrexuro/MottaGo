@@ -10,8 +10,10 @@ import { Button } from '../../components/atoms/Button';
 import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { addEntry } from '../../mock/utilityStore';
-import type { WasteCategoryDb } from '../../mock/utility';
+import { wasteService } from '../../services/wasteService';
+import { capacityService } from '../../services/capacityService';
+import { supabase } from '../../lib/supabase';
+import type { WasteType } from '../../types/waste.types';
 import type { SelectOption } from '../../types/common.types';
 import { WASTE_UNIT_MAP } from '../../constants/waste';
 
@@ -22,33 +24,77 @@ const KATEGORI_OPTIONS: SelectOption[] = [
 ];
 
 export default function CatatSampahPage() {
-  const { profile, logout } = useAuth();
+  const { profile, user, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Utility';
+  const storeId = profile?.storeId ?? null;
 
-  const [kategori, setKategori] = useState<WasteCategoryDb>('organik');
+  const [kategori, setKategori] = useState<WasteType>('organik');
   const [jumlah, setJumlah] = useState('');
   const [catatan, setCatatan] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!storeId || !user?.id) return;
+
     setLoading(true);
-    setTimeout(() => {
-      addEntry({
-        kategori,
-        kuantitas: parseFloat(jumlah) || 0,
-        unit: WASTE_UNIT_MAP[kategori] as 'kg' | 'liter',
-        dicatatOleh: profile?.fullName ?? 'Utility',
+    setError(null);
+
+    try {
+      const result = await wasteService.insertWasteItem({
+        storeId,
+        wasteType: kategori,
+        quantity: parseFloat(jumlah) || 0,
+        recordedBy: user.id,
+        notes: catatan || undefined,
       });
-      setLoading(false);
+
+      if (!result) throw new Error('Gagal menyimpan data sampah');
+
+      const todayData = await wasteService.getWasteToday(storeId);
+      const { data: storeData } = await supabase
+        .from('stores')
+        .select('max_capacity')
+        .eq('id', storeId)
+        .single();
+
+      if (todayData && storeData?.max_capacity) {
+        await capacityService.createSnapshot(
+          storeId,
+          todayData.totalKg,
+          Number(storeData.max_capacity)
+        );
+      }
+
       setSubmitted(true);
       setJumlah('');
       setCatatan('');
       setTimeout(() => setSubmitted(false), 3000);
-    }, 800);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan data');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (!storeId) {
+    return (
+      <FormLayout
+        navItems={utilityNavItems}
+        userRole="utility"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => {}}
+      >
+        <div className="flex items-center justify-center p-8 text-text-secondary">
+          <p>Store tidak ditemukan. Hubungi administrator.</p>
+        </div>
+      </FormLayout>
+    );
+  }
 
   return (
     <FormLayout
@@ -65,6 +111,7 @@ export default function CatatSampahPage() {
         </div>
 
         {submitted && <AlertBanner variant="success" title="Entri berhasil dicatat!" />}
+        {error && <AlertBanner variant="error" title={error} />}
 
         <form
           onSubmit={handleSubmit}
@@ -75,7 +122,7 @@ export default function CatatSampahPage() {
               id="kategori"
               options={KATEGORI_OPTIONS}
               value={kategori}
-              onChange={(e) => setKategori(e.target.value as WasteCategoryDb)}
+              onChange={(e) => setKategori(e.target.value as WasteType)}
             />
           </FormField>
 

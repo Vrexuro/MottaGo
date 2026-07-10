@@ -15,8 +15,7 @@ import { KpiCard } from '../../components/molecules/KpiCard';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { CHART_7D, CHART_30D, CHART_90D, KPI_7D, KPI_30D, KPI_90D } from '../../mock/report';
-import type { ReportKpi, WeeklyChartPoint } from '../../mock/report';
+import { useReport } from '../../hooks/useReport';
 
 const getCSSVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -33,26 +32,36 @@ const PERIOD_LABELS: Record<Period, string> = {
   '90d': '90 Hari',
 };
 
-const PERIOD_CHART: Record<Period, WeeklyChartPoint[]> = {
-  '7d': CHART_7D,
-  '30d': CHART_30D,
-  '90d': CHART_90D,
-};
-
-const PERIOD_KPI: Record<Period, ReportKpi> = {
-  '7d': KPI_7D,
-  '30d': KPI_30D,
-  '90d': KPI_90D,
+const PERIOD_DAYS: Record<Period, number> = {
+  '7d': 7,
+  '30d': 30,
+  '90d': 90,
 };
 
 export default function LaporanPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
+  const storeId = profile?.storeId ?? null;
 
   const [period, setPeriod] = useState<Period>('30d');
-  const currentKpi = PERIOD_KPI[period];
-  const currentChart = PERIOD_CHART[period];
+  const { kpi, chartData, loading, error } = useReport(storeId ?? 0, PERIOD_DAYS[period]);
+
+  if (!storeId) {
+    return (
+      <DashboardLayout
+        navItems={manajerNavItems}
+        userRole="manajer"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      >
+        <div className="flex items-center justify-center p-8 text-text-secondary">
+          <p>Store tidak ditemukan. Hubungi administrator.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
@@ -85,50 +94,74 @@ export default function LaporanPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KpiCard
-              label="Total Sampah"
-              iconName="Scale"
-              accent="success"
-              value={String(currentKpi.totalSampahKg)}
-              unit="kg"
-            />
-            <KpiCard
-              label="Total Pickup"
-              iconName="Truck"
-              accent="orange"
-              value={String(currentKpi.totalPickup)}
-              unit="pickup"
-            />
-            <KpiCard
-              label="Rata Harian"
-              iconName="TrendingUp"
-              accent="warning"
-              value={String(currentKpi.rataHarianKg)}
-              unit="kg/hari"
-            />
-            <KpiCard
-              label="Efisiensi"
-              iconName="Gauge"
-              accent="success"
-              value={`${currentKpi.efisiensiPct}%`}
-            />
-          </div>
+          {error && <p className="text-sm text-error-text">{error}</p>}
 
-          <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-4 md:p-6">
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={currentChart}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="minggu" tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={(v: number) => `${v} kg`} tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="organik" name="Organik" stackId="a" fill={CSS_BAR_ORGANIK} />
-                <Bar dataKey="anorganik" name="Anorganik" stackId="a" fill={CSS_BAR_ANORGANIK} />
-                <Bar dataKey="minyak" name="Minyak Jelantah" stackId="a" fill={CSS_BAR_MINYAK} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {loading && !kpi ? (
+            <div className="p-8 text-text-secondary">Memuat data...</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <KpiCard
+                  label="Total Sampah"
+                  iconName="Scale"
+                  accent="success"
+                  value={String(kpi?.totalSampahKg ?? 0)}
+                  unit="kg"
+                />
+                <KpiCard
+                  label="Total Pickup"
+                  iconName="Truck"
+                  accent="orange"
+                  value={String(kpi?.totalPickup ?? 0)}
+                  unit="pickup"
+                />
+                <KpiCard
+                  label="Rata Harian"
+                  iconName="TrendingUp"
+                  accent="warning"
+                  value={String(kpi?.rataHarianKg ?? 0)}
+                  unit="kg/hari"
+                />
+                <KpiCard
+                  label="Efisiensi"
+                  iconName="Gauge"
+                  accent="success"
+                  value={`${kpi?.efisiensiPct ?? 0}%`}
+                />
+              </div>
+
+              <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-4 md:p-6">
+                {chartData.length === 0 ? (
+                  <div className="flex items-center justify-center h-[280px] text-text-secondary text-sm">
+                    Belum ada data untuk periode ini
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="minggu" tick={{ fontSize: 11 }} />
+                      <YAxis tickFormatter={(v: number) => `${v} kg`} tick={{ fontSize: 11 }} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="organik" name="Organik" stackId="a" fill={CSS_BAR_ORGANIK} />
+                      <Bar
+                        dataKey="anorganik"
+                        name="Anorganik"
+                        stackId="a"
+                        fill={CSS_BAR_ANORGANIK}
+                      />
+                      <Bar
+                        dataKey="minyak"
+                        name="Minyak Jelantah"
+                        stackId="a"
+                        fill={CSS_BAR_MINYAK}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </DashboardLayout>

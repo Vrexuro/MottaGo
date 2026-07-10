@@ -1,7 +1,7 @@
 // Shared constants untuk waste category display.
 // Digunakan di seluruh role Utility dan Manajer.
 // Sprint C: validasi bahwa nilai ini konsisten dengan enum database.
-import type { WasteCategoryDb } from '../mock/utility';
+import type { WasteType as WasteCategoryDb } from '../types/waste.types';
 
 /** Unit pengukuran per kategori waste */
 export const WASTE_UNIT_MAP: Record<WasteCategoryDb, string> = {

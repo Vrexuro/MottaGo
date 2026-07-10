@@ -17,8 +17,6 @@ interface Category {
   colorClass: string;
 }
 
-const MAX_CAPACITY_KG = 400;
-
 const CATEGORY_CONFIG = [
   { key: 'organik' as const, name: 'Sampah Organik', colorClass: 'bg-accent-primary' },
   { key: 'anorganik' as const, name: 'Sampah Anorganik', colorClass: 'bg-info-bg' },
@@ -29,6 +27,7 @@ interface CategoryBreakdownCardProps {
   organik: number;
   anorganik: number;
   minyak: number;
+  maxKg?: number;
   className?: string;
 }
 
@@ -36,6 +35,7 @@ export function CategoryBreakdownCard({
   organik,
   anorganik,
   minyak,
+  maxKg = 400,
   className,
 }: CategoryBreakdownCardProps) {
   const [period, setPeriod] = useState<Period>('today');
@@ -54,7 +54,7 @@ export function CategoryBreakdownCard({
   }));
 
   const total = CATEGORIES.reduce((sum, c) => sum + c.kg, 0);
-  const capacityPct = Math.round((total / MAX_CAPACITY_KG) * 100);
+  const capacityPct = maxKg > 0 ? Math.round((total / maxKg) * 100) : 0;
 
   return (
     <div
@@ -142,7 +142,7 @@ export function CategoryBreakdownCard({
         </div>
         <ProgressBar value={capacityPct} variant="capacity" size="sm" />
         <p className="text-[11px] text-text-disabled text-right">
-          {capacityPct}% dari {MAX_CAPACITY_KG} kg kapasitas maksimum
+          {capacityPct}% dari {maxKg} kg kapasitas maksimum
         </p>
       </div>
     </div>

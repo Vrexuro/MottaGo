@@ -7,22 +7,81 @@ import { CategoryBreakdownCard } from '../../components/molecules/CategoryBreakd
 import { StatusThresholdCard } from '../../components/molecules/StatusThresholdCard';
 import { CapacityAlertHistoryCard } from '../../components/molecules/CapacityAlertHistoryCard';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { getManagerState, subscribeManager } from '../../mock/managerStore';
+import { useCapacity } from '../../hooks/useCapacity';
+import { useWaste } from '../../hooks/useWaste';
+import { useEffect } from 'react';
 
 function KapasitasPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   const userName = profile?.fullName ?? 'Manajer';
+  const storeId = profile?.storeId ?? null;
 
-  const [mgr, setMgr] = useState(() => getManagerState());
+  const {
+    currentCapacity,
+    summary,
+    alertHistory,
+    trend,
+    loading: capacityLoading,
+    fetchTrend,
+  } = useCapacity(storeId ?? 0);
+  const { categories, loading: wasteLoading } = useWaste(storeId ?? 0);
 
   useEffect(() => {
-    return subscribeManager(() => setMgr(getManagerState()));
-  }, []);
+    if (!storeId) return;
+    void fetchTrend(7);
+  }, [storeId, fetchTrend]);
+
+  if (!storeId) {
+    return (
+      <DashboardLayout
+        navItems={manajerNavItems}
+        userRole="manajer"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      >
+        <div className="flex items-center justify-center p-8 text-text-secondary">
+          <p>Store tidak ditemukan. Hubungi administrator.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const loading = capacityLoading || wasteLoading;
+  const currentKg = currentCapacity?.currentKg ?? 0;
+  const maxKg = currentCapacity?.maxKg ?? 0;
+  const lastUpdated = currentCapacity?.lastUpdated
+    ? new Date(currentCapacity.lastUpdated).toLocaleTimeString('id-ID')
+    : '—';
+  const wasteHariIniKg = summary?.wasteHariIniKg ?? 0;
+  const rataHarianKg = summary?.rataHarianKg ?? 0;
+  const pct = maxKg > 0 ? Math.round((currentKg / maxKg) * 100) : 0;
+  const kategoriKg: Record<'organik' | 'anorganik' | 'minyak', number> = {
+    organik: 0,
+    anorganik: 0,
+    minyak: 0,
+  };
+  for (const cat of categories) {
+    if (cat.type in kategoriKg) kategoriKg[cat.type as keyof typeof kategoriKg] = cat.totalKg;
+  }
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        navItems={manajerNavItems}
+        userRole="manajer"
+        userName={userName}
+        onLogout={logout}
+        onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      >
+        <div className="p-8 text-text-secondary">Memuat data...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
@@ -68,39 +127,46 @@ function KapasitasPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
               <CapacityGaugePanel
-                currentKg={mgr.kapasitas.currentKg}
-                maxKg={mgr.kapasitas.maxKg}
-                lastUpdated={mgr.kapasitas.lastUpdated}
+                currentKg={currentKg}
+                maxKg={maxKg}
+                lastUpdated={lastUpdated}
                 className="h-full"
               />
             </div>
             <div className="lg:col-span-2">
               <CapacitySummaryStats
-                maxKg={mgr.kapasitas.maxKg}
-                currentKg={mgr.kapasitas.currentKg}
-                wasteHariIniKg={mgr.wasteHariIni.totalKg}
-                rataHarianKg={mgr.wasteHariIni.rataHarianKg}
+                maxKg={maxKg}
+                currentKg={currentKg}
+                wasteHariIniKg={wasteHariIniKg}
+                rataHarianKg={rataHarianKg}
                 className="h-full"
               />
             </div>
           </div>
 
           {/* ── Row 3: Capacity Trend Chart ──────────────────── */}
-          <CapacityTrendCard className="min-h-[320px]" />
+          <CapacityTrendCard
+            className="min-h-[320px]"
+            trend={trend}
+            maxKg={currentCapacity?.maxKg}
+            onRangeChange={fetchTrend}
+            loading={capacityLoading}
+          />
 
           {/* ── Row 4: Category Breakdown 50% + Threshold 50% ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CategoryBreakdownCard
-              organik={mgr.kategori.organik}
-              anorganik={mgr.kategori.anorganik}
-              minyak={mgr.kategori.minyak}
+              organik={kategoriKg.organik}
+              anorganik={kategoriKg.anorganik}
+              minyak={kategoriKg.minyak}
+              maxKg={maxKg}
               className="min-h-[240px]"
             />
-            <StatusThresholdCard />
+            <StatusThresholdCard currentPct={pct} />
           </div>
 
           {/* ── Row 5: Alert History ──────────────────────────── */}
-          <CapacityAlertHistoryCard />
+          <CapacityAlertHistoryCard alerts={alertHistory} loading={capacityLoading} />
         </div>
       </div>
     </DashboardLayout>

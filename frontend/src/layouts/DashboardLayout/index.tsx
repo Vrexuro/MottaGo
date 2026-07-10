@@ -7,6 +7,8 @@ import { SideNav } from '../../components/organisms/SideNav';
 
 import type { NavItem, SideNavState } from '../../types/nav.types';
 import type { UserRole } from '../../types/user.types';
+import { useAuth } from '../../hooks/useAuth';
+import { useNotification } from '../../hooks/useNotification';
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -35,6 +37,8 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [sideNavState, setSideNavState] = useState<SideNavState>(getBreakpointState);
   const location = useLocation();
+  const { profile } = useAuth();
+  const { unreadCount } = useNotification(profile?.storeId ?? 0);
 
   useEffect(() => {
     const lgMq = window.matchMedia('(min-width: 1024px)');
@@ -71,6 +75,7 @@ export function DashboardLayout({
         onMenuToggle={handleMenuToggle}
         pageTitle={pageTitle}
         onNotificationClick={onNotificationClick}
+        notificationCount={unreadCount}
       />
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
