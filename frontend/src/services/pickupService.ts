@@ -49,7 +49,7 @@ export const pickupService = {
       .in('status', ['waiting', 'in-transit'])
       .order('requested_at', { ascending: false });
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     return ((data ?? []) as PickupRow[]).map(mapRow);
   },
@@ -59,11 +59,11 @@ export const pickupService = {
       .from('pickups')
       .select(PICKUP_SELECT)
       .eq('store_id', storeId)
-      .eq('status', 'completed')
-      .order('completed_at', { ascending: false })
+      .in('status', ['completed', 'cancelled'])
+      .order('requested_at', { ascending: false })
       .limit(50);
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     return ((data ?? []) as PickupRow[]).map(mapRow);
   },
@@ -96,7 +96,27 @@ export const pickupService = {
       .eq('id', pickupId)
       .eq('status', 'waiting'); // Only cancel pickups still waiting for confirmation
 
-    return !error; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    return !error;
+  },
+
+  confirmPickup: async (pickupId: string): Promise<boolean> => {
+    const { error } = await supabase
+      .from('pickups')
+      .update({ status: 'in-transit' })
+      .eq('id', pickupId)
+      .eq('status', 'waiting');
+
+    return !error;
+  },
+
+  completePickup: async (pickupId: string): Promise<boolean> => {
+    const { error } = await supabase
+      .from('pickups')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', pickupId)
+      .eq('status', 'in-transit');
+
+    return !error;
   },
 
   getPickupSummary: async (storeId: number): Promise<PickupStatusCount | null> => {
@@ -121,7 +141,7 @@ export const pickupService = {
         .gte('completed_at', `${today}T00:00:00.000Z`),
     ]);
 
-    if (waitingRes.error || transitRes.error || completedRes.error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (waitingRes.error || transitRes.error || completedRes.error) return null;
 
     return {
       waiting: waitingRes.count ?? 0,

@@ -1,6 +1,6 @@
 # MottaGo — Project Status
 
-**Terakhir diperbarui:** 3 Juli 2026
+**Terakhir diperbarui:** 10 Juli 2026
 **Diperbarui oleh:** Independent Auditor MottaGo
 
 ---
@@ -13,9 +13,9 @@
 
 ## Current Milestone
 
-**C2 — Real Data Integration**
+**Sprint E — Production Polish**
 
-Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3a1af1c` (Docs Audit, 15 files). Repository sudah sinkron dengan GitHub.
+Pasca RC v1.0 push (10 Juli 2026, commit `f4742b2`). Sprint B–D selesai secara lokal; Sprint E sedang berjalan. Push Sprint B–E ke GitHub dijadwalkan setelah Sprint E selesai.
 
 ---
 
@@ -47,6 +47,11 @@ Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3
 | Batch A5 | Dashboard SCR-M-01 token cleanup, navigation wiring, DashboardHeader refactor | ✅ Selesai |
 | EA-01 | Environment Activation — Supabase credentials, 11 migrations applied | ✅ Selesai |
 | EA-02 | Development Test Accounts — manager_demo + utility_demo via Admin API | ✅ Selesai |
+| Sprint B (B0–B4) | Layout stabilization, SideNav 7 items, logout wiring, component fixes | ✅ Selesai |
+| Sprint C | Real Data Integration — semua pages dihubungkan ke Supabase nyata; Laporan; Notifikasi; Kelola Pengguna; Role Utility penuh; Migration 0012 + 0013 | ✅ Selesai |
+| F-02 | Request Pickup untuk role Utility (UtilityRequestPickupPage + route) | ✅ Selesai |
+| Sprint D Batch 1 | Pickup status lifecycle — confirm/complete/cancel + Aksi column di RiwayatPickupPage | ✅ Selesai |
+| Sprint D Batch 2 | Tambah Pengguna — Edge Function `create-user` (Deno) + form di KelolaPenggunaPage | ✅ Selesai |
 
 ---
 
@@ -67,6 +72,8 @@ Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3
 | `0009_remove_vendor_role.sql` | Hapus role vendor & pelayan | ✅ Committed (cf0390d) | ✅ Applied |
 | `0010_vendor_whatsapp_and_pickup_amendments.sql` | WhatsApp, store_vendor_assignments, DL-03/DL-06 revision | ✅ Committed (cf0390d) | ✅ Applied |
 | `0011_username_auth.sql` | Username auth, profiles.username UNIQUE | ✅ Committed (cf0390d) | ✅ Applied |
+| `0012_fix_waste_type_constraint.sql` | Fix waste_type CHECK constraint | ✅ Local (Sprint C) | ✅ Applied |
+| `0013_fix_profiles_rls.sql` | Fix profiles RLS untuk utility user | ✅ Local (Sprint C) | ✅ Applied |
 
 **Tabel database aktif:** vendors, stores, profiles, pickups, waste_items, capacity_snapshots, notifications, capacity_alerts, store_vendor_assignments
 
@@ -83,14 +90,16 @@ Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3
 | Molecules (COMP-10–17) | ✅ Selesai | FormField, NotificationBadge, AlertBanner, CapacityCard, DashboardHeader, KpiCard, PickupSummaryCard, QuickActionsCard, StatusPickupCard, CapacityGaugePanel, CapacitySummaryStats, CapacityTrendCard, WasteTrendCard |
 | Organisms | ✅ Selesai | AppHeader (COMP-19), SideNav (COMP-21), **AuthCard** (COMP-22, baru) |
 | Layouts | ✅ Selesai | AuthLayout (LT-01), SimpleLayout (LT-02), DashboardLayout (LT-03), FormLayout (LT-04) |
-| Pages (Manajer) | ✅ Selesai (mock) | DashboardPage, KapasitasPage, RequestPickupPage, + placeholder: KelolaPenggunaPage, LaporanPage, VendorManagementPage |
-| LoginPage | ✅ Selesai | Username-based auth, AuthCard integration, error handling (Batch A4) |
-| Router | ✅ Selesai | Routes, ROUTES const, RoleGuard aktif (bukan skeleton) |
-| Services | ✅ Selesai | authService, capacityService, wasteService, pickupService, vendorService |
-| Hooks | ✅ Skeleton | useAuth, useCapacity, usePickup, useVendor, useWaste |
-| AuthContext | ✅ Updated | Profile fetching dari tabel profiles, role-aware |
+| Pages (Manajer) | ✅ Selesai (real data) | Dashboard, Kapasitas, RequestPickup, RiwayatPickup (+ Aksi column Sprint D), KelolaPenggunaan (+ Tambah Pengguna Sprint D), Laporan, Notifikasi; PengaturanPage masih placeholder (TD-06) |
+| Pages (Utility) | ✅ Selesai | Dashboard, CatatSampah, RequestPickup, RiwayatInput, Profil |
+| LoginPage | ✅ Selesai | Username-based auth, AuthCard integration, error handling |
+| Router | ✅ Selesai | Routes, ROUTES const, RoleGuard aktif; semua route manajer + utility terdefinisi |
+| Services | ✅ Selesai | authService, capacityService, wasteService, pickupService, vendorService, userService, reportService |
+| Hooks | ✅ Selesai | useAuth, useCapacity, usePickup, useVendor, useWaste (semua terhubung ke Supabase nyata) |
+| AuthContext | ✅ Updated | Profile fetching dari tabel profiles, role-aware. **Catatan:** username belum di-fetch (TD-07, Sprint E Batch 1) |
 | Constants | ✅ Selesai | `constants/capacity.ts` — CAPACITY_THRESHOLDS sebagai SSOT |
-| Mock Data → Real | ❌ Pending | DashboardPage, KapasitasPage, RequestPickupPage masih mock — milestone C2 |
+| Edge Functions | ✅ Selesai | `create-user` (Deno) — aktif di Supabase project; membuat pengguna Utility baru |
+| Mock Data → Real | ✅ Selesai Sprint C | Semua pages terhubung ke Supabase nyata |
 
 ---
 
@@ -107,7 +116,7 @@ Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3
 | Functions | 4 | ✅ |
 | Triggers | 6 | ✅ |
 | Seed Rows | 26 | ✅ |
-| Auth Users (dev) | 2 | ✅ manager_demo + utility_demo |
+| Auth Users (dev) | 3+ | ✅ manajer_demo + utility_demo + staff_baru (test, Sprint D) |
 | RLS Policies | Aktif di semua tabel | ✅ |
 
 ---
@@ -121,11 +130,12 @@ Git push selesai (3 Juli 2026) — 2 commit: `cf0390d` (Sprint A, 50 files) + `3
 ## Latest Commit (GitHub)
 
 ```
-3a1af1c docs: documentation audit — sync all docs to Sprint A state
-cf0390d feat: Sprint A — RLS migrations, username auth, and frontend implementation
+f4742b2  chore: RC v1.0 — pre-Sprint D baseline            (10 Juli 2026)
+3a1af1c  docs: documentation audit — sync all docs to Sprint A state
+cf0390d  feat: Sprint A — RLS migrations, username auth, and frontend implementation
 ```
 
-**Repository status:** ✅ Sinkron dengan GitHub. Push selesai 3 Juli 2026 (fast-forward, tidak ada divergensi).
+**Repository status:** ⚠️ Sprint B–E belum di-push ke GitHub. RC v1.0 (`f4742b2`) adalah baseline terakhir yang tersinkron. Push berikutnya dijadwalkan setelah Sprint E selesai.
 
 ---
 
@@ -139,7 +149,7 @@ MottaGo
 ├── Backend   : Supabase (PostgreSQL 15, Auth, PostgREST auto-API, RLS)
 │               No custom API server (DL-12)
 └── Database  : PostgreSQL via Supabase
-                9 tables, migrations 0001–0011
+                9 tables, migrations 0001–0013
                 RLS aktif, get_my_store_id() + get_my_role() helpers
 ```
 
@@ -177,8 +187,9 @@ D:\Project\MottaGo\
 │   │   └── types/            # common pickup user vendor waste
 │   └── tailwind.config.ts
 ├── supabase/
-│   └── migrations/           # 0001–0011 SQL files
-│                             # 0001–0011: semua committed ke GitHub (cf0390d)
+│   └── migrations/           # 0001–0013 SQL files
+│                             # 0001–0011: committed ke GitHub (cf0390d)
+│                             # 0012–0013: local only (Sprint C, belum di-push)
 ├── docs/
 │   ├── CLAUDE_INSTRUCTIONS.md
 │   ├── CURRENT_FOCUS.md
@@ -212,16 +223,15 @@ D:\Project\MottaGo\
 
 ## Next Milestone
 
-**C2 — Real Data Integration**
+**Sprint E — Production Polish**
 
 Scope:
-1. Ganti mock data di DashboardPage dengan Supabase queries nyata
-2. Ganti mock data di KapasitasPage dengan Supabase queries nyata
-3. Ganti mock data di RequestPickupPage dengan Supabase queries nyata
-4. Wire notifikasi polling ke tabel `notifications` (DL-04)
-5. Implementasi role Utility (halaman & workflow)
-6. Tambah missing routes (TD-05): `MANAJER_RIWAYAT_PICKUP`, `MANAJER_PENGATURAN`
-7. Pastikan build clean + lint 0 warning
+1. Fix AuthContext: tambah `username` ke `ProfileData` + `fetchProfile` query (TD-07)
+2. Fix ProfilPage: tampilkan `profile.username` + gunakan `last_sign_in_at` asli
+3. Hapus 10 stale TODO comments di service error handlers
+4. Hapus dead function `getWasteDailySummary`
+5. Implementasi minimal PengaturanPage (form edit max_capacity) (TD-06)
+6. Update docs → git push Sprint B–E ke GitHub
 
 ---
 
@@ -229,9 +239,13 @@ Scope:
 
 | ID | Komponen | Deskripsi | Status | Target |
 |---|---|---|---|---|
-| TD-01 | TextInput / Button | `leftIcon`/`rightIcon` bertipe `string`, bukan `LucideIconName` | Open | C2 |
+| TD-01 | TextInput / Button | `leftIcon`/`rightIcon` bertipe `string`, bukan `LucideIconName` | Open | Sprint E+ |
 | TD-02 | TextInput | State `readOnly` menggunakan `#F7F8FA` tanpa token eksplisit | Open | Visual Validation |
-| TD-03 | Badge | Warning variant `text-[#92400E]` tanpa token | **Resolved** | ✅ Sprint A |
+| TD-03 | Badge | Warning variant `text-[#92400E]` tanpa token | ✅ Resolved | Sprint A |
+| TD-04 | DashboardPage, dll | Mock data belum diganti real data | ✅ Resolved | Sprint C |
+| TD-05 | router/routes.ts | Routes MANAJER_RIWAYAT_PICKUP & MANAJER_PENGATURAN belum ada | ✅ Resolved | Sprint B0/C |
+| TD-06 | PengaturanPage | Halaman placeholder — belum bisa edit max_capacity | ✅ Resolved | Sprint E Batch 2 |
+| TD-07 | AuthContext / ProfilPage | Username tidak di-fetch, tampilan salah | ✅ Resolved | Sprint E Batch 1 |
 
 Detail lengkap: `docs/TECHNICAL_DEBT.md`
 

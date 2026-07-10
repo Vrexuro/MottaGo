@@ -11,6 +11,8 @@ export interface UsePickupReturn {
   refresh: () => Promise<void>;
   create: (dto: CreatePickupDto) => Promise<Pickup | null>;
   cancel: (pickupId: string) => Promise<boolean>;
+  confirm: (pickupId: string) => Promise<boolean>;
+  complete: (pickupId: string) => Promise<boolean>;
 }
 
 export function usePickup(storeId: number): UsePickupReturn {
@@ -57,6 +59,24 @@ export function usePickup(storeId: number): UsePickupReturn {
     [fetchAll]
   );
 
+  const confirm = useCallback(
+    async (pickupId: string): Promise<boolean> => {
+      const success = await pickupService.confirmPickup(pickupId);
+      if (success) await fetchAll();
+      return success;
+    },
+    [fetchAll]
+  );
+
+  const complete = useCallback(
+    async (pickupId: string): Promise<boolean> => {
+      const success = await pickupService.completePickup(pickupId);
+      if (success) await fetchAll();
+      return success;
+    },
+    [fetchAll]
+  );
+
   useEffect(() => {
     void fetchAll();
   }, [fetchAll]);
@@ -70,5 +90,7 @@ export function usePickup(storeId: number): UsePickupReturn {
     refresh: fetchAll,
     create,
     cancel,
+    confirm,
+    complete,
   };
 }

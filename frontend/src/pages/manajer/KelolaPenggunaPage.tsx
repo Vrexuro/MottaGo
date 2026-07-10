@@ -37,6 +37,15 @@ export default function KelolaPenggunaPage() {
   const [activeMap, setActiveMap] = useState<Record<string, boolean>>({});
   const [confirmUser, setConfirmUser] = useState<ProfileUser | null>(null);
 
+  // ── Tambah Pengguna form state ────────────────────────────────────────────
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newFullName, setNewFullName] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createSuccess, setCreateSuccess] = useState(false);
+
   useEffect(() => {
     if (!storeId) return;
     setLoading(true);
@@ -66,6 +75,51 @@ export default function KelolaPenggunaPage() {
     setConfirmUser(null);
   };
 
+  const handleAddUser = async () => {
+    if (!storeId) return;
+    setIsCreating(true);
+    setCreateError(null);
+
+    try {
+      await userService.createUser({
+        username: newUsername.trim().toLowerCase(),
+        fullName: newFullName.trim(),
+        password: newPassword,
+      });
+
+      // Refresh user list
+      const updated = await userService.getUsersByStore(storeId);
+      setUsers(updated);
+      setActiveMap((prev) => {
+        const next = { ...prev };
+        updated.forEach((u) => {
+          if (!(u.id in next)) next[u.id] = true;
+        });
+        return next;
+      });
+
+      // Reset form and show success
+      setNewUsername('');
+      setNewFullName('');
+      setNewPassword('');
+      setShowAddForm(false);
+      setCreateSuccess(true);
+      setTimeout(() => setCreateSuccess(false), 3000);
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : 'Gagal membuat pengguna');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleCancelAddUser = () => {
+    setShowAddForm(false);
+    setNewUsername('');
+    setNewFullName('');
+    setNewPassword('');
+    setCreateError(null);
+  };
+
   if (!storeId) {
     return (
       <DashboardLayout
@@ -92,10 +146,28 @@ export default function KelolaPenggunaPage() {
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 lg:p-8 space-y-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-text-primary">Kelola Pengguna</h1>
-            <p className="text-sm text-text-secondary mt-1">Total {users.length} pengguna</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-text-primary">Kelola Pengguna</h1>
+              <p className="text-sm text-text-secondary mt-1">Total {users.length} pengguna</p>
+            </div>
+            <Button
+              variant="primary"
+              leftIcon="UserPlus"
+              onClick={() => {
+                setShowAddForm(true);
+                setCreateError(null);
+              }}
+            >
+              Tambah Pengguna
+            </Button>
           </div>
+
+          {createSuccess && (
+            <div className="bg-success-bg border border-success-border text-success-text text-sm px-4 py-3 rounded-[var(--radius-md)]">
+              Pengguna baru berhasil dibuat dan dapat langsung login.
+            </div>
+          )}
 
           {loading ? (
             <div className="p-8 text-text-secondary">Memuat data...</div>
@@ -211,6 +283,111 @@ export default function KelolaPenggunaPage() {
                 onClick={handleConfirm}
               >
                 {(activeMap[confirmUser.id] ?? true) ? 'Nonaktifkan' : 'Aktifkan'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tambah Pengguna Modal ──────────────────── */}
+      {showAddForm && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-user-dialog-title"
+        >
+          <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-6 w-full max-w-sm space-y-4">
+            <h2 id="add-user-dialog-title" className="text-base font-semibold text-text-primary">
+              Tambah Pengguna Baru
+            </h2>
+            <p className="text-xs text-text-secondary">
+              Pengguna baru akan memiliki role <strong>Utility</strong> dan terdaftar di store ini.
+            </p>
+
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="new-fullname"
+                  className="block text-sm font-medium text-text-primary"
+                >
+                  Nama Lengkap <span className="text-error-text">*</span>
+                </label>
+                <input
+                  id="new-fullname"
+                  type="text"
+                  value={newFullName}
+                  onChange={(e) => setNewFullName(e.target.value)}
+                  placeholder="Contoh: Budi Santoso"
+                  disabled={isCreating}
+                  className="w-full px-3 py-2 text-sm border border-mottago-border rounded-[var(--radius-md)] bg-mottago-surface text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary disabled:opacity-50"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="new-username"
+                  className="block text-sm font-medium text-text-primary"
+                >
+                  Username <span className="text-error-text">*</span>
+                </label>
+                <input
+                  id="new-username"
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value.toLowerCase())}
+                  placeholder="Contoh: budi_santoso"
+                  disabled={isCreating}
+                  className="w-full px-3 py-2 text-sm border border-mottago-border rounded-[var(--radius-md)] bg-mottago-surface text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary disabled:opacity-50"
+                />
+                <p className="text-xs text-text-secondary">
+                  Huruf kecil, angka, dan underscore. Min. 3 karakter.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="new-password"
+                  className="block text-sm font-medium text-text-primary"
+                >
+                  Password <span className="text-error-text">*</span>
+                </label>
+                <input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Minimal 8 karakter"
+                  disabled={isCreating}
+                  className="w-full px-3 py-2 text-sm border border-mottago-border rounded-[var(--radius-md)] bg-mottago-surface text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary disabled:opacity-50"
+                />
+              </div>
+            </div>
+
+            {createError && (
+              <p className="text-sm text-error-text bg-error-bg border border-error-border px-3 py-2 rounded-[var(--radius-md)]">
+                {createError}
+              </p>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleCancelAddUser}
+                disabled={isCreating}
+              >
+                Batal
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon="UserPlus"
+                loading={isCreating}
+                disabled={!newUsername || !newFullName || !newPassword || isCreating}
+                onClick={handleAddUser}
+              >
+                Buat Pengguna
               </Button>
             </div>
           </div>

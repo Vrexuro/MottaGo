@@ -4,9 +4,6 @@ import { Divider } from '../../components/atoms/Divider';
 import { utilityNavItems } from '../../router/navigation';
 import { useAuth } from '../../hooks/useAuth';
 
-// Mock — akan diganti dengan data sesi nyata di Sprint C
-const MOCK_LAST_LOGIN = 'Sabtu, 5 Juli 2026 — 08:23';
-
 const getInitials = (name: string) =>
   name
     .split(' ')
@@ -15,9 +12,22 @@ const getInitials = (name: string) =>
     .join('')
     .toUpperCase();
 
+function formatLastLogin(isoString: string | undefined): string {
+  if (!isoString) return '—';
+  return new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(isoString));
+}
+
 export default function ProfilPage() {
-  const { profile, logout } = useAuth();
+  const { profile, logout, session } = useAuth();
   const userName = profile?.fullName ?? 'Utility';
+  const lastLogin = formatLastLogin(session?.user.last_sign_in_at ?? undefined);
 
   return (
     <DashboardLayout
@@ -34,14 +44,12 @@ export default function ProfilPage() {
           </div>
 
           <p className="mt-4 text-lg font-semibold text-text-primary">{profile?.fullName ?? '—'}</p>
-          <p className="text-sm text-text-secondary">
-            {profile?.fullName?.toLowerCase().replace(/\s+/g, '.') ?? '—'}
-          </p>
+          <p className="text-sm text-text-secondary">{profile?.username ?? '—'}</p>
           <p className="text-sm text-text-secondary mt-1">Utility</p>
           <p className="text-sm text-text-secondary">
             {profile?.storeId != null ? String(profile.storeId) : '—'}
           </p>
-          <p className="text-xs text-text-secondary mt-2">Terakhir masuk: {MOCK_LAST_LOGIN}</p>
+          <p className="text-xs text-text-secondary mt-2">Terakhir masuk: {lastLogin}</p>
 
           <Divider className="my-4 w-full" />
 
@@ -53,10 +61,6 @@ export default function ProfilPage() {
           >
             Keluar dari Akun
           </Button>
-
-          <p className="text-xs text-text-secondary text-center mt-4">
-            Data profil lengkap tersedia setelah integrasi database (Sprint C)
-          </p>
         </div>
       </div>
     </DashboardLayout>

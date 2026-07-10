@@ -84,7 +84,7 @@ export const wasteService = {
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: true });
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     const rows = (data ?? []) as Array<{ quantity: number; created_at: string }>;
 
@@ -117,22 +117,10 @@ export const wasteService = {
       .eq('store_id', storeId)
       .gte('created_at', since);
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     const rows = (data ?? []) as Array<{ waste_type: WasteType; quantity: number }>;
     return aggregateByType(rows);
-  },
-
-  getWasteDailySummary: async (
-    _storeId: number,
-    _date: string
-  ): Promise<WasteDailySummary | null> => {
-    // TODO: implement once waste_items table is created.
-    // Requires two queries for _date:
-    //   1. SUM(quantity) GROUP BY waste_type WHERE date = _date AND store_id = _storeId
-    //   2. AVG(daily_total) over the 7 days preceding _date (for rataHarian)
-    // Consider a Supabase DB function to handle both in one round-trip.
-    return null;
   },
 
   insertWasteItem: async (params: {

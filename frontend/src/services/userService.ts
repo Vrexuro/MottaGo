@@ -45,4 +45,30 @@ export const userService = {
 
     return ((data ?? []) as ProfileRow[]).map(mapRow);
   },
+
+  createUser: async (params: {
+    username: string;
+    fullName: string;
+    password: string;
+  }): Promise<{ id: string; username: string; fullName: string; role: string } | null> => {
+    const { data, error } = await supabase.functions.invoke('create-user', {
+      body: params,
+    });
+
+    if (error) {
+      // Extract meaningful error message from Edge Function response
+      let message = error.message;
+      try {
+        if ('context' in error && error.context instanceof Response) {
+          const body = await (error.context as Response).json();
+          message = (body as { error?: string }).error ?? message;
+        }
+      } catch {
+        // keep original message if parsing fails
+      }
+      throw new Error(message);
+    }
+
+    return data as { id: string; username: string; fullName: string; role: string };
+  },
 };

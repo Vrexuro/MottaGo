@@ -34,9 +34,48 @@ export interface CapacityAlert {
 
 export type CapacityTrendRange = 7 | 14 | 30 | 90;
 
+export interface StoreInfo {
+  id: number;
+  storeName: string;
+  city: string;
+  maxCapacity: number | null;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export const capacityService = {
+  getStoreInfo: async (storeId: number): Promise<StoreInfo | null> => {
+    const { data, error } = await supabase
+      .from('stores')
+      .select('id, store_name, city, max_capacity')
+      .eq('id', storeId)
+      .single();
+
+    if (error || !data) return null;
+
+    const row = data as {
+      id: number;
+      store_name: string;
+      city: string;
+      max_capacity: number | null;
+    };
+    return {
+      id: row.id,
+      storeName: row.store_name,
+      city: row.city,
+      maxCapacity: row.max_capacity,
+    };
+  },
+
+  updateMaxCapacity: async (storeId: number, newMaxKg: number): Promise<boolean> => {
+    const { error } = await supabase
+      .from('stores')
+      .update({ max_capacity: newMaxKg, updated_at: new Date().toISOString() })
+      .eq('id', storeId);
+
+    return !error;
+  },
+
   getCurrentCapacity: async (storeId: number): Promise<CurrentCapacity | null> => {
     const { data, error } = await supabase
       .from('capacity_snapshots')
@@ -46,7 +85,7 @@ export const capacityService = {
       .limit(1)
       .single();
 
-    if (error) return null; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return null;
 
     return {
       currentKg: data.current_kg as number,
@@ -69,7 +108,7 @@ export const capacityService = {
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: true });
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     const rows = (data ?? []) as Array<{
       current_kg: number;
@@ -142,7 +181,7 @@ export const capacityService = {
       .eq('store_id', storeId)
       .order('created_at', { ascending: false });
 
-    if (error) return []; // TODO: implement Supabase query (tables exist in migration 0002_tables.sql)
+    if (error) return [];
 
     const rows = (data ?? []) as Array<{
       id: string;

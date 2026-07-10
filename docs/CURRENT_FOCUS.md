@@ -1,58 +1,79 @@
 # CURRENT FOCUS
 
-**Updated:** 2026-07-04
-**Sprint:** B0 — Stabilisasi Aplikasi
+**Updated:** 2026-07-10
+**Sprint:** Sprint E — Production Polish
 **Status:** SELESAI ✅
 
 ---
 
-## Sprint B0 — SELESAI
+## Riwayat Sprint (ringkasan)
 
-Sprint B0 telah berhasil diselesaikan. Semua 12 task telah diimplementasikan dan di-verify melalui TypeScript build (`tsc -b && vite build` PASS).
-
-### Yang Sudah Selesai (B0-01 s/d B0-12)
-
-| Task | Deskripsi | Status |
-|------|-----------|--------|
-| B0-01 | AuthContext: tambah `logout()` | ✅ |
-| B0-02 | DashboardPage: wire logout + userName real + notif + date click | ✅ |
-| B0-03 | KapasitasPage: wire logout + userName real + notif | ✅ |
-| B0-04 | RequestPickupPage: wire logout + userName real + notif | ✅ |
-| B0-05 | AppHeader: hapus Search Bar | ✅ |
-| B0-06 | NotifikasiPage: buat halaman placeholder + route + wire bell | ✅ |
-| B0-07 | RiwayatPickupPage: buat halaman placeholder + route | ✅ |
-| B0-08 | SideNav Manajer: expand dari 3 ke 7 item navigasi | ✅ |
-| B0-09 | StatusPickupCard: wire `onLihatSemua` prop | ✅ |
-| B0-10 | PickupSummaryCard: wire `onLihatSemua` prop + TODO per-row | ✅ |
-| B0-11 | DashboardHeader: tambah `onDateClick` prop (conditional button) | ✅ |
-| B0-12 | KelolaPenggunaPage, VendorManagementPage, LaporanPage: upgrade ke DashboardLayout | ✅ |
-
-### Temuan Kritis Sesi Ini
-
-🔴 **NTFS Mount Write Truncation Bug** — File yang ditulis via Edit/Write tool di-truncate di disk. Python writes ke NTFS mount diperlukan untuk memastikan commit ke disk. Semua 17 file B0 telah di-rewrite via Python dan diverifikasi.
-
-🟠 **Pre-existing Prettier Violations** — 1030 errors single-quote vs double-quote di seluruh codebase. Bukan dari B0. Perlu `npm run format` di sesi berikutnya.
+| Sprint | Scope | Status |
+|---|---|---|
+| Sprint A | Migrations 0007–0011, RLS, username auth, LoginPage, AuthCard | ✅ Selesai |
+| Sprint B (B0–B4) | Layout stabilization, navigation wiring, component fixes | ✅ Selesai |
+| Sprint C | Real Data Integration — semua pages dihubungkan ke Supabase | ✅ Selesai |
+| Sprint D Batch 1 | Pickup status lifecycle (confirm/complete/cancel + Aksi column) | ✅ Selesai |
+| Sprint D Batch 2 | Tambah Pengguna — Edge Function create-user + UI Manajer | ✅ Selesai |
+| Sprint E | Production polish — username fix, PengaturanPage, cleanup | ✅ Selesai |
 
 ---
 
-## Sprint B1 — NEXT (Real Data Integration)
+## Sprint E — Scope
 
-Sprint B1 akan menghubungkan semua widget ke Supabase:
-- Dashboard KPI cards → Supabase queries
-- Kapasitas → real-time capacity data
-- Pickup → real pickup records
-- Notifikasi → NOTIFICATION table polling (DL-04)
-- Riwayat Pickup → paginated pickup history
+### Batch 1 (Quick Wins) — Prioritas Tinggi
 
-**Pre-requisite sebelum B1:**
-1. Jalankan `npm run format` untuk fix Prettier violations
-2. Verify login + logout flow manual di browser
-3. Confirm semua 7 nav items muncul di SideNav
+| Task | File | Deskripsi |
+|---|---|---|
+| H-01 | `AuthContext.tsx`, `ProfilPage.tsx` | Tambah `username` ke fetchProfile + fix tampilan ProfilPage |
+| M-01 | `ProfilPage.tsx` | Ganti MOCK_LAST_LOGIN dengan `session.user.last_sign_in_at` |
+| M-02 | `wasteService.ts`, `pickupService.ts`, `capacityService.ts` | Hapus 10 stale TODO comments di error handlers |
+| M-03 | `wasteService.ts` | Hapus dead function `getWasteDailySummary` (tidak pernah dipanggil) |
+| L-01 | `PengaturanPage.tsx`, `ProfilPage.tsx` | Hapus teks "Sprint C" basi |
+
+### Batch 2 (Implementasi) — Prioritas Sedang
+
+| Task | File | Deskripsi |
+|---|---|---|
+| H-02 | `PengaturanPage.tsx` | Implementasi form edit max_capacity + info store |
+
+### Setelah Batch 2 — NEXT STEP
+
+- **Git push Sprint B–E ke GitHub** (dikerjakan manual oleh Project Leader)
+- Demo walkthrough semua role (manajer_demo + utility_demo)
+
+## Catatan Desain — Perilaku KapasitasPage setelah update max_capacity
+
+Setelah `max_capacity` di tabel `stores` diubah via PengaturanPage, `KapasitasPage`
+masih menampilkan nilai lama dari `capacity_snapshots.max_kg` hingga snapshot baru
+dibuat. Ini adalah **design behavior yang disengaja** — snapshot menyimpan nilai
+historis `max_kg` pada saat snapshot dibuat. Bukan bug.
 
 ---
 
 ## Constraint Aktif
 
-- GIT: DILARANG commit/push — dikontrol Project Leader
-- Backend: DILARANG sentuh supabase/migrations/
-- Mock data: semua widget masih pakai data hardcoded
+- **GIT:** DILARANG `git add`, `git commit`, `git push`, `git merge`, `git reset` — dikontrol Project Leader
+- **Backend:** Tidak ada migration baru untuk Sprint E (semua changes adalah frontend-only)
+- **Scope:** Hanya perbaikan yang tercatat di FINAL_PRODUCTION_READINESS_REVIEW.md
+
+---
+
+## State Terakhir yang Diverifikasi (10 Juli 2026)
+
+- `npm run build` → SUCCESS
+- `npx tsc -b --noEmit` → 0 errors
+- `npm run lint` → 0 problems
+- Dev server aktif, semua route accessible
+- Edge Function `create-user` → ACTIVE di Supabase project `nwivhbnuisrigiowvuri`
+- Migrations aktif: 0001–0013
+
+## Commits di GitHub (branch main)
+
+```
+f4742b2  chore: RC v1.0 — pre-Sprint D baseline         (10 Juli 2026)
+3a1af1c  docs: documentation audit — sync all docs to Sprint A state
+cf0390d  feat: Sprint A — RLS migrations, username auth, and frontend implementation
+```
+
+Sprint B–D belum di-push ke GitHub. Push berikutnya harus mencakup semua perubahan Sprint B s/d E.

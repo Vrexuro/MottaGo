@@ -9,12 +9,14 @@ interface ProfileRow {
   role: string;
   store_id: number | null;
   full_name: string | null;
+  username: string;
 }
 
 export interface ProfileData {
   role: UserRole;
   storeId: number | null;
   fullName: string | null;
+  username: string;
 }
 
 export interface AuthContextValue {
@@ -35,7 +37,7 @@ interface AuthProviderProps {
 async function fetchProfile(userId: string): Promise<ProfileData | null> {
   const { data } = await supabase
     .from('profiles')
-    .select('role, store_id, full_name')
+    .select('role, store_id, full_name, username')
     .eq('id', userId)
     .single();
 
@@ -46,6 +48,7 @@ async function fetchProfile(userId: string): Promise<ProfileData | null> {
     role: row.role as UserRole,
     storeId: row.store_id,
     fullName: row.full_name,
+    username: row.username,
   };
 }
 
