@@ -24,6 +24,13 @@ export const utilityNavItems: NavItem[] = [
     allowedRoles: ['utility'],
   },
   {
+    id: 'utility-riwayat-pickup',
+    label: 'Riwayat Pickup',
+    iconName: 'ClipboardList',
+    path: ROUTES.UTILITY_RIWAYAT_PICKUP,
+    allowedRoles: ['utility'],
+  },
+  {
     id: 'utility-riwayat',
     label: 'Riwayat Input',
     iconName: 'ClipboardList',

@@ -13,35 +13,26 @@ interface StatusItem {
 }
 
 interface StatusPickupCardProps {
-  waiting: number;
-  inTransit: number;
+  /** Jumlah pickup yang sedang berjalan (menunggu + dalam perjalanan digabung
+   * — Manajer hanya perlu tahu ada request aktif, bukan detail granular
+   * yang jadi wewenang operasional Utility). */
+  active: number;
   completedToday: number;
   className?: string;
   onLihatSemua?: () => void;
 }
 
 export function StatusPickupCard({
-  waiting,
-  inTransit,
+  active,
   completedToday,
   className,
   onLihatSemua,
 }: StatusPickupCardProps) {
   const STATUS_ITEMS: StatusItem[] = [
     {
-      id: 'waiting',
-      label: 'Menunggu Konfirmasi',
-      count: waiting,
-      iconName: 'Clock',
-      iconBgClass: 'bg-warning-bg',
-      iconColorClass: 'text-capacity-warning',
-      countColorClass: 'text-text-primary',
-      rowBgClass: 'bg-warning-bg',
-    },
-    {
-      id: 'in-transit',
-      label: 'Dalam Perjalanan',
-      count: inTransit,
+      id: 'active',
+      label: 'Sedang Berjalan',
+      count: active,
       iconName: 'Truck',
       iconBgClass: 'bg-info-bg',
       iconColorClass: 'text-info-text',
