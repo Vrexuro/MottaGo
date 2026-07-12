@@ -16,6 +16,11 @@ export interface ChartPoint {
   minyak: number;
 }
 
+export interface StoreInfo {
+  name: string;
+  city: string;
+}
+
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
 const DAY_LABELS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -106,5 +111,18 @@ export const reportService = {
     }
 
     return Array.from(buckets.values());
+  },
+
+  getStoreInfo: async (storeId: number): Promise<StoreInfo | null> => {
+    const { data, error } = await supabase
+      .from('stores')
+      .select('store_name, city')
+      .eq('id', storeId)
+      .single();
+
+    if (error || !data) return null;
+
+    const row = data as { store_name: string; city: string };
+    return { name: row.store_name, city: row.city };
   },
 };

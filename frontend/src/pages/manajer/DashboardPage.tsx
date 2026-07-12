@@ -130,10 +130,7 @@ function DashboardPage() {
               accent="orange"
               value={String(activePickups.length)}
               valueAccent
-              subtexts={[
-                `${pickupSummary?.waiting ?? 0} menunggu`,
-                `${pickupSummary?.inTransit ?? 0} dalam perjalanan`,
-              ]}
+              subtexts={['Sedang dijalankan Pegawai Utility']}
             />
             <KpiCard
               label="Pickup Bulan Ini"
@@ -151,8 +148,7 @@ function DashboardPage() {
             </div>
             <div className="md:col-span-2">
               <StatusPickupCard
-                waiting={pickupSummary?.waiting ?? 0}
-                inTransit={pickupSummary?.inTransit ?? 0}
+                active={(pickupSummary?.waiting ?? 0) + (pickupSummary?.inTransit ?? 0)}
                 completedToday={pickupSummary?.completedToday ?? 0}
                 className="w-full h-full"
                 onLihatSemua={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}

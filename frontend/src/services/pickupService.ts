@@ -89,32 +89,27 @@ export const pickupService = {
     return mapRow(data as PickupRow);
   },
 
+  // Bisa dibatalkan selama belum selesai — termasuk record lama yang
+  // sempat berstatus 'in-transit' dari alur konfirmasi yang sudah dihapus.
   cancelPickup: async (pickupId: string): Promise<boolean> => {
     const { error } = await supabase
       .from('pickups')
       .update({ status: 'cancelled' })
       .eq('id', pickupId)
-      .eq('status', 'waiting'); // Only cancel pickups still waiting for confirmation
+      .in('status', ['waiting', 'in-transit']);
 
     return !error;
   },
 
-  confirmPickup: async (pickupId: string): Promise<boolean> => {
-    const { error } = await supabase
-      .from('pickups')
-      .update({ status: 'in-transit' })
-      .eq('id', pickupId)
-      .eq('status', 'waiting');
-
-    return !error;
-  },
-
+  // Utility menyelesaikan pickup langsung dari status 'waiting' — tidak ada
+  // langkah "konfirmasi dalam perjalanan" terpisah. 'in-transit' tetap
+  // diterima di sini untuk kompatibilitas dengan record lama (pre-simplifikasi).
   completePickup: async (pickupId: string): Promise<boolean> => {
     const { error } = await supabase
       .from('pickups')
       .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', pickupId)
-      .eq('status', 'in-transit');
+      .in('status', ['waiting', 'in-transit']);
 
     return !error;
   },

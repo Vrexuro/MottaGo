@@ -12,7 +12,6 @@ import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { wasteService } from '../../services/wasteService';
 import { capacityService } from '../../services/capacityService';
-import { supabase } from '../../lib/supabase';
 import type { WasteType } from '../../types/waste.types';
 import type { SelectOption } from '../../types/common.types';
 import { WASTE_UNIT_MAP } from '../../constants/waste';
@@ -54,19 +53,23 @@ export default function CatatSampahPage() {
 
       if (!result) throw new Error('Gagal menyimpan data sampah');
 
-      const todayData = await wasteService.getWasteToday(storeId);
-      const { data: storeData } = await supabase
-        .from('stores')
-        .select('max_capacity')
-        .eq('id', storeId)
-        .single();
+      // currentCapacity dihitung live (akumulasi sejak pickup terakhir selesai,
+      // bukan sekadar "hari ini") — lihat capacityService.getCurrentCapacity.
+      const capacity = await capacityService.getCurrentCapacity(storeId);
 
-      if (todayData && storeData?.max_capacity) {
-        await capacityService.createSnapshot(
+      if (capacity && capacity.maxKg > 0) {
+        const snapshotOk = await capacityService.createSnapshot(
           storeId,
-          todayData.totalKg,
-          Number(storeData.max_capacity)
+          capacity.currentKg,
+          capacity.maxKg
         );
+        if (!snapshotOk) {
+          // Entri sampah sudah tersimpan — hanya catatan tren kapasitas yang
+          // gagal. Tetap beri tahu, tapi jangan blokir alur submit.
+          setError(
+            'Entri tersimpan, tapi gagal mencatat snapshot tren kapasitas. Data kapasitas terkini tetap akurat.'
+          );
+        }
       }
 
       setSubmitted(true);

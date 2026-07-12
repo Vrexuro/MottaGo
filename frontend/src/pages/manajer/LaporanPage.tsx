@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart,
@@ -12,10 +12,14 @@ import {
 } from 'recharts';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { KpiCard } from '../../components/molecules/KpiCard';
+import { Button } from '../../components/atoms/Button';
 import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { useReport } from '../../hooks/useReport';
+import { reportService } from '../../services/reportService';
+import type { StoreInfo } from '../../services/reportService';
+import { exportLaporanPdf } from '../../lib/pdfExport';
 
 const getCSSVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -47,6 +51,31 @@ export default function LaporanPage() {
   const [period, setPeriod] = useState<Period>('30d');
   const { kpi, chartData, loading, error } = useReport(storeId ?? 0, PERIOD_DAYS[period]);
 
+  const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    if (!storeId) return;
+    reportService.getStoreInfo(storeId).then(setStoreInfo);
+  }, [storeId]);
+
+  const handleExportPdf = () => {
+    if (!kpi) return;
+    setIsExporting(true);
+    try {
+      exportLaporanPdf({
+        storeName: storeInfo?.name ?? `Store #${storeId}`,
+        city: storeInfo?.city ?? '—',
+        periodLabel: PERIOD_LABELS[period],
+        generatedBy: userName,
+        kpi,
+        chartData,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (!storeId) {
     return (
       <DashboardLayout
@@ -73,24 +102,36 @@ export default function LaporanPage() {
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <h1 className="text-2xl font-semibold text-text-primary">Laporan Sampah</h1>
-            <div className="flex items-center gap-3">
-              {(['7d', '30d', '90d'] as Period[]).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPeriod(p)}
-                  className={[
-                    'text-xs transition-colors',
-                    period === p
-                      ? 'text-text-primary font-semibold'
-                      : 'text-text-secondary hover:text-text-primary',
-                  ].join(' ')}
-                >
-                  {PERIOD_LABELS[p]}
-                </button>
-              ))}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                {(['7d', '30d', '90d'] as Period[]).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    className={[
+                      'text-xs transition-colors',
+                      period === p
+                        ? 'text-text-primary font-semibold'
+                        : 'text-text-secondary hover:text-text-primary',
+                    ].join(' ')}
+                  >
+                    {PERIOD_LABELS[p]}
+                  </button>
+                ))}
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon="FileDown"
+                loading={isExporting}
+                disabled={!kpi || loading}
+                onClick={handleExportPdf}
+              >
+                Ekspor PDF
+              </Button>
             </div>
           </div>
 

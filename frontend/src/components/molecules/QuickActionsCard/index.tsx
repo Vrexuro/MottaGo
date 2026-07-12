@@ -13,9 +13,9 @@ interface ActionItem {
 
 const ACTION_ITEMS: ActionItem[] = [
   {
-    id: 'request-pickup',
-    to: ROUTES.MANAJER_PICKUP_REQUEST,
-    label: 'Request Pickup',
+    id: 'riwayat-pickup',
+    to: ROUTES.MANAJER_RIWAYAT_PICKUP,
+    label: 'Riwayat Pickup',
     iconName: 'Truck',
     iconBgClass: 'bg-accent-success-bg',
     iconColorClass: 'text-accent-success-text',
@@ -27,14 +27,6 @@ const ACTION_ITEMS: ActionItem[] = [
     iconName: 'FileText',
     iconBgClass: 'bg-warning-bg',
     iconColorClass: 'text-capacity-warning',
-  },
-  {
-    id: 'pengaturan-store',
-    to: ROUTES.MANAJER_PENGATURAN,
-    label: 'Pengaturan Store',
-    iconName: 'Settings',
-    iconBgClass: 'bg-mottago-surface-subtle',
-    iconColorClass: 'text-text-secondary',
   },
   {
     id: 'manajemen-vendor',

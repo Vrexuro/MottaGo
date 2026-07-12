@@ -52,8 +52,9 @@ export default function UtilityDashboardPage() {
     );
   }
 
-  const totalEntri = (today?.byCategory ?? []).length;
+  const totalEntri = today?.entryCount ?? 0;
   const totalKg = today?.totalKg ?? 0;
+  const totalLiter = today?.totalLiter ?? 0;
   const kapasitasKg = currentCapacity?.currentKg ?? 0;
   const maxKg = currentCapacity?.maxKg ?? 0;
   const kapasitasPct = maxKg > 0 ? Math.round((kapasitasKg / maxKg) * 100) : 0;
@@ -88,8 +89,8 @@ export default function UtilityDashboardPage() {
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
           <DashboardHeader title="Dashboard" userName={userName} />
 
-          {/* 4 KPI Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* 5 KPI Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <KpiCard
               label="Entri Hari Ini"
               iconName="PenLine"
@@ -103,6 +104,13 @@ export default function UtilityDashboardPage() {
               accent="success"
               value={String(totalKg)}
               unit="kg"
+            />
+            <KpiCard
+              label="Total Minyak"
+              iconName="Droplet"
+              accent="warning"
+              value={String(totalLiter)}
+              unit="liter"
             />
             <KpiCard
               label="Pickup Aktif"

@@ -17,13 +17,6 @@ export const manajerNavItems: NavItem[] = [
     allowedRoles: ['manajer'],
   },
   {
-    id: 'manajer-pickup-request',
-    label: 'Request Pickup',
-    iconName: 'Truck',
-    path: ROUTES.MANAJER_PICKUP_REQUEST,
-    allowedRoles: ['manajer'],
-  },
-  {
     id: 'manajer-riwayat-pickup',
     label: 'Riwayat Pickup',
     iconName: 'ClipboardList',

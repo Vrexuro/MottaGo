@@ -6,7 +6,6 @@ import LoginPage from '../pages/LoginPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import DashboardPage from '../pages/manajer/DashboardPage';
 import KapasitasPage from '../pages/manajer/KapasitasPage';
-import RequestPickupPage from '../pages/manajer/RequestPickupPage';
 import KelolaPenggunaPage from '../pages/manajer/KelolaPenggunaPage';
 import VendorManagementPage from '../pages/manajer/VendorManagementPage';
 import LaporanPage from '../pages/manajer/LaporanPage';
@@ -17,6 +16,7 @@ import CatatSampahPage from '../pages/utility/CatatSampahPage';
 import RiwayatInputPage from '../pages/utility/RiwayatInputPage';
 import ProfilPage from '../pages/utility/ProfilPage';
 import UtilityRequestPickupPage from '../pages/utility/UtilityRequestPickupPage';
+import UtilityRiwayatPickupPage from '../pages/utility/UtilityRiwayatPickupPage';
 import PengaturanPage from '../pages/manajer/PengaturanPage';
 
 export const router = createBrowserRouter([
@@ -48,14 +48,6 @@ export const router = createBrowserRouter([
     element: (
       <RoleGuard allowedRoles={['manajer']}>
         <KapasitasPage />
-      </RoleGuard>
-    ),
-  },
-  {
-    path: ROUTES.MANAJER_PICKUP_REQUEST,
-    element: (
-      <RoleGuard allowedRoles={['manajer']}>
-        <RequestPickupPage />
       </RoleGuard>
     ),
   },
@@ -126,6 +118,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES.UTILITY_RIWAYAT_PICKUP,
+    element: (
+      <RoleGuard allowedRoles={['utility']}>
+        <UtilityRiwayatPickupPage />
+      </RoleGuard>
+    ),
+  },
+  {
     path: ROUTES.UTILITY_RIWAYAT_INPUT,
     element: (
       <RoleGuard allowedRoles={['utility']}>
@@ -150,7 +150,7 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // ── Fallback ──────────────────────────────────────────────────────────────────────────────────────
+  // ── Fallback ────────────────────────────────────────────────────────────────────────────────
   {
     path: '*',
     element: <Navigate to={ROUTES.NOT_FOUND} replace />,

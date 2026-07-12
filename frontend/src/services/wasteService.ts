@@ -49,7 +49,12 @@ export const wasteService = {
 
     const rows = (data ?? []) as Array<{ waste_type: WasteType; quantity: number }>;
     const byCategory = aggregateByType(rows);
-    const totalKg = byCategory.reduce((sum, c) => sum + c.totalKg, 0);
+    // minyak jelantah diukur dalam liter, bukan kg — jangan dijumlahkan
+    // bersama organik/anorganik (kg) ke satu angka yang sama.
+    const totalKg = byCategory
+      .filter((c) => c.type !== 'minyak')
+      .reduce((sum, c) => sum + c.totalKg, 0);
+    const totalLiter = byCategory.find((c) => c.type === 'minyak')?.totalKg ?? 0;
 
     const since7d = new Date();
     since7d.setDate(since7d.getDate() - 7);
@@ -57,6 +62,7 @@ export const wasteService = {
       .from('waste_items')
       .select('quantity_kg')
       .eq('store_id', storeId)
+      .neq('waste_type', 'minyak') // rata-rata harian dipakai untuk proyeksi kapasitas (kg)
       .gte('created_at', since7d.toISOString());
 
     const weekKg = ((weekData ?? []) as Array<{ quantity_kg: number }>).reduce(
@@ -68,8 +74,10 @@ export const wasteService = {
     return {
       date: today,
       totalKg,
+      totalLiter,
       rataHarian,
       byCategory,
+      entryCount: rows.length,
     };
   },
 

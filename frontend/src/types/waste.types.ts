@@ -22,7 +22,9 @@ export interface WasteTrendPoint {
 // Aggregated waste data for a single day
 export interface WasteDailySummary {
   date: string; // ISO date 'YYYY-MM-DD'
-  totalKg: number; // sum across all categories (mock: 47.3 kg today)
-  rataHarian: number; // 7-day rolling average kg/day (mock: 38.5 kg/day)
+  totalKg: number; // organik + anorganik saja (satuan kg) — TIDAK termasuk minyak (liter)
+  totalLiter: number; // minyak jelantah saja (satuan liter)
+  rataHarian: number; // 7-day rolling average kg/day, organik+anorganik saja
   byCategory: WasteCategory[];
+  entryCount: number; // jumlah baris waste_items hari ini (bukan jumlah kategori)
 }

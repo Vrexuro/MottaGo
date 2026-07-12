@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertBanner } from '../../components/molecules/AlertBanner';
 import { FormLayout } from '../../layouts/FormLayout';
 import { KpiCard } from '../../components/molecules/KpiCard';
@@ -15,6 +15,11 @@ import { useCapacity } from '../../hooks/useCapacity';
 import { useWaste } from '../../hooks/useWaste';
 import { useVendor } from '../../hooks/useVendor';
 import { usePickup } from '../../hooks/usePickup';
+import {
+  storeVendorAssignmentService,
+  type VendorAssignmentMap,
+} from '../../services/storeVendorAssignmentService';
+import { capacityService } from '../../services/capacityService';
 import type { CreatePickupDto } from '../../types/pickup.types';
 
 const KATEGORI_OPTIONS = [
@@ -45,7 +50,6 @@ function UtilityRequestPickupPage() {
     rataHarianKg > 0 ? Math.round(((maxKg - currentKg) / rataHarianKg) * 10) / 10 : null;
 
   const { vendors, loading: vendorsLoading } = useVendor();
-  const vendorOptions = vendors.map((v) => ({ value: String(v.id), label: v.name }));
   const { activePickups, create } = usePickup(storeId ?? 0);
 
   const [selectedVendorId, setSelectedVendorId] = useState('');
@@ -54,8 +58,34 @@ function UtilityRequestPickupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [vendorAssignments, setVendorAssignments] = useState<VendorAssignmentMap>({
+    organik: null,
+    anorganik: null,
+    minyak: null,
+  });
+
+  // Vendor default per kategori (diatur Manajer di Vendor Management) —
+  // dimuat sekali per store.
+  useEffect(() => {
+    if (!storeId) return;
+    storeVendorAssignmentService.getAssignments(storeId).then(setVendorAssignments);
+  }, [storeId]);
+
+  // Vendor SELALU mengikuti penugasan kategori — Utility tidak berwenang
+  // memilih vendor secara manual (penugasan adalah wewenang Manajer di
+  // Vendor Management). Field ini hanya tampilan read-only.
+  useEffect(() => {
+    const assignedId = vendorAssignments[selectedKategori];
+    if (assignedId !== null && vendors.some((v) => v.id === assignedId)) {
+      setSelectedVendorId(String(assignedId));
+    } else {
+      setSelectedVendorId('');
+    }
+  }, [selectedKategori, vendorAssignments, vendors]);
 
   const isNoVendor = !vendorsLoading && vendors.length === 0;
+  const assignedVendor = vendors.find((v) => String(v.id) === selectedVendorId) ?? null;
+  const hasDefaultVendor = assignedVendor !== null;
   const isActivePickup = activePickups.some((p) => p.wasteCategory === selectedKategori);
   const activePickupForKategori = activePickups.find((p) => p.wasteCategory === selectedKategori);
   const submitDisabled = isActivePickup || isNoVendor || isSubmitting || !selectedVendorId;
@@ -67,10 +97,20 @@ function UtilityRequestPickupPage() {
     setError(null);
 
     try {
+      // Estimasi = akumulasi live kategori ini SAAT request dibuat (bukan
+      // input manual) — mencerminkan jumlah sampah yang benar-benar
+      // menumpuk menunggu pickup, dihitung dengan logika yang sama dengan
+      // gauge Kapasitas per Kategori.
+      const estimasiKg = await capacityService.getCurrentValueForCategory(
+        storeId,
+        selectedKategori
+      );
+
       const result = await create({
         storeId,
         vendorId: Number(selectedVendorId),
         wasteCategory: selectedKategori,
+        estimasiKg: estimasiKg > 0 ? estimasiKg : undefined,
       });
 
       if (!result) {
@@ -80,7 +120,6 @@ function UtilityRequestPickupPage() {
       }
 
       setIsSuccess(true);
-      setSelectedVendorId('');
       setTimeout(() => setIsSuccess(false), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
@@ -147,6 +186,13 @@ function UtilityRequestPickupPage() {
             description="Hubungi manajer untuk menambahkan vendor."
           />
         )}
+        {!isNoVendor && !hasDefaultVendor && (
+          <AlertBanner
+            variant="warning"
+            title="Belum ada vendor default untuk kategori ini."
+            description="Hubungi manajer untuk menugaskan vendor di halaman Manajemen Vendor. Pickup tidak dapat dibuat sampai vendor ditugaskan."
+          />
+        )}
 
         {/* ── Zone D — Form Card ───────────────────────────── */}
         <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
@@ -168,24 +214,25 @@ function UtilityRequestPickupPage() {
               />
             </FormField>
 
+            {/* Vendor mengikuti penugasan kategori dari Manajer — Utility
+                hanya melihat, tidak memilih. */}
             <FormField
               label="Vendor"
-              htmlFor="vendor-select"
+              htmlFor="vendor-display"
               required
-              helpText={
-                isNoVendor
-                  ? 'Belum ada vendor aktif. Hubungi manajer.'
-                  : 'Hanya vendor aktif yang ditampilkan.'
-              }
+              helpText="Ditentukan otomatis oleh Manajer berdasarkan kategori waste — bukan pilihan Utility."
             >
-              <SelectInput
-                id="vendor-select"
-                options={isNoVendor ? [] : vendorOptions}
-                placeholder="Pilih vendor..."
-                value={selectedVendorId}
-                onChange={(e) => setSelectedVendorId(e.target.value)}
-                disabled={isNoVendor}
-              />
+              <div
+                id="vendor-display"
+                className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-[var(--radius-md)] border border-mottago-border bg-mottago-surface-subtle text-text-primary min-h-[38px]"
+              >
+                <Icon name="Lock" size={16} className="text-text-disabled shrink-0" />
+                {hasDefaultVendor ? (
+                  <span className="font-medium">{assignedVendor?.name}</span>
+                ) : (
+                  <span className="text-text-disabled">Belum ada vendor untuk kategori ini</span>
+                )}
+              </div>
             </FormField>
           </div>
 

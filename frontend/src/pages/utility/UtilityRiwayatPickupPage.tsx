@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { Badge } from '../../components/atoms/Badge';
-import { manajerNavItems } from '../../router/navigation';
+import { Button } from '../../components/atoms/Button';
+import { utilityNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { usePickup } from '../../hooks/usePickup';
@@ -33,26 +35,73 @@ function formatTanggalWaktu(iso: string): string {
   return `${tanggal}, ${waktu}`;
 }
 
-// Catatan: halaman ini bersifat monitoring saja (read-only) untuk Manajer.
-// Perubahan status pickup (menandai selesai/batalkan) adalah wewenang
-// Pegawai Utility — lihat pages/utility/UtilityRiwayatPickupPage.tsx.
-export default function RiwayatPickupPage() {
+// Pegawai Utility berwenang mengubah status pickup — cukup tandai "Selesai"
+// begitu vendor mengambil sampah, atau "Batalkan" jika request dibatalkan.
+// Tidak ada langkah konfirmasi terpisah untuk status "dalam perjalanan".
+// Manajer hanya memantau — lihat pages/manajer/RiwayatPickupPage.tsx (read-only).
+export default function UtilityRiwayatPickupPage() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
-  const userName = profile?.fullName ?? 'Manajer';
+  const userName = profile?.fullName ?? 'Utility';
   const storeId = profile?.storeId ?? null;
 
-  const { activePickups, pickupHistory, loading } = usePickup(storeId ?? 0);
+  const { activePickups, pickupHistory, loading, cancel, complete } = usePickup(storeId ?? 0);
   const allPickups: Pickup[] = [...activePickups, ...pickupHistory];
+
+  type PendingAction = { pickupId: string; action: 'complete' | 'cancel' };
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [isActing, setIsActing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const CONFIRM_TEXT: Record<PendingAction['action'], string> = {
+    complete: 'Tandai pickup ini sebagai selesai? Vendor telah mengambil sampah.',
+    cancel: 'Batalkan request pickup ini? Tindakan ini tidak dapat diurungkan.',
+  };
+
+  const CONFIRM_LABEL: Record<PendingAction['action'], string> = {
+    complete: 'Ya, Selesaikan',
+    cancel: 'Ya, Batalkan',
+  };
+
+  const CONFIRM_VARIANT: Record<PendingAction['action'], 'primary' | 'danger'> = {
+    complete: 'primary',
+    cancel: 'danger',
+  };
+
+  const handleAction = (pickupId: string, action: PendingAction['action']) => {
+    setActionError(null);
+    setPendingAction({ pickupId, action });
+  };
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+    setIsActing(true);
+    setActionError(null);
+
+    const { pickupId, action } = pendingAction;
+    const success = action === 'complete' ? await complete(pickupId) : await cancel(pickupId);
+
+    setIsActing(false);
+    if (success) {
+      setPendingAction(null);
+    } else {
+      setActionError('Tindakan gagal. Mungkin status pickup sudah berubah. Refresh halaman.');
+    }
+  };
+
+  const handleCancelAction = () => {
+    setPendingAction(null);
+    setActionError(null);
+  };
 
   if (!storeId) {
     return (
       <DashboardLayout
-        navItems={manajerNavItems}
-        userRole="manajer"
+        navItems={utilityNavItems}
+        userRole="utility"
         userName={userName}
         onLogout={logout}
-        onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+        onNotificationClick={() => {}}
       >
         <div className="flex items-center justify-center p-8 text-text-secondary">
           <p>Store tidak ditemukan. Hubungi administrator.</p>
@@ -63,28 +112,40 @@ export default function RiwayatPickupPage() {
 
   return (
     <DashboardLayout
-      navItems={manajerNavItems}
-      userRole="manajer"
+      navItems={utilityNavItems}
+      userRole="utility"
       userName={userName}
       onLogout={logout}
-      onNotificationClick={() => navigate(ROUTES.MANAJER_NOTIFICATIONS)}
+      onNotificationClick={() => {}}
     >
       <div className="min-h-full bg-mottago-surface-subtle">
         <div className="max-w-[1280px] mx-auto p-4 md:p-6 lg:p-8 space-y-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-text-primary">Riwayat Pickup</h1>
-            <p className="text-sm text-text-secondary mt-1">
-              Total {allPickups.length} pickup · Mode pemantauan (perubahan status dilakukan oleh
-              Pegawai Utility)
-            </p>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-text-primary">Riwayat Pickup</h1>
+              <p className="text-sm text-text-secondary mt-1">Total {allPickups.length} pickup</p>
+            </div>
+            <Button
+              variant="primary"
+              leftIcon="Truck"
+              onClick={() => navigate(ROUTES.UTILITY_REQUEST_PICKUP)}
+            >
+              Request Pickup
+            </Button>
           </div>
+
+          {actionError && (
+            <div className="bg-error-bg border border-error-border text-error-text text-sm px-4 py-3 rounded-[var(--radius-md)]">
+              {actionError}
+            </div>
+          )}
 
           {loading && allPickups.length === 0 ? (
             <div className="p-8 text-text-secondary">Memuat data...</div>
           ) : (
             <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[880px]">
+                <table className="w-full min-w-[980px]">
                   <thead>
                     <tr className="border-b border-mottago-border bg-mottago-surface-subtle">
                       <th className="px-4 md:px-5 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
@@ -107,6 +168,9 @@ export default function RiwayatPickupPage() {
                       </th>
                       <th className="px-4 md:px-5 py-2.5 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
                         Status
+                      </th>
+                      <th className="px-4 md:px-5 py-2.5 text-right text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                        Aksi
                       </th>
                     </tr>
                   </thead>
@@ -151,6 +215,28 @@ export default function RiwayatPickupPage() {
                             {STATUS_LABEL[pickup.status]}
                           </Badge>
                         </td>
+                        <td className="px-4 md:px-5 py-3.5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-3">
+                            {(pickup.status === 'waiting' || pickup.status === 'in-transit') && (
+                              <button
+                                type="button"
+                                onClick={() => handleAction(pickup.id, 'complete')}
+                                className="text-xs font-medium text-success-text hover:opacity-80 transition-opacity"
+                              >
+                                Selesaikan
+                              </button>
+                            )}
+                            {(pickup.status === 'waiting' || pickup.status === 'in-transit') && (
+                              <button
+                                type="button"
+                                onClick={() => handleAction(pickup.id, 'cancel')}
+                                className="text-xs font-medium text-error-text hover:opacity-80 transition-opacity"
+                              >
+                                Batalkan
+                              </button>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -160,6 +246,42 @@ export default function RiwayatPickupPage() {
           )}
         </div>
       </div>
+
+      {/* ── Action Confirm Modal ──────────────────── */}
+      {pendingAction && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="action-dialog-title"
+        >
+          <div className="bg-mottago-surface border border-mottago-border rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] p-6 w-full max-w-sm space-y-4">
+            <h2 id="action-dialog-title" className="text-base font-semibold text-text-primary">
+              Konfirmasi Tindakan
+            </h2>
+            <p className="text-sm text-text-secondary">{CONFIRM_TEXT[pendingAction.action]}</p>
+            {actionError && <p className="text-sm text-error-text">{actionError}</p>}
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleCancelAction}
+                disabled={isActing}
+              >
+                Batal
+              </Button>
+              <Button
+                variant={CONFIRM_VARIANT[pendingAction.action]}
+                size="sm"
+                loading={isActing}
+                onClick={handleConfirmAction}
+              >
+                {CONFIRM_LABEL[pendingAction.action]}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

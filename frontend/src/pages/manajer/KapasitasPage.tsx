@@ -11,8 +11,8 @@ import { manajerNavItems } from '../../router/navigation';
 import { ROUTES } from '../../router/routes';
 import { useAuth } from '../../hooks/useAuth';
 import { useCapacity } from '../../hooks/useCapacity';
-import { useWaste } from '../../hooks/useWaste';
-import { useEffect } from 'react';
+import { capacityService, type CategoryCapacity } from '../../services/capacityService';
+import { useEffect, useState } from 'react';
 
 function KapasitasPage() {
   const { profile, logout } = useAuth();
@@ -28,7 +28,20 @@ function KapasitasPage() {
     loading: capacityLoading,
     fetchTrend,
   } = useCapacity(storeId ?? 0);
-  const { categories, loading: wasteLoading } = useWaste(storeId ?? 0);
+
+  const [categoryCapacities, setCategoryCapacities] = useState<CategoryCapacity[]>([]);
+  const [categoryLoading, setCategoryLoading] = useState(true);
+
+  useEffect(() => {
+    if (!storeId) {
+      setCategoryLoading(false);
+      return;
+    }
+    capacityService.getCategoryCapacities(storeId).then((data) => {
+      setCategoryCapacities(data ?? []);
+      setCategoryLoading(false);
+    });
+  }, [storeId]);
 
   useEffect(() => {
     if (!storeId) return;
@@ -51,7 +64,7 @@ function KapasitasPage() {
     );
   }
 
-  const loading = capacityLoading || wasteLoading;
+  const loading = capacityLoading || categoryLoading;
   const currentKg = currentCapacity?.currentKg ?? 0;
   const maxKg = currentCapacity?.maxKg ?? 0;
   const lastUpdated = currentCapacity?.lastUpdated
@@ -60,14 +73,6 @@ function KapasitasPage() {
   const wasteHariIniKg = summary?.wasteHariIniKg ?? 0;
   const rataHarianKg = summary?.rataHarianKg ?? 0;
   const pct = maxKg > 0 ? Math.round((currentKg / maxKg) * 100) : 0;
-  const kategoriKg: Record<'organik' | 'anorganik' | 'minyak', number> = {
-    organik: 0,
-    anorganik: 0,
-    minyak: 0,
-  };
-  for (const cat of categories) {
-    if (cat.type in kategoriKg) kategoriKg[cat.type as keyof typeof kategoriKg] = cat.totalKg;
-  }
 
   if (loading) {
     return (
@@ -116,9 +121,9 @@ function KapasitasPage() {
               <Button
                 variant="primary"
                 leftIcon="Truck"
-                onClick={() => navigate(ROUTES.MANAJER_PICKUP_REQUEST)}
+                onClick={() => navigate(ROUTES.MANAJER_RIWAYAT_PICKUP)}
               >
-                Request Pickup
+                Lihat Riwayat Pickup
               </Button>
             </div>
           </div>
@@ -155,13 +160,7 @@ function KapasitasPage() {
 
           {/* ── Row 4: Category Breakdown 50% + Threshold 50% ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CategoryBreakdownCard
-              organik={kategoriKg.organik}
-              anorganik={kategoriKg.anorganik}
-              minyak={kategoriKg.minyak}
-              maxKg={maxKg}
-              className="min-h-[240px]"
-            />
+            <CategoryBreakdownCard categories={categoryCapacities} className="min-h-[240px]" />
             <StatusThresholdCard currentPct={pct} />
           </div>
 
